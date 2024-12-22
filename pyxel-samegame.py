@@ -12,9 +12,18 @@ BUTTON_SPACING = 5
 BUTTON_Y = 5
 COLORS = [8, 11, 12]  # 赤、緑、青を表すPyxelのパレット番号
 DEFAULT_TOP_SCORES = [100, 90, 80, 70, 60, 50, 40, 30, 20, 10]  # デフォルトのトップ10スコア
+MAX_COLORS = 12  # 最大の色数
 
 class SameGame:
     def __init__(self):
+        # 基本設定
+        self.low_threshold = 3  # 少ないコマの閾値
+        self.mid_threshold = 6  # 中くらいのコマの閾値
+        self.base_speed = 15  # 音の長さの基本値
+        self.high_octave_shift = 12  # 高いオクターブの音程シフト
+        self.mid_octave_shift = 0  # 中くらいオクターブの音程シフト
+        self.low_octave_shift = -12  # 低いオクターブの音程シフト
+
         pyxel.init(WINDOW_WIDTH, WINDOW_HEIGHT)
         pyxel.mouse(True)
         pyxel.title = "SameGame"
@@ -28,13 +37,18 @@ class SameGame:
         pyxel.run(self.update, self.draw)
 
     def create_sounds(self):
-        pyxel.sound(0).set(
-            notes="c3e3g3c4",
-            tones="p",
-            volumes="7",
-            effects="n",
-            speed=15
-        )
+        # 各色ごとにベース音風の低音を設定
+        self.sounds = {}
+        self.base_notes = ["c2", "d2", "e2", "f2", "g2", "a2", "b2", "c3", "d3", "e3", "f3", "g3"]
+        for i in range(MAX_COLORS):
+            pyxel.sounds[i].set(
+                notes=self.base_notes[i % len(self.base_notes)],  # 音階を割り当て
+                tones="p",  # パーカッシブ音
+                volumes="5",  # 音量
+                effects="n",  # ノーマル
+                speed=self.base_speed,  # 音の長さの基本値
+            )
+            self.sounds[i] = self.base_notes[i % len(self.base_notes)]  # 音階を記録
 
     def reset_game(self):
         self.grid = [[pyxel.rndi(0, len(COLORS) - 1) for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
@@ -98,11 +112,48 @@ class SameGame:
         # 消すコマを探索
         blocks_to_remove = self.find_connected_blocks(x, y, color)
         if len(blocks_to_remove) > 1:  # 隣接するブロックが2個以上なら消去
-            pyxel.play(0, 0)  # 音を再生
+            note_shift, sound_length = self.get_sound_settings(len(blocks_to_remove))
+            base_note = self.sounds[color]  # ベース音の取得
+            shifted_note = self.shift_note(base_note, note_shift)  # オクターブシフト適用
+            pyxel.sounds[color].set(
+                notes=shifted_note,  # シフト後の音階を設定
+                tones="p",
+                volumes="5",
+                effects="n",
+                speed=sound_length,
+            )
+            pyxel.play(0, color)  # コマの色に応じた音を再生
             for bx, by in blocks_to_remove:
                 self.grid[by][bx] = -1  # 消去
             self.score += len(blocks_to_remove)
             self.apply_gravity()
+
+    def shift_note(self, base_note, shift):
+        """
+        ベース音(base_note)をオクターブシフト(shift)させる。
+        """
+        note_mapping = {"c": 0, "d": 2, "e": 4, "f": 5, "g": 7, "a": 9, "b": 11}
+        note, octave = base_note[:-1], int(base_note[-1])  # ノート部分とオクターブを分割
+        note_index = note_mapping[note] + shift  # ノート番号にシフトを適用
+
+        new_octave = octave + (note_index // 12)  # オクターブの調整
+        new_note = list(note_mapping.keys())[note_index % 12]  # 新しいノート
+        return f"{new_note}{new_octave}"
+
+    def get_sound_settings(self, block_count):
+        """
+        コマの数に応じたオクターブと音の長さを取得
+        """
+        if block_count <= self.low_threshold:
+            note_shift = self.low_octave_shift
+            sound_length = self.base_speed + 5  # 長め
+        elif block_count <= self.mid_threshold:
+            note_shift = self.mid_octave_shift
+            sound_length = self.base_speed  # 通常
+        else:
+            note_shift = self.high_octave_shift
+            sound_length = self.base_speed - 5  # 短め
+        return note_shift, sound_length
 
     def find_connected_blocks(self, x, y, color):
         stack = [(x, y)]
