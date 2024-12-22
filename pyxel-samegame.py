@@ -35,13 +35,13 @@ class Button:
 class SameGame:
     def __init__(self):
         self.difficulty_levels = {
-            "easy": {"grid_size": 5, "colors": 3, "time_limit": None, "score_multiplier": 1.0},
-            "normal": {"grid_size": 8, "colors": 4, "time_limit": None, "score_multiplier": 1.2},
-            "hard": {"grid_size": 10, "colors": 5, "time_limit": 60, "score_multiplier": 1.5},
-            "very_hard": {"grid_size": 12, "colors": 6, "time_limit": 45, "score_multiplier": 2.0},
-            "expert": {"grid_size": 15, "colors": 8, "time_limit": 30, "score_multiplier": 3.0},
+            "Easy": {"grid_size": 5, "colors": 3, "time_limit": None, "score_multiplier": 1.0},
+            "Normal": {"grid_size": 8, "colors": 4, "time_limit": None, "score_multiplier": 1.2},
+            "Hard": {"grid_size": 10, "colors": 5, "time_limit": 60, "score_multiplier": 1.5},
+            "Very Hard": {"grid_size": 12, "colors": 6, "time_limit": 45, "score_multiplier": 2.0},
+            "Expert": {"grid_size": 15, "colors": 8, "time_limit": 30, "score_multiplier": 3.0},
         }
-        self.current_difficulty = "easy"
+        self.current_difficulty = "Easy"
         self.grid_size = self.difficulty_levels[self.current_difficulty]["grid_size"]
         self.num_colors = self.difficulty_levels[self.current_difficulty]["colors"]
         self.time_limit = self.difficulty_levels[self.current_difficulty]["time_limit"]
@@ -74,7 +74,7 @@ class SameGame:
             {"label": "Expert", "description": "Maximum challenge"},
         ]
         # ボタンを縦に並べるための開始位置を計算
-        start_x = (WINDOW_WIDTH - BUTTON_WIDTH) // 2
+        start_x = (WINDOW_WIDTH - BUTTON_WIDTH) // 2 - 60
         start_y = 40
         for i, diff in enumerate(difficulties):
             x = start_x
@@ -161,7 +161,7 @@ class SameGame:
                 self.state = "opening"
 
     def apply_difficulty_settings(self):
-        settings = self.difficulty_levels[self.current_difficulty.lower()]
+        settings = self.difficulty_levels[self.current_difficulty]
         self.grid_size = settings["grid_size"]
         self.num_colors = settings["colors"]
         self.time_limit = settings["time_limit"]
