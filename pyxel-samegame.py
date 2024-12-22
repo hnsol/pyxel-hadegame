@@ -1,106 +1,153 @@
 import pyxel
+import copy
 
 # 定数の設定
-GRID_WIDTH = 5
-GRID_HEIGHT = 5
-CELL_SIZE = 40  # 各セルのサイズ
 WINDOW_WIDTH = 240
 WINDOW_HEIGHT = 240
-BUTTON_WIDTH = 40
-BUTTON_HEIGHT = 15
-BUTTON_SPACING = 5
-BUTTON_Y = 5
-COLORS = [8, 11, 12]  # 赤、緑、青を表すPyxelのパレット番号
-DEFAULT_TOP_SCORES = [100, 90, 80, 70, 60, 50, 40, 30, 20, 10]  # デフォルトのトップ10スコア
-MAX_COLORS = 12  # 最大の色数
+
+BUTTON_WIDTH = 80
+BUTTON_HEIGHT = 20
+BUTTON_SPACING = 10
+BUTTON_AREA_HEIGHT = 100  # ボタンエリアの高さ（縦にボタンを並べるため拡大）
+STATUS_AREA_HEIGHT = 30  # 表示エリアの高さ
+
+COLORS = [8, 11, 12, 13, 14, 15, 6, 7]  # 使用可能なPyxelの色番号
+DEFAULT_TOP_SCORES = [5120, 2560, 1280, 640, 320, 160, 80, 40, 20, 10]  # デフォルトのトップ10スコア
+
+class Button:
+    def __init__(self, x, y, width, height, label):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.label = label
+
+    def is_hovered(self, mx, my):
+        return self.x <= mx <= self.x + self.width and self.y <= my <= self.y + self.height
+
+    def draw(self, is_hovered):
+        color = pyxel.COLOR_LIGHT_BLUE if is_hovered else pyxel.COLOR_GRAY
+        pyxel.rect(self.x, self.y, self.width, self.height, color)
+        text_x = self.x + (self.width // 2) - (len(self.label) * 2)
+        text_y = self.y + (self.height // 2) - 4
+        pyxel.text(text_x, text_y, self.label.capitalize(), pyxel.COLOR_WHITE)
 
 class SameGame:
     def __init__(self):
-        # 基本設定
-        self.low_threshold = 3  # 少ないコマの閾値
-        self.mid_threshold = 6  # 中くらいのコマの閾値
-        self.base_speed = 15  # 音の長さの基本値
-        self.high_octave_shift = 12  # 高いオクターブの音程シフト
-        self.mid_octave_shift = 0  # 中くらいオクターブの音程シフト
-        self.low_octave_shift = -12  # 低いオクターブの音程シフト
+        self.difficulty_levels = {
+            "easy": {"grid_size": 5, "colors": 3, "time_limit": None, "score_multiplier": 1.0},
+            "normal": {"grid_size": 8, "colors": 4, "time_limit": None, "score_multiplier": 1.2},
+            "hard": {"grid_size": 10, "colors": 5, "time_limit": 60, "score_multiplier": 1.5},
+            "very_hard": {"grid_size": 12, "colors": 6, "time_limit": 45, "score_multiplier": 2.0},
+            "expert": {"grid_size": 15, "colors": 8, "time_limit": 30, "score_multiplier": 3.0},
+        }
+        self.current_difficulty = "easy"
+        self.grid_size = self.difficulty_levels[self.current_difficulty]["grid_size"]
+        self.num_colors = self.difficulty_levels[self.current_difficulty]["colors"]
+        self.time_limit = self.difficulty_levels[self.current_difficulty]["time_limit"]
+        self.score_multiplier = self.difficulty_levels[self.current_difficulty]["score_multiplier"]
 
         pyxel.init(WINDOW_WIDTH, WINDOW_HEIGHT)
         pyxel.mouse(True)
         pyxel.title = "SameGame"
         self.state = "opening"
-        self.high_scores = DEFAULT_TOP_SCORES[:]  # デフォルトのトップ10スコア
-        self.current_score_rank = None  # 今回のスコアの順位
+        self.high_scores = DEFAULT_TOP_SCORES[:]
+        self.current_score_rank = None
+        self.start_time = None
         self.initial_grid = []
-        self.reset_game()
+        self.reset_game(initial=True)
         self.create_sounds()
-        self.gave_up = False  # ギブアップフラグ
+
+        # 難易度選択用ボタンの作成
+        self.difficulty_buttons = []
+        self.create_difficulty_buttons()
+
         pyxel.run(self.update, self.draw)
 
+    def create_difficulty_buttons(self):
+        # 各難易度のラベルと説明
+        difficulties = [
+            {"label": "Easy", "description": "Small grid, few colors"},
+            {"label": "Normal", "description": "Larger grid, more colors"},
+            {"label": "Hard", "description": "Timed play"},
+            {"label": "Very Hard", "description": "Shorter time"},
+            {"label": "Expert", "description": "Maximum challenge"},
+        ]
+        # ボタンを縦に並べるための開始位置を計算
+        start_x = (WINDOW_WIDTH - BUTTON_WIDTH) // 2
+        start_y = 40
+        for i, diff in enumerate(difficulties):
+            x = start_x
+            y = start_y + i * (BUTTON_HEIGHT + BUTTON_SPACING)
+            self.difficulty_buttons.append(Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, diff["label"]))
+        self.difficulties = difficulties  # 説明のために保持
+
     def create_sounds(self):
-        # 各色ごとにベース音風の低音を設定
         self.sounds = {}
-        self.base_notes = ["c2", "d2", "e2", "f2", "g2", "a2", "b2", "c3", "d3", "e3", "f3", "g3"]
-        for i in range(MAX_COLORS):
+        self.base_notes = ["c2", "d2", "e2", "f2", "g2", "a2", "b2", "c3"]
+        for i in range(len(COLORS)):
             pyxel.sounds[i].set(
-                notes=self.base_notes[i % len(self.base_notes)],  # 音階を割り当て
-                tones="p",  # パーカッシブ音
-                volumes="5",  # 音量
-                effects="n",  # ノーマル
-                speed=self.base_speed,  # 音の長さの基本値
+                notes=self.base_notes[i % len(self.base_notes)],
+                tones="p",
+                volumes="5",
+                effects="n",
+                speed=15,
             )
-            self.sounds[i] = self.base_notes[i % len(self.base_notes)]  # 音階を記録
 
-    def reset_game(self):
-        self.grid = [[pyxel.rndi(0, len(COLORS) - 1) for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
-        self.initial_grid = [row[:] for row in self.grid]
-        self.score = 0
-        self.gave_up = False
-
-    def restore_initial_state(self):
-        self.grid = [row[:] for row in self.initial_grid]
+    def reset_game(self, initial=False):
+        if initial or not hasattr(self, 'initial_grid'):
+            self.grid = [
+                [pyxel.rndi(0, self.num_colors - 1) for _ in range(self.grid_size)]
+                for _ in range(self.grid_size)
+            ]
+            self.initial_grid = copy.deepcopy(self.grid)
+        else:
+            self.grid = copy.deepcopy(self.initial_grid)
+        self.start_time = pyxel.frame_count if self.time_limit else None
         self.score = 0
 
     def update(self):
+        mx, my = pyxel.mouse_x, pyxel.mouse_y
+
         if self.state == "opening":
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                self.reset_game()
-                self.state = "game"
+                self.state = "difficulty_selection"
+
+        elif self.state == "difficulty_selection":
+            for button in self.difficulty_buttons:
+                if button.is_hovered(mx, my):
+                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                        self.current_difficulty = button.label
+                        self.apply_difficulty_settings()
+                        self.state = "game"
+                        break
 
         elif self.state == "game":
+            if self.time_limit and pyxel.frame_count - self.start_time > self.time_limit * 30:
+                self.state = "time_up"
+
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                mx, my = pyxel.mouse_x, pyxel.mouse_y
-
-                # ボタン判定
-                if BUTTON_SPACING <= mx <= BUTTON_SPACING + BUTTON_WIDTH:
-                    if BUTTON_Y <= my <= BUTTON_Y + BUTTON_HEIGHT:
-                        self.restore_initial_state()  # Retry
+                # ボタンエリア内のクリック判定
+                if 0 <= my <= BUTTON_AREA_HEIGHT:
+                    # Retryボタン
+                    if BUTTON_SPACING <= mx <= BUTTON_SPACING + BUTTON_WIDTH:
+                        self.reset_game()
                         return
-                elif BUTTON_SPACING * 2 + BUTTON_WIDTH <= mx <= BUTTON_SPACING * 2 + BUTTON_WIDTH * 2:
-                    if BUTTON_Y <= my <= BUTTON_Y + BUTTON_HEIGHT:
-                        self.gave_up = True  # ギブアップフラグを立てる
-                        self.state = "no_moves"  # ギブアップ後にno_moves画面へ遷移
+                    # Quitボタン
+                    elif 2 * BUTTON_SPACING + BUTTON_WIDTH <= mx <= 2 * BUTTON_SPACING + BUTTON_WIDTH * 2:
+                        self.state = "gave_up"
                         return
+                else:
+                    self.handle_click(mx, my)
 
-                # コマ判定
-                if BUTTON_Y + BUTTON_HEIGHT < my < BUTTON_Y + BUTTON_HEIGHT + GRID_HEIGHT * CELL_SIZE:
-                    x = mx // CELL_SIZE
-                    y = (my - BUTTON_Y - BUTTON_HEIGHT) // CELL_SIZE
-                    if 0 <= x < GRID_WIDTH and 0 <= y < GRID_HEIGHT:
-                        self.handle_click(x, y)
-
-            # **順序変更**: すべてのコマが消えた場合のチェック
-            if self.all_cleared():
-                self.score += 50  # ボーナススコア
-                self.state = "stage_cleared"
-            elif not self.has_valid_moves():
+            if not self.has_valid_moves():
                 self.state = "no_moves"
 
-        elif self.state == "no_moves":
-            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                self.update_high_scores()
-                self.state = "score_display"
+            # すべてのブロックが消去されたかをチェック
+            if self.is_grid_empty():
+                self.state = "game_cleared"
 
-        elif self.state == "stage_cleared":
+        elif self.state in ["time_up", "no_moves", "gave_up", "game_cleared"]:
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.update_high_scores()
                 self.state = "score_display"
@@ -113,61 +160,36 @@ class SameGame:
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.state = "opening"
 
-    def handle_click(self, x, y):
-        color = self.grid[y][x]
-        if color == -1:  # 空白セルは無視
-            return
+    def apply_difficulty_settings(self):
+        settings = self.difficulty_levels[self.current_difficulty.lower()]
+        self.grid_size = settings["grid_size"]
+        self.num_colors = settings["colors"]
+        self.time_limit = settings["time_limit"]
+        self.score_multiplier = settings["score_multiplier"]
+        self.reset_game(initial=True)  # 新しい難易度では初期盤面を生成
 
-        # 消すコマを探索
-        blocks_to_remove = self.find_connected_blocks(x, y, color)
-        if len(blocks_to_remove) > 1:  # 隣接するブロックが2個以上なら消去
-            note_shift, sound_length = self.get_sound_settings(len(blocks_to_remove))
-            base_note = self.sounds[color]  # ベース音の取得
-            shifted_note = self.shift_note(base_note, note_shift)  # オクターブシフト適用
-            pyxel.sounds[color].set(
-                notes=shifted_note,  # シフト後の音階を設定
-                tones="p",
-                volumes="5",
-                effects="n",
-                speed=sound_length,
-            )
-            pyxel.play(0, color)  # コマの色に応じた音を再生
-            for bx, by in blocks_to_remove:
-                self.grid[by][bx] = -1  # 消去
-            self.score += len(blocks_to_remove)
-            self.apply_gravity()
+    def handle_click(self, mx, my):
+        # 盤面エリアのY座標を調整
+        game_area_y = BUTTON_AREA_HEIGHT
+        game_area_height = WINDOW_HEIGHT - BUTTON_AREA_HEIGHT - STATUS_AREA_HEIGHT
+        cell_width = WINDOW_WIDTH // self.grid_size
+        cell_height = game_area_height // self.grid_size
 
-            # すべてのコマが消去されたかを判定
-            if self.all_cleared():
-                self.score += 50  # ボーナススコア
-                self.state = "stage_cleared"
+        x = mx // cell_width
+        y = (my - game_area_y) // cell_height
+        if 0 <= x < self.grid_size and 0 <= y < self.grid_size:
+            color = self.grid[y][x]
+            if color == -1:
+                return
 
-    def shift_note(self, base_note, shift):
-        """
-        ベース音(base_note)をオクターブシフト(shift)させる。
-        """
-        note_mapping = {"c": 0, "d": 2, "e": 4, "f": 5, "g": 7, "a": 9, "b": 11}
-        note, octave = base_note[:-1], int(base_note[-1])  # ノート部分とオクターブを分割
-        note_index = note_mapping[note] + shift  # ノート番号にシフトを適用
-
-        new_octave = octave + (note_index // 12)  # オクターブの調整
-        new_note = list(note_mapping.keys())[note_index % 12]  # 新しいノート
-        return f"{new_note}{new_octave}"
-
-    def get_sound_settings(self, block_count):
-        """
-        コマの数に応じたオクターブと音の長さを取得
-        """
-        if block_count <= self.low_threshold:
-            note_shift = self.low_octave_shift
-            sound_length = self.base_speed + 5  # 長め
-        elif block_count <= self.mid_threshold:
-            note_shift = self.mid_octave_shift
-            sound_length = self.base_speed  # 通常
-        else:
-            note_shift = self.high_octave_shift
-            sound_length = self.base_speed - 5  # 短め
-        return note_shift, sound_length
+            blocks_to_remove = self.find_connected_blocks(x, y, color)
+            if len(blocks_to_remove) > 1:
+                for bx, by in blocks_to_remove:
+                    self.grid[by][bx] = -1
+                pyxel.play(0, color)
+                self.score += int(len(blocks_to_remove) * (len(blocks_to_remove) ** 2) * self.score_multiplier)
+                self.apply_gravity()
+                self.shift_columns_left()
 
     def find_connected_blocks(self, x, y, color):
         stack = [(x, y)]
@@ -182,52 +204,52 @@ class SameGame:
             if self.grid[cy][cx] == color:
                 connected.append((cx, cy))
                 for nx, ny in [(cx - 1, cy), (cx + 1, cy), (cx, cy - 1), (cx, cy + 1)]:
-                    if 0 <= nx < GRID_WIDTH and 0 <= ny < GRID_HEIGHT:
+                    if 0 <= nx < self.grid_size and 0 <= ny < self.grid_size:
                         stack.append((nx, ny))
         return connected
 
     def apply_gravity(self):
-        for x in range(GRID_WIDTH):
-            column = [self.grid[y][x] for y in range(GRID_HEIGHT) if self.grid[y][x] != -1]
-            for y in range(GRID_HEIGHT):
-                self.grid[GRID_HEIGHT - y - 1][x] = column[-(y + 1)] if y < len(column) else -1
+        for x in range(self.grid_size):
+            column = [self.grid[y][x] for y in range(self.grid_size) if self.grid[y][x] != -1]
+            for y in range(self.grid_size):
+                self.grid[self.grid_size - y - 1][x] = column[-(y + 1)] if y < len(column) else -1
 
+    def shift_columns_left(self):
+        # 新しいグリッドを作成
         new_grid = []
-        for x in range(GRID_WIDTH):
-            if any(self.grid[y][x] != -1 for y in range(GRID_HEIGHT)):
-                new_grid.append([self.grid[y][x] for y in range(GRID_HEIGHT)])
-
-        for x in range(GRID_WIDTH):
-            for y in range(GRID_HEIGHT):
-                if x < len(new_grid):
-                    self.grid[y][x] = new_grid[x][y]
-                else:
-                    self.grid[y][x] = -1
+        for x in range(self.grid_size):
+            # 各列がすべて -1 かどうかをチェック
+            if any(self.grid[y][x] != -1 for y in range(self.grid_size)):
+                # 空でない列を追加
+                new_grid.append([self.grid[y][x] for y in range(self.grid_size)])
+        # 空の列を追加してグリッドサイズを維持
+        while len(new_grid) < self.grid_size:
+            new_grid.append([-1] * self.grid_size)
+        # グリッドを更新
+        for x in range(self.grid_size):
+            for y in range(self.grid_size):
+                self.grid[y][x] = new_grid[x][y]
 
     def has_valid_moves(self):
-        for y in range(GRID_HEIGHT):
-            for x in range(GRID_WIDTH):
+        for y in range(self.grid_size):
+            for x in range(self.grid_size):
                 color = self.grid[y][x]
                 if color != -1 and len(self.find_connected_blocks(x, y, color)) > 1:
                     return True
         return False
 
-    def all_cleared(self):
-        """
-        すべてのコマが消去されたかを判定
-        """
-        return all(self.grid[y][x] == -1 for y in range(GRID_HEIGHT) for x in range(GRID_WIDTH))
+    def is_grid_empty(self):
+        for row in self.grid:
+            for cell in row:
+                if cell != -1:
+                    return False
+        return True
 
     def update_high_scores(self):
-        """
-        スコアをトップ10に追加してソートし、順位を記録
-        """
         if self.score not in self.high_scores:
             self.high_scores.append(self.score)
-        self.high_scores.sort(reverse=True)  # 高い順にソート
-        self.high_scores = self.high_scores[:10]  # トップ10に絞る
-
-        # 現在のスコアがランクインしている場合に順位を記録
+        self.high_scores.sort(reverse=True)
+        self.high_scores = self.high_scores[:10]
         try:
             self.current_score_rank = self.high_scores.index(self.score)
         except ValueError:
@@ -237,61 +259,106 @@ class SameGame:
         pyxel.cls(0)
 
         if self.state == "opening":
-            pyxel.text(80, 50, "Welcome to SameGame", pyxel.COLOR_WHITE)
-            pyxel.text(10, 70, "How to Play:", pyxel.COLOR_YELLOW)
-            pyxel.text(10, 90, "1. Click blocks of the same color", pyxel.COLOR_WHITE)
-            pyxel.text(10, 100, "   that are connected to remove them.", pyxel.COLOR_WHITE)
-            pyxel.text(10, 110, "2. The more blocks you remove at once,", pyxel.COLOR_WHITE)
-            pyxel.text(10, 120, "   the higher your score.", pyxel.COLOR_WHITE)
-            pyxel.text(10, 130, "3. Clear all blocks for a bonus!", pyxel.COLOR_WHITE)
-            pyxel.text(10, 140, "4. If no moves are left, the game ends.", pyxel.COLOR_WHITE)
-            pyxel.text(80, 170, "Click to Start", pyxel.COLOR_WHITE)
+            pyxel.text(WINDOW_WIDTH // 2 - 60, WINDOW_HEIGHT // 2 - 10, "Welcome to SameGame", pyxel.COLOR_WHITE)
+            pyxel.text(WINDOW_WIDTH // 2 - 50, WINDOW_HEIGHT // 2 + 10, "Click to Start", pyxel.COLOR_WHITE)
 
-        elif self.state == "game" or self.state == "no_moves":
-            # ボタン描画
-            pyxel.rect(BUTTON_SPACING, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
-            pyxel.text(BUTTON_SPACING + 5, BUTTON_Y + 3, "Retry", pyxel.COLOR_WHITE)
+        elif self.state == "difficulty_selection":
+            pyxel.text(WINDOW_WIDTH // 2 - 60, 10, "Select Difficulty", pyxel.COLOR_YELLOW)
+            # 各ボタンと説明を描画
+            for i, button in enumerate(self.difficulty_buttons):
+                is_hovered = button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
+                button.draw(is_hovered)
+                # 説明文をボタンの右側に表示
+                description = self.difficulties[i]["description"]
+                pyxel.text(button.x + button.width + 10, button.y + 5, description, pyxel.COLOR_WHITE)
 
-            pyxel.rect(BUTTON_SPACING * 2 + BUTTON_WIDTH, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
-            pyxel.text(BUTTON_SPACING * 2 + BUTTON_WIDTH + 5, BUTTON_Y + 3, "Quit", pyxel.COLOR_WHITE)
+        elif self.state == "game":
+            self.draw_buttons()
+            self.draw_grid()
+            self.draw_status()
 
-            # コマ描画
-            for y in range(GRID_HEIGHT):
-                for x in range(GRID_WIDTH):
-                    color = self.grid[y][x]
-                    if color != -1:
-                        pyxel.rect(x * CELL_SIZE, y * CELL_SIZE + BUTTON_Y + BUTTON_HEIGHT, CELL_SIZE, CELL_SIZE, COLORS[color])
+        elif self.state == "time_up":
+            pyxel.text(WINDOW_WIDTH // 2 - 30, WINDOW_HEIGHT // 2 - 10, "Time's Up!", pyxel.COLOR_RED)
+            pyxel.text(WINDOW_WIDTH // 2 - 30, WINDOW_HEIGHT // 2 + 10, f"Score: {int(self.score)}", pyxel.COLOR_WHITE)
+            pyxel.text(WINDOW_WIDTH // 2 - 40, WINDOW_HEIGHT // 2 + 30, "Click to Continue", pyxel.COLOR_WHITE)
 
-            # スコア表示
-            pyxel.text(10, WINDOW_HEIGHT - 15, f"Score: {self.score}", pyxel.COLOR_WHITE)
+        elif self.state == "no_moves":
+            pyxel.text(WINDOW_WIDTH // 2 - 50, WINDOW_HEIGHT // 2 - 10, "No Moves Available!", pyxel.COLOR_RED)
+            pyxel.text(WINDOW_WIDTH // 2 - 30, WINDOW_HEIGHT // 2 + 10, f"Score: {int(self.score)}", pyxel.COLOR_WHITE)
+            pyxel.text(WINDOW_WIDTH // 2 - 40, WINDOW_HEIGHT // 2 + 30, "Click to Continue", pyxel.COLOR_WHITE)
 
-            # "No moves" 表示
-            if self.state == "no_moves":
-                pyxel.rect(30, 100, 180, 60, pyxel.COLOR_GRAY)  # 背景を塗る
-                if self.gave_up:
-                    pyxel.text(40, 110, "You gave up this game.", pyxel.COLOR_RED)
-                else:
-                    pyxel.text(40, 110, "No moves available!", pyxel.COLOR_RED)
-                pyxel.text(60, 140, "Click to Continue", pyxel.COLOR_WHITE)
+        elif self.state == "gave_up":
+            pyxel.text(WINDOW_WIDTH // 2 - 60, WINDOW_HEIGHT // 2 - 10, "You gave up this game.", pyxel.COLOR_RED)
+            pyxel.text(WINDOW_WIDTH // 2 - 30, WINDOW_HEIGHT // 2 + 10, f"Score: {int(self.score)}", pyxel.COLOR_WHITE)
+            pyxel.text(WINDOW_WIDTH // 2 - 40, WINDOW_HEIGHT // 2 + 30, "Click to Continue", pyxel.COLOR_WHITE)
 
-        elif self.state == "stage_cleared":
-            pyxel.text(40, 100, "Congratulations!", pyxel.COLOR_YELLOW)
-            pyxel.text(40, 120, "Stage Cleared!", pyxel.COLOR_WHITE)
-            pyxel.text(50, 140, f"Bonus: +50 Points", pyxel.COLOR_WHITE)
-            pyxel.text(60, 160, "Click to Continue", pyxel.COLOR_WHITE)
+        elif self.state == "game_cleared":
+            pyxel.text(WINDOW_WIDTH // 2 - 70, WINDOW_HEIGHT // 2 - 10, "Congratulations!", pyxel.COLOR_GREEN)
+            pyxel.text(WINDOW_WIDTH // 2 - 80, WINDOW_HEIGHT // 2 + 10, "You cleared the game!", pyxel.COLOR_WHITE)
+            pyxel.text(WINDOW_WIDTH // 2 - 40, WINDOW_HEIGHT // 2 + 30, "Click to Continue", pyxel.COLOR_WHITE)
 
         elif self.state == "score_display":
-            pyxel.text(80, 100, f"Your Score: {self.score}", pyxel.COLOR_YELLOW)
-            pyxel.text(90, 120, "Click to Continue", pyxel.COLOR_WHITE)
+            pyxel.text(WINDOW_WIDTH // 2 - 30, WINDOW_HEIGHT // 2 - 20, "Your Score", pyxel.COLOR_YELLOW)
+            pyxel.text(WINDOW_WIDTH // 2 - 20, WINDOW_HEIGHT // 2, f"{int(self.score)}", pyxel.COLOR_YELLOW)
+            pyxel.text(WINDOW_WIDTH // 2 - 40, WINDOW_HEIGHT // 2 + 20, "Click to Continue", pyxel.COLOR_WHITE)
 
         elif self.state == "high_score_display":
-            pyxel.text(80, 90, "Top 10 High Scores", pyxel.COLOR_YELLOW)
+            pyxel.text(WINDOW_WIDTH // 2 - 60, 10, "Top 10 High Scores", pyxel.COLOR_YELLOW)
             for i, score in enumerate(self.high_scores):
-                if i == self.current_score_rank:
-                    pyxel.text(80, 110 + i * 10, f"{i+1}. {score}", pyxel.COLOR_YELLOW)
-                else:
-                    pyxel.text(80, 110 + i * 10, f"{i+1}. {score}", pyxel.COLOR_WHITE)
-            pyxel.text(90, 220, "Click to Return", pyxel.COLOR_WHITE)
+                color = pyxel.COLOR_YELLOW if i == self.current_score_rank else pyxel.COLOR_WHITE
+                pyxel.text(WINDOW_WIDTH // 2 - 30, 30 + i * 10, f"{i + 1}: {score}", color)
+            pyxel.text(WINDOW_WIDTH // 2 - 40, WINDOW_HEIGHT - 20, "Click to Return", pyxel.COLOR_WHITE)
+
+    def draw_buttons(self):
+        # Retryボタン
+        retry_x = BUTTON_SPACING
+        retry_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
+        pyxel.rect(retry_x, retry_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
+        pyxel.text(retry_x + 10, retry_y + 5, "Retry", pyxel.COLOR_WHITE)
+
+        # Quitボタン
+        quit_x = BUTTON_SPACING + BUTTON_WIDTH + BUTTON_SPACING
+        quit_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
+        pyxel.rect(quit_x, quit_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
+        pyxel.text(quit_x + 10, quit_y + 5, "Quit", pyxel.COLOR_WHITE)
+
+    def draw_grid(self):
+        game_area_y = BUTTON_AREA_HEIGHT
+        game_area_height = WINDOW_HEIGHT - BUTTON_AREA_HEIGHT - STATUS_AREA_HEIGHT
+        cell_width = WINDOW_WIDTH // self.grid_size
+        cell_height = game_area_height // self.grid_size
+
+        for y in range(self.grid_size):
+            for x in range(self.grid_size):
+                color = self.grid[y][x]
+                if color != -1:
+                    pyxel.rect(
+                        x * cell_width,
+                        y * cell_height + game_area_y,
+                        cell_width,
+                        cell_height,
+                        COLORS[color]
+                    )
+
+    def draw_status(self):
+        # 難易度表示
+        difficulty_text = f"Difficulty: {self.current_difficulty.capitalize()}"
+        pyxel.text(10, WINDOW_HEIGHT - STATUS_AREA_HEIGHT + 5, difficulty_text, pyxel.COLOR_WHITE)
+
+        # スコア表示（難易度表示の右側に配置）
+        score_text = f"Score: {int(self.score)}"
+        score_x = 10 + len(difficulty_text) * 8  # 調整: フォントサイズに合わせて調整
+        pyxel.text(score_x, WINDOW_HEIGHT - STATUS_AREA_HEIGHT + 5, score_text, pyxel.COLOR_WHITE)
+
+        # タイマー表示
+        if self.time_limit:
+            remaining_time = max(0, self.time_limit - (pyxel.frame_count - self.start_time) // 30)
+            time_text = f"Time: {remaining_time}s"
+        else:
+            time_text = "Time: --"  # 修正: 時間無制限時は "--" を表示
+        # 画面右側に表示
+        time_text_width = len(time_text) * 4  # フォント幅を推定
+        pyxel.text(WINDOW_WIDTH - time_text_width - 10, WINDOW_HEIGHT - STATUS_AREA_HEIGHT + 5, time_text, pyxel.COLOR_WHITE)
 
 # ゲームの開始
 SameGame()
