@@ -16,7 +16,7 @@ BUTTON_AREA_HEIGHT = 100  # ボタンエリアの高さ（縦にボタンを並�
 STATUS_AREA_HEIGHT = 30   # 表示エリアの高さ
 
 COLORS = [8, 11, 12, 13, 14, 15, 6, 7]  # 使用可能なPyxelの色番号
-DEFAULT_TOP_SCORES = [5120, 2560, 1280, 640, 320, 160, 80, 40, 20, 10]  # デフォルトのトップ10スコア
+DEFAULT_TOP_SCORES = [10000, 5000, 2500, 1000, 500, 250, 100, 50, 25, 10]  # デフォルトのトップ10スコア
 
 class GameState(Enum):
     OPENING = "opening"
@@ -154,7 +154,8 @@ class SameGame:
 #            for ch in bgm_channels:
 #                pyxel.stop(ch)
 #            self.current_bgm = None  # 現在のBGM状態をリセット
-        bgm_channels = [1, 2, 3]  # BGM用のチャンネル
+#        bgm_channels = [1, 2, 3]  # BGM用のチャンネル
+        bgm_channels = [0, 1, 2, 3]  # 全チャンネル消す
         for ch in bgm_channels:
             pyxel.stop(ch)  # チャンネルごとに停止
         self.current_bgm = None  # 現在のBGM状態をリセット
@@ -164,9 +165,9 @@ class SameGame:
         difficulties = [
             {"label": "Easy",      "description": "Small grid, few colors"},
             {"label": "Normal",    "description": "Larger grid, more colors"},
-            {"label": "Hard",      "description": "Timed play"},
-            {"label": "Very Hard", "description": "Shorter time"},
-            {"label": "Expert",    "description": "Maximum challenge"},
+            {"label": "Hard",      "description": "Timed play, more colors"},
+            {"label": "Very Hard", "description": "Shorter time, even more colors"},
+            {"label": "Expert",    "description": "Maximum grid size, most colors"},
         ]
         # ボタンを縦に並べるための開始位置を計算（中央に配置）
         start_x = (WINDOW_WIDTH - BUTTON_WIDTH) // 2 - 60
@@ -286,6 +287,12 @@ class SameGame:
         elif self.state == GameState.GAME_CLEARED:
             if self.current_bgm != GameState.GAME_CLEARED:
                 self.play_bgm(GameState.GAME_CLEARED)
+
+            # ボーナススコアを加算{
+            bonus_score = int(self.score * 0.5)  # 現在のスコアの50%をボーナス
+            self.score += bonus_score
+            print(f"Bonus Score Added: {bonus_score}")  # デバッグ用
+
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.update_high_scores()
                 self.state = GameState.SCORE_DISPLAY
@@ -426,9 +433,17 @@ class SameGame:
         pyxel.cls(0)
     
         if self.state == GameState.OPENING:
-            pyxel.text(WINDOW_WIDTH // 2 - 60, WINDOW_HEIGHT // 2 - 10, "Welcome to SameGame", pyxel.COLOR_WHITE)
-            pyxel.text(WINDOW_WIDTH // 2 - 50, WINDOW_HEIGHT // 2 + 10, "Click to Start", pyxel.COLOR_WHITE)
-    
+#            pyxel.text(WINDOW_WIDTH // 2 - 60, WINDOW_HEIGHT // 2 - 10, "Welcome to SameGame", pyxel.COLOR_WHITE)
+#            pyxel.text(WINDOW_WIDTH // 2 - 50, WINDOW_HEIGHT // 2 + 10, "Click to Start", pyxel.COLOR_WHITE)
+            pyxel.text(80, 50, "Welcome to SameGame", pyxel.COLOR_WHITE)
+            pyxel.text(30, 70, "How to Play:", pyxel.COLOR_YELLOW)
+            pyxel.text(30, 90, "1. Click connected blocks to remove them.", pyxel.COLOR_WHITE)
+            pyxel.text(30, 100, "2. Remove more blocks at once for higher scores.", pyxel.COLOR_WHITE)
+            pyxel.text(30, 110, "3. Clear all blocks for a bonus!", pyxel.COLOR_WHITE)
+            pyxel.text(30, 120, "4. Higher difficulty means higher scores!", pyxel.COLOR_WHITE)
+            pyxel.text(30, 130, "5. No moves left? Game over.", pyxel.COLOR_WHITE)
+            pyxel.text(80, 160, "Click to Start", pyxel.COLOR_WHITE)
+
         elif self.state == GameState.DIFFICULTY_SELECTION:
             pyxel.text(WINDOW_WIDTH // 2 - 60, 10, "Select Difficulty", pyxel.COLOR_YELLOW)
             for i, button in enumerate(self.difficulty_buttons):
@@ -458,10 +473,9 @@ class SameGame:
             elif self.state == GameState.GAME_CLEARED:
                 pyxel.text(WINDOW_WIDTH // 2 - 70, WINDOW_HEIGHT // 2 - 10, "Congratulations!", pyxel.COLOR_GREEN)
                 pyxel.text(WINDOW_WIDTH // 2 - 80, WINDOW_HEIGHT // 2 + 10, "You cleared the game!", pyxel.COLOR_WHITE)
-    
-            pyxel.text(WINDOW_WIDTH // 2 - 30, WINDOW_HEIGHT // 2 + 10, f"Score: {int(self.score)}", pyxel.COLOR_WHITE)
-            pyxel.text(WINDOW_WIDTH // 2 - 40, WINDOW_HEIGHT // 2 + 30, "Click to Continue", pyxel.COLOR_WHITE)
-    
+                pyxel.text(WINDOW_WIDTH // 2 - 50, WINDOW_HEIGHT // 2 + 30, f"Bonus: {int(self.score * 0.5)}", pyxel.COLOR_YELLOW)
+                pyxel.text(WINDOW_WIDTH // 2 - 40, WINDOW_HEIGHT // 2 + 50, "Click to Continue", pyxel.COLOR_WHITE)
+
         elif self.state == GameState.SCORE_DISPLAY:
             pyxel.text(WINDOW_WIDTH // 2 - 30, WINDOW_HEIGHT // 2 - 20, "Your Score", pyxel.COLOR_YELLOW)
             pyxel.text(WINDOW_WIDTH // 2 - 20, WINDOW_HEIGHT // 2, f"{int(self.score)}", pyxel.COLOR_YELLOW)
