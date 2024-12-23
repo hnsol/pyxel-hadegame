@@ -59,7 +59,7 @@ class SameGame:
             GameState.GAME_END: "assets/gameplay_end_music.json",     # ゲーム終盤のBGM
             GameState.TIME_UP: "assets/time_up_music.json",           # タイムアップ時のBGM
             GameState.NO_MOVES: "assets/no_moves_music.json",         # 動ける手がなくなった時のBGM
-            GameState.GAME_CLEARED: "assets/victory_music.json",      # ゲームクリア時のBGM
+            GameState.GAME_CLEARED: "assets/cleared_music.json",      # ゲームクリア時のBGM
         }
         self.bgm_data = {}
         self.current_bgm = None
@@ -105,7 +105,7 @@ class SameGame:
             try:
                 with open(file_path, "rt") as fin:
                     self.bgm_data[state] = json.loads(fin.read())
-                    print(f"BGM data loaded for {state.name}: {self.bgm_data[state]}")  # デバッグ用
+#                    print(f"BGM data loaded for {state.name}: {self.bgm_data[state]}")  # デバッグ用
             except FileNotFoundError:
                 print(f"BGM file not found: {file_path}")
             except json.JSONDecodeError:
@@ -287,6 +287,8 @@ class SameGame:
                 self.state = GameState.SCORE_DISPLAY
     
         elif self.state == GameState.SCORE_DISPLAY:
+            if self.current_bgm != GameState.OPENING:
+                self.play_bgm(GameState.OPENING)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.state = GameState.HIGH_SCORE_DISPLAY
     
