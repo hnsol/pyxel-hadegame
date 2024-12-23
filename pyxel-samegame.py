@@ -148,12 +148,16 @@ class SameGame:
             print(f"BGM data not found for state: {state.name}")  # デバッグ用
     
     def stop_bgm(self):
-        """現在再生中のBGMを停止する"""
-        if self.current_bgm is not None:
-            bgm_channels = [1, 2, 3]  # BGM用のチャンネル
-            for ch in bgm_channels:
-                pyxel.stop(ch)
-            self.current_bgm = None  # 現在のBGM状態をリセット
+#        """現在再生中のBGMを停止する"""
+#        if self.current_bgm is not None:
+#            bgm_channels = [1, 2, 3]  # BGM用のチャンネル
+#            for ch in bgm_channels:
+#                pyxel.stop(ch)
+#            self.current_bgm = None  # 現在のBGM状態をリセット
+        bgm_channels = [1, 2, 3]  # BGM用のチャンネル
+        for ch in bgm_channels:
+            pyxel.stop(ch)  # チャンネルごとに停止
+        self.current_bgm = None  # 現在のBGM状態をリセット
 
     def create_difficulty_buttons(self):
         # 各難易度のラベルと説明
