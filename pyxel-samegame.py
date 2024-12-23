@@ -1,4 +1,5 @@
 import pyxel
+import json
 import copy
 
 # 定数の設定
@@ -36,6 +37,21 @@ class Button:
 
 class SameGame:
     def __init__(self):
+        # BGM関連の初期化
+        self.bgm_files = {
+            "opening": "assets/opening_music.json",
+            "selection": "assets/selection_music.json",
+            "gameplay": "assets/gameplay_music.json",
+            "gameover": "assets/gameover_music.json",
+            "no_moves": "assets/no_moves_music.json",
+            "victory": "assets/victory_music.json",
+            "critical": "assets/critical_music.json",
+        }
+        self.bgm_data = {}
+        self.current_bgm = None
+
+        self.load_bgms()
+
         self.difficulty_levels = {
             "Easy": {"grid_rows": 5, "grid_cols": 5, "colors": 3, "time_limit": None, "score_multiplier": 1.0},
             "Normal": {"grid_rows": 7, "grid_cols": 12, "colors": 4, "time_limit": None, "score_multiplier": 1.2},
@@ -58,14 +74,51 @@ class SameGame:
         self.current_score_rank = None
         self.start_time = None
         self.initial_grid = []
+        self.bgm_tracks = self.setup_bgm()
+        self.current_bgm = None
+
         self.reset_game(initial=True)
         self.create_sounds()
 
-        # 難易度選択用ボタンの作成
         self.difficulty_buttons = []
         self.create_difficulty_buttons()
 
+        self.current_bgm = None  # 現在再生中のBGMを記録
         pyxel.run(self.update, self.draw)
+
+    def load_bgms(self):
+        for state, file_path in self.bgm_files.items():
+            try:
+                with open(file_path, "rt") as fin:
+                    self.bgm_data[state] = json.loads(fin.read())
+            except Exception as e:
+                print(f"Error loading BGM file {file_path}: {e}")
+
+    def setup_bgm(self):
+        """Initialize BGM mappings for states and game logic."""
+        return {
+            "opening": 0,              # Intro BGM (track 0)
+            "difficulty_selection": 1, # Difficulty selection BGM (track 1)
+            "game": 2,                 # Main game BGM (track 2)
+            "time_up": 3,              # Game over BGM (track 3)
+            "no_moves": 4,             # No moves BGM (track 4)
+            "game_cleared": 5,         # Game cleared BGM (track 5)
+        }
+
+    def play_bgm(self, state):
+        """指定された状態に対応するBGMを再生"""
+        if self.current_bgm == state:
+            return  # 既に再生中
+        self.current_bgm = state
+    
+        if state in self.bgm_data:
+            bgm_channels = [1, 2, 3]  # チャンネル1〜3をBGM用に使用
+            for ch, sound in zip(bgm_channels, self.bgm_data[state]):
+                pyxel.sound(ch).set(*sound)
+                pyxel.play(ch, ch, loop=True)  # 各チャンネルでBGMをループ再生
+    
+        def stop_bgm(self):
+                pyxel.stop()
 
     def create_difficulty_buttons(self):
         # 各難易度のラベルと説明
@@ -86,11 +139,10 @@ class SameGame:
         self.difficulties = difficulties  # 説明のために保持
 
     def create_sounds(self):
-        self.sounds = {}
+        """ゲーム内の効果音を準備"""
         self.base_notes = ["c2", "d2", "e2", "f2", "g2", "a2", "b2", "c3"]
-        # Pyxel上で予め s0, s1, ... が存在している想定
         for i in range(len(COLORS)):
-            pyxel.sounds[i].set(
+            pyxel.sound(i).set(
                 notes=self.base_notes[i % len(self.base_notes)],
                 tones="p",
                 volumes="5",
@@ -114,47 +166,53 @@ class SameGame:
         mx, my = pyxel.mouse_x, pyxel.mouse_y
 
         if self.state == "opening":
+            if self.current_bgm != "opening":
+                self.play_bgm("opening")
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.state = "difficulty_selection"
 
         elif self.state == "difficulty_selection":
+            if self.current_bgm != "selection":
+                self.play_bgm("selection")
             for button in self.difficulty_buttons:
                 if button.is_hovered(mx, my):
                     if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                         self.current_difficulty = button.label
                         self.apply_difficulty_settings()
                         self.state = "game"
-                        break
 
         elif self.state == "game":
-            # タイムリミットのチェック
+            if self.current_bgm != "gameplay":
+                self.play_bgm("gameplay")
+
+            # マウスクリックを処理
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                self.handle_click(pyxel.mouse_x, pyxel.mouse_y)
+
             if self.time_limit and pyxel.frame_count - self.start_time > self.time_limit * 30:
                 self.state = "time_up"
-
-            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                # ボタンエリア内のクリック判定
-                if 0 <= my <= BUTTON_AREA_HEIGHT:
-                    # Retryボタン
-                    if BUTTON_SPACING <= mx <= BUTTON_SPACING + BUTTON_WIDTH:
-                        self.reset_game()
-                        return
-                    # Quitボタン
-                    elif (2 * BUTTON_SPACING + BUTTON_WIDTH) <= mx <= (2 * BUTTON_SPACING + BUTTON_WIDTH * 2):
-                        self.state = "gave_up"
-                        return
-                else:
-                    self.handle_click(mx, my)
-
-            # 有効な手がない場合
-            if not self.has_valid_moves():
+            elif not self.has_valid_moves():
                 self.state = "no_moves"
-
-            # 全ブロックが消去されたかどうか
-            if self.is_grid_empty():
+            elif self.is_grid_empty():
                 self.state = "game_cleared"
 
-        elif self.state in ["time_up", "no_moves", "gave_up", "game_cleared"]:
-            # ここでは盤面を保持し、クリックしたらスコア画面へ
+        elif self.state == "time_up":
+            if self.current_bgm != "gameover":
+                self.play_bgm("gameover")
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                self.update_high_scores()
+                self.state = "score_display"
+
+        elif self.state == "no_moves":
+            if self.current_bgm != "no_moves":
+                self.play_bgm("no_moves")
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                self.update_high_scores()
+                self.state = "score_display"
+
+        elif self.state == "game_cleared":
+            if self.current_bgm != "victory":
+                self.play_bgm("victory")
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.update_high_scores()
                 self.state = "score_display"
@@ -164,6 +222,8 @@ class SameGame:
                 self.state = "high_score_display"
 
         elif self.state == "high_score_display":
+            if self.current_bgm != "opening":
+                self.play_bgm("opening")
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.state = "opening"
 
@@ -177,24 +237,28 @@ class SameGame:
         self.reset_game(initial=True)
 
     def handle_click(self, mx, my):
-        # 盤面エリアのY座標を調整
+        """盤面クリック時の処理"""
         game_area_y = BUTTON_AREA_HEIGHT
         game_area_height = WINDOW_HEIGHT - BUTTON_AREA_HEIGHT - STATUS_AREA_HEIGHT
         cell_size = min(WINDOW_WIDTH // self.grid_cols, game_area_height // self.grid_rows)
         grid_x_start = (WINDOW_WIDTH - (cell_size * self.grid_cols)) // 2
         grid_y_start = game_area_y + (game_area_height - (cell_size * self.grid_rows)) // 2
-
+    
         x = (mx - grid_x_start) // cell_size
         y = (my - grid_y_start) // cell_size
+    
         if 0 <= x < self.grid_cols and 0 <= y < self.grid_rows:
             color = self.grid[y][x]
             if color == -1:
                 return
-
+    
+            # 消去処理
             blocks_to_remove = self.find_connected_blocks(x, y, color)
             if len(blocks_to_remove) > 1:
                 for bx, by in blocks_to_remove:
                     self.grid[by][bx] = -1
+    
+                # 効果音専用チャンネル（0番）で再生
                 pyxel.play(0, color)
                 self.score += int(len(blocks_to_remove) * (len(blocks_to_remove) ** 2) * self.score_multiplier)
                 self.apply_gravity()
