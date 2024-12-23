@@ -212,6 +212,32 @@ class SameGame:
     def update(self):
         """ゲームの状態を更新"""
         mx, my = pyxel.mouse_x, pyxel.mouse_y
+
+        # Retryボタンの処理
+        retry_x = BUTTON_SPACING
+        retry_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
+        if (
+            retry_x <= mx <= retry_x + BUTTON_WIDTH
+            and retry_y <= my <= retry_y + BUTTON_HEIGHT
+            and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)
+        ):
+            print("Retry button clicked")
+            self.reset_game(initial=True)  # 開始時の状態に戻す
+            self.state = GameState.GAME_START  # ゲームを最初から開始
+            return
+
+        # Quitボタンの処理
+        quit_x = BUTTON_SPACING + BUTTON_WIDTH + BUTTON_SPACING
+        quit_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
+        if (
+            quit_x <= mx <= quit_x + BUTTON_WIDTH
+            and quit_y <= my <= quit_y + BUTTON_HEIGHT
+            and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)
+        ):
+            print("Quit button clicked")
+            self.state = GameState.SCORE_DISPLAY  # SCORE_DISPLAY画面に遷移
+            return
+
         previous_state = self.state  # ステータスの変更を追跡
     
         if self.state == GameState.OPENING:
