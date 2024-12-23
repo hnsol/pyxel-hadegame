@@ -1,6 +1,7 @@
 import pyxel
 import json
 import copy
+from enum import Enum
 
 # 定数の設定
 WINDOW_WIDTH = 240
@@ -16,6 +17,18 @@ STATUS_AREA_HEIGHT = 30   # 表示エリアの高さ
 
 COLORS = [8, 11, 12, 13, 14, 15, 6, 7]  # 使用可能なPyxelの色番号
 DEFAULT_TOP_SCORES = [5120, 2560, 1280, 640, 320, 160, 80, 40, 20, 10]  # デフォルトのトップ10スコア
+
+class GameState(Enum):
+    OPENING = "opening"
+    DIFFICULTY_SELECTION = "difficulty_selection"
+    GAME_START = "game_start"
+    GAME_MID = "game_mid"
+    GAME_END = "game_end"
+    TIME_UP = "time_up"
+    NO_MOVES = "no_moves"
+    GAME_CLEARED = "game_cleared"
+    SCORE_DISPLAY = "score_display"
+    HIGH_SCORE_DISPLAY = "high_score_display"
 
 class Button:
     def __init__(self, x, y, width, height, label):
@@ -39,13 +52,14 @@ class SameGame:
     def __init__(self):
         # BGM関連の初期化
         self.bgm_files = {
-            "opening": "assets/opening_music.json",
-            "selection": "assets/selection_music.json",
-            "gameplay": "assets/gameplay_music.json",
-            "gameover": "assets/gameover_music.json",
-            "no_moves": "assets/no_moves_music.json",
-            "victory": "assets/victory_music.json",
-            "critical": "assets/critical_music.json",
+            GameState.OPENING: "assets/opening_music.json",            # オープニング画面のBGM
+            GameState.DIFFICULTY_SELECTION: "assets/selection_music.json", # 難易度選択画面のBGM
+            GameState.GAME_START: "assets/gameplay_start_music.json", # ゲーム序盤のBGM
+            GameState.GAME_MID: "assets/gameplay_mid_music.json",     # ゲーム中盤のBGM
+            GameState.GAME_END: "assets/gameplay_end_music.json",     # ゲーム終盤のBGM
+            GameState.TIME_UP: "assets/time_up_music.json",           # タイムアップ時のBGM
+            GameState.NO_MOVES: "assets/no_moves_music.json",         # 動ける手がなくなった時のBGM
+            GameState.GAME_CLEARED: "assets/victory_music.json",      # ゲームクリア時のBGM
         }
         self.bgm_data = {}
         self.current_bgm = None
@@ -69,7 +83,7 @@ class SameGame:
         pyxel.init(WINDOW_WIDTH, WINDOW_HEIGHT)
         pyxel.mouse(True)
         pyxel.title = "SameGame"
-        self.state = "opening"
+        self.state = GameState.OPENING
         self.high_scores = DEFAULT_TOP_SCORES[:]
         self.current_score_rank = None
         self.start_time = None
@@ -110,14 +124,19 @@ class SameGame:
         if self.current_bgm == state:
             return  # 既に再生中
         self.current_bgm = state
-    
+
+        # 現在再生中のBGMを停止
+        bgm_channels = [1, 2, 3]  # BGM用のチャンネル
+        for ch in bgm_channels:
+            pyxel.stop(ch)  # チャンネルを停止
+
         if state in self.bgm_data:
             bgm_channels = [1, 2, 3]  # チャンネル1〜3をBGM用に使用
             for ch, sound in zip(bgm_channels, self.bgm_data[state]):
-                pyxel.sound(ch).set(*sound)
+                pyxel.sounds[ch].set(*sound)
                 pyxel.play(ch, ch, loop=True)  # 各チャンネルでBGMをループ再生
     
-        def stop_bgm(self):
+    def stop_bgm(self):
                 pyxel.stop()
 
     def create_difficulty_buttons(self):
@@ -142,7 +161,7 @@ class SameGame:
         """ゲーム内の効果音を準備"""
         self.base_notes = ["c2", "d2", "e2", "f2", "g2", "a2", "b2", "c3"]
         for i in range(len(COLORS)):
-            pyxel.sound(i).set(
+            pyxel.sounds[i].set(
                 notes=self.base_notes[i % len(self.base_notes)],
                 tones="p",
                 volumes="5",
@@ -162,70 +181,98 @@ class SameGame:
         self.start_time = pyxel.frame_count if self.time_limit else None
         self.score = 0
 
+    def calculate_progress(self):
+        """盤面の進行状況を計算"""
+        total_cells = self.grid_rows * self.grid_cols
+        remaining_cells = sum(1 for row in self.grid for cell in row if cell != -1)
+        removed_percentage = (total_cells - remaining_cells) / total_cells
+        return remaining_cells, removed_percentage
+
+
     def update(self):
+        """ゲームの状態を更新"""
         mx, my = pyxel.mouse_x, pyxel.mouse_y
-
-        if self.state == "opening":
+        previous_state = self.state  # ステータスの変更を追跡
+    
+        if self.state == GameState.OPENING:
+#            print("GameState is OPENING")  # デバッグ出力
             if self.current_bgm != "opening":
-                self.play_bgm("opening")
+                self.play_bgm(GameState.OPENING)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                self.state = "difficulty_selection"
+                print("Clicked in opening screen")  # デバッグ出力
+                self.state = GameState.DIFFICULTY_SELECTION
+                print(f"State changed to: {self.state}")  # 状態変更後の確認
 
-        elif self.state == "difficulty_selection":
+        elif self.state == GameState.DIFFICULTY_SELECTION:
             if self.current_bgm != "selection":
-                self.play_bgm("selection")
+                self.play_bgm(GameState.DIFFICULTY_SELECTION)
             for button in self.difficulty_buttons:
                 if button.is_hovered(mx, my):
                     if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                         self.current_difficulty = button.label
                         self.apply_difficulty_settings()
-                        self.state = "game"
-
-        elif self.state == "game":
-            if self.current_bgm != "gameplay":
-                self.play_bgm("gameplay")
-
-            # マウスクリックを処理
+                        self.state = GameState.GAME_START
+    
+        elif self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
+            # 序盤、中盤、終盤の進行状態を確認
+            remaining_cells, removed_percentage = self.calculate_progress()
+    
+            if self.state == GameState.GAME_START:
+                if removed_percentage >= 0.2:  # コマ数が20%減少したら中盤へ移行
+                    self.state = GameState.GAME_MID
+    
+            elif self.state == GameState.GAME_MID:
+                is_low_time = (
+                    self.time_limit
+                    and (self.time_limit - (pyxel.frame_count - self.start_time) // 30) <= 10
+                )
+                if remaining_cells / (self.grid_rows * self.grid_cols) <= 0.25 or is_low_time:
+                    self.state = GameState.GAME_END
+    
+            # 共通ゲーム進行処理
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                self.handle_click(pyxel.mouse_x, pyxel.mouse_y)
-
+                self.handle_click(mx, my)
             if self.time_limit and pyxel.frame_count - self.start_time > self.time_limit * 30:
-                self.state = "time_up"
+                self.state = GameState.TIME_UP
             elif not self.has_valid_moves():
-                self.state = "no_moves"
+                self.state = GameState.NO_MOVES
             elif self.is_grid_empty():
-                self.state = "game_cleared"
-
-        elif self.state == "time_up":
-            if self.current_bgm != "gameover":
-                self.play_bgm("gameover")
+                self.state = GameState.GAME_CLEARED
+    
+        elif self.state == GameState.TIME_UP:
+            if self.current_bgm != "time_up":
+                self.play_bgm(GameState.TIME_UP)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.update_high_scores()
-                self.state = "score_display"
-
-        elif self.state == "no_moves":
+                self.state = GameState.SCORE_DISPLAY
+    
+        elif self.state == GameState.NO_MOVES:
             if self.current_bgm != "no_moves":
-                self.play_bgm("no_moves")
+                self.play_bgm(GameState.NO_MOVES)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.update_high_scores()
-                self.state = "score_display"
-
-        elif self.state == "game_cleared":
+                self.state = GameState.SCORE_DISPLAY
+    
+        elif self.state == GameState.GAME_CLEARED:
             if self.current_bgm != "victory":
-                self.play_bgm("victory")
+                self.play_bgm(GameState.GAME_CLEARED)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.update_high_scores()
-                self.state = "score_display"
-
-        elif self.state == "score_display":
+                self.state = GameState.SCORE_DISPLAY
+    
+        elif self.state == GameState.SCORE_DISPLAY:
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                self.state = "high_score_display"
-
-        elif self.state == "high_score_display":
+                self.state = GameState.HIGH_SCORE_DISPLAY
+    
+        elif self.state == GameState.HIGH_SCORE_DISPLAY:
             if self.current_bgm != "opening":
-                self.play_bgm("opening")
+                self.play_bgm(GameState.OPENING)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                self.state = "opening"
+                self.state = GameState.OPENING
+    
+        # ステータス変更時のBGM切り替え
+        if self.state != previous_state:
+            self.handle_state_change()
 
     def apply_difficulty_settings(self):
         settings = self.difficulty_levels[self.current_difficulty]
@@ -263,6 +310,22 @@ class SameGame:
                 self.score += int(len(blocks_to_remove) * (len(blocks_to_remove) ** 2) * self.score_multiplier)
                 self.apply_gravity()
                 self.shift_columns_left()
+
+    def handle_state_change(self):
+        """ステータス変更時のBGMを再生"""
+        bgm_mapping = {
+            GameState.GAME_START: "gameplay_start",
+            GameState.GAME_MID: "gameplay_mid",
+            GameState.GAME_END: "gameplay_end",
+            GameState.TIME_UP: "time_up",
+            GameState.NO_MOVES: "no_moves",
+            GameState.GAME_CLEARED: "victory",
+            GameState.OPENING: "opening",
+            GameState.DIFFICULTY_SELECTION: "selection",
+        }
+        bgm = bgm_mapping.get(self.state)
+        if bgm:
+            self.play_bgm(bgm)
 
     def find_connected_blocks(self, x, y, color):
         stack = [(x, y)]
@@ -329,12 +392,12 @@ class SameGame:
     def draw(self):
         # 画面をクリア
         pyxel.cls(0)
-
-        if self.state == "opening":
+    
+        if self.state == GameState.OPENING:
             pyxel.text(WINDOW_WIDTH // 2 - 60, WINDOW_HEIGHT // 2 - 10, "Welcome to SameGame", pyxel.COLOR_WHITE)
             pyxel.text(WINDOW_WIDTH // 2 - 50, WINDOW_HEIGHT // 2 + 10, "Click to Start", pyxel.COLOR_WHITE)
-
-        elif self.state == "difficulty_selection":
+    
+        elif self.state == GameState.DIFFICULTY_SELECTION:
             pyxel.text(WINDOW_WIDTH // 2 - 60, 10, "Select Difficulty", pyxel.COLOR_YELLOW)
             for i, button in enumerate(self.difficulty_buttons):
                 is_hovered = button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
@@ -342,39 +405,37 @@ class SameGame:
                 # 説明文をボタンの右側に表示
                 description = self.difficulties[i]["description"]
                 pyxel.text(button.x + button.width + 10, button.y + 5, description, pyxel.COLOR_WHITE)
-
-        elif self.state == "game":
+    
+        elif self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
             # 盤面とボタン・ステータスを描画
             self.draw_buttons()
             self.draw_grid()
             self.draw_score_and_time()
-
-        elif self.state in ["time_up", "no_moves", "gave_up", "game_cleared"]:
+    
+        elif self.state in [GameState.TIME_UP, GameState.NO_MOVES, GameState.GAME_CLEARED]:
             # 盤面を消さずにそのまま描画し、上にテキストを重ねる
             self.draw_buttons()
             self.draw_grid()
             self.draw_score_and_time()
-
+    
             # それぞれの状態に応じたメッセージを上書き
-            if self.state == "time_up":
+            if self.state == GameState.TIME_UP:
                 pyxel.text(WINDOW_WIDTH // 2 - 30, WINDOW_HEIGHT // 2 - 10, "Time's Up!", pyxel.COLOR_RED)
-            elif self.state == "no_moves":
+            elif self.state == GameState.NO_MOVES:
                 pyxel.text(WINDOW_WIDTH // 2 - 50, WINDOW_HEIGHT // 2 - 10, "No Moves Available!", pyxel.COLOR_RED)
-            elif self.state == "gave_up":
-                pyxel.text(WINDOW_WIDTH // 2 - 60, WINDOW_HEIGHT // 2 - 10, "You gave up this game.", pyxel.COLOR_RED)
-            elif self.state == "game_cleared":
+            elif self.state == GameState.GAME_CLEARED:
                 pyxel.text(WINDOW_WIDTH // 2 - 70, WINDOW_HEIGHT // 2 - 10, "Congratulations!", pyxel.COLOR_GREEN)
                 pyxel.text(WINDOW_WIDTH // 2 - 80, WINDOW_HEIGHT // 2 + 10, "You cleared the game!", pyxel.COLOR_WHITE)
-
+    
             pyxel.text(WINDOW_WIDTH // 2 - 30, WINDOW_HEIGHT // 2 + 10, f"Score: {int(self.score)}", pyxel.COLOR_WHITE)
             pyxel.text(WINDOW_WIDTH // 2 - 40, WINDOW_HEIGHT // 2 + 30, "Click to Continue", pyxel.COLOR_WHITE)
-
-        elif self.state == "score_display":
+    
+        elif self.state == GameState.SCORE_DISPLAY:
             pyxel.text(WINDOW_WIDTH // 2 - 30, WINDOW_HEIGHT // 2 - 20, "Your Score", pyxel.COLOR_YELLOW)
             pyxel.text(WINDOW_WIDTH // 2 - 20, WINDOW_HEIGHT // 2, f"{int(self.score)}", pyxel.COLOR_YELLOW)
             pyxel.text(WINDOW_WIDTH // 2 - 40, WINDOW_HEIGHT // 2 + 20, "Click to Continue", pyxel.COLOR_WHITE)
-
-        elif self.state == "high_score_display":
+    
+        elif self.state == GameState.HIGH_SCORE_DISPLAY:
             pyxel.text(WINDOW_WIDTH // 2 - 60, 10, "Top 10 High Scores", pyxel.COLOR_YELLOW)
             for i, score in enumerate(self.high_scores):
                 color = pyxel.COLOR_YELLOW if i == self.current_score_rank else pyxel.COLOR_WHITE
