@@ -208,6 +208,21 @@ class SameGame:
         removed_percentage = (total_cells - remaining_cells) / total_cells
         return remaining_cells, removed_percentage
 
+    def reset_game(self, initial=False):
+        """ゲームをリセット"""
+        if initial or not hasattr(self, 'initial_grid'):
+            self.grid = [
+                [pyxel.rndi(0, self.num_colors - 1) for _ in range(self.grid_cols)]
+                for _ in range(self.grid_rows)
+            ]
+            # 初期盤面を保存
+            self.initial_grid = copy.deepcopy(self.grid)
+        else:
+            # 保存した初期盤面を復元
+            self.grid = copy.deepcopy(self.initial_grid)
+
+        self.start_time = pyxel.frame_count if self.time_limit else None
+        self.score = 0
 
     def update(self):
         """ゲームの状態を更新"""
@@ -222,7 +237,7 @@ class SameGame:
             and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)
         ):
             print("Retry button clicked")
-            self.reset_game(initial=True)  # 開始時の状態に戻す
+            self.reset_game(initial=False)  # 保存済みの初期状態に戻す
             self.state = GameState.GAME_START  # ゲームを最初から開始
             return
 
