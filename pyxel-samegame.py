@@ -105,39 +105,55 @@ class SameGame:
             try:
                 with open(file_path, "rt") as fin:
                     self.bgm_data[state] = json.loads(fin.read())
+                    print(f"BGM data loaded for {state.name}: {self.bgm_data[state]}")  # デバッグ用
+            except FileNotFoundError:
+                print(f"BGM file not found: {file_path}")
+            except json.JSONDecodeError:
+                print(f"BGM file is not valid JSON: {file_path}")
             except Exception as e:
-                print(f"Error loading BGM file {file_path}: {e}")
+                print(f"Error loading BGM file for state {state.name}: {e}")
 
     def setup_bgm(self):
         """Initialize BGM mappings for states and game logic."""
         return {
-            "opening": 0,              # Intro BGM (track 0)
-            "difficulty_selection": 1, # Difficulty selection BGM (track 1)
-            "game": 2,                 # Main game BGM (track 2)
-            "time_up": 3,              # Game over BGM (track 3)
-            "no_moves": 4,             # No moves BGM (track 4)
-            "game_cleared": 5,         # Game cleared BGM (track 5)
+            GameState.OPENING: 0,              # Intro BGM (track 0)
+            GameState.DIFFICULTY_SELECTION: 1, # Difficulty selection BGM (track 1)
+            GameState.GAME_START: 2,           # Main game BGM (track 2)
+            GameState.TIME_UP: 3,              # Game over BGM (track 3)
+            GameState.NO_MOVES: 4,             # No moves BGM (track 4)
+            GameState.GAME_CLEARED: 5,         # Game cleared BGM (track 5)
         }
 
     def play_bgm(self, state):
         """指定された状態に対応するBGMを再生"""
         if self.current_bgm == state:
-            return  # 既に再生中
+            return  # 既に再生中の場合は何もしない
+    
+        print(f"Switching to BGM for state in play_bgm: {state.name}")  # デバッグ用
+
+        # 現在のBGMを停止
+        self.stop_bgm()
+
         self.current_bgm = state
-
-        # 現在再生中のBGMを停止
-        bgm_channels = [1, 2, 3]  # BGM用のチャンネル
-        for ch in bgm_channels:
-            pyxel.stop(ch)  # チャンネルを停止
-
+    
+        # 指定されたステートのBGMが存在する場合、再生
         if state in self.bgm_data:
             bgm_channels = [1, 2, 3]  # チャンネル1〜3をBGM用に使用
             for ch, sound in zip(bgm_channels, self.bgm_data[state]):
                 pyxel.sounds[ch].set(*sound)
-                pyxel.play(ch, ch, loop=True)  # 各チャンネルでBGMをループ再生
+                pyxel.play(ch, ch, loop=True)  # チャンネルごとにループ再生
+#                if not pyxel.play_pos(ch):  # チャンネルが再生されていない場合のみ再生
+#                    pyxel.play(ch, ch, loop=True)
+        else:
+            print(f"BGM data not found for state: {state.name}")  # デバッグ用
     
     def stop_bgm(self):
-                pyxel.stop()
+        """現在再生中のBGMを停止する"""
+        if self.current_bgm is not None:
+            bgm_channels = [1, 2, 3]  # BGM用のチャンネル
+            for ch in bgm_channels:
+                pyxel.stop(ch)
+            self.current_bgm = None  # 現在のBGM状態をリセット
 
     def create_difficulty_buttons(self):
         # 各難易度のラベルと説明
@@ -160,14 +176,13 @@ class SameGame:
     def create_sounds(self):
         """ゲーム内の効果音を準備"""
         self.base_notes = ["c2", "d2", "e2", "f2", "g2", "a2", "b2", "c3"]
-        for i in range(len(COLORS)):
-            pyxel.sounds[i].set(
-                notes=self.base_notes[i % len(self.base_notes)],
-                tones="p",
-                volumes="5",
-                effects="n",
-                speed=15,
-            )
+        pyxel.sounds[0].set(
+            notes=self.base_notes[0], #消したマスの色によって音を変えるのは未実装
+            tones="p",
+            volumes="5",
+            effects="n",
+            speed=15,
+        )
 
     def reset_game(self, initial=False):
         if initial or not hasattr(self, 'initial_grid'):
@@ -196,7 +211,7 @@ class SameGame:
     
         if self.state == GameState.OPENING:
 #            print("GameState is OPENING")  # デバッグ出力
-            if self.current_bgm != "opening":
+            if self.current_bgm != GameState.OPENING:
                 self.play_bgm(GameState.OPENING)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 print("Clicked in opening screen")  # デバッグ出力
@@ -204,8 +219,11 @@ class SameGame:
                 print(f"State changed to: {self.state}")  # 状態変更後の確認
 
         elif self.state == GameState.DIFFICULTY_SELECTION:
-            if self.current_bgm != "selection":
+#            print(f"GameState is: {self.state}") # デバッグ出力
+            if self.current_bgm != GameState.DIFFICULTY_SELECTION:
                 self.play_bgm(GameState.DIFFICULTY_SELECTION)
+                print(f"Switching to BGM for state state name: {state.name}")  # デバッグ用
+                print(f"Switching to BGM for state game state: {GameState.DIFFICULTY_SELECTION}")  # デバッグ用
             for button in self.difficulty_buttons:
                 if button.is_hovered(mx, my):
                     if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
@@ -216,18 +234,26 @@ class SameGame:
         elif self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
             # 序盤、中盤、終盤の進行状態を確認
             remaining_cells, removed_percentage = self.calculate_progress()
-    
+
             if self.state == GameState.GAME_START:
+                if self.current_bgm != GameState.GAME_START:
+                    self.play_bgm(GameState.GAME_START)
+
                 if removed_percentage >= 0.2:  # コマ数が20%減少したら中盤へ移行
                     self.state = GameState.GAME_MID
     
             elif self.state == GameState.GAME_MID:
+                if self.current_bgm != GameState.GAME_MID:
+                    self.play_bgm(GameState.GAME_MID)
                 is_low_time = (
                     self.time_limit
                     and (self.time_limit - (pyxel.frame_count - self.start_time) // 30) <= 10
                 )
                 if remaining_cells / (self.grid_rows * self.grid_cols) <= 0.25 or is_low_time:
                     self.state = GameState.GAME_END
+            elif self.state == GameState.GAME_END:
+                if self.current_bgm != GameState.GAME_END:
+                    self.play_bgm(GameState.GAME_END)
     
             # 共通ゲーム進行処理
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
@@ -240,21 +266,21 @@ class SameGame:
                 self.state = GameState.GAME_CLEARED
     
         elif self.state == GameState.TIME_UP:
-            if self.current_bgm != "time_up":
+            if self.current_bgm != GameState.TIME_UP:
                 self.play_bgm(GameState.TIME_UP)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.update_high_scores()
                 self.state = GameState.SCORE_DISPLAY
     
         elif self.state == GameState.NO_MOVES:
-            if self.current_bgm != "no_moves":
+            if self.current_bgm != GameState.NO_MOVES:
                 self.play_bgm(GameState.NO_MOVES)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.update_high_scores()
                 self.state = GameState.SCORE_DISPLAY
     
         elif self.state == GameState.GAME_CLEARED:
-            if self.current_bgm != "victory":
+            if self.current_bgm != GameState.GAME_CLEARED:
                 self.play_bgm(GameState.GAME_CLEARED)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.update_high_scores()
@@ -265,7 +291,7 @@ class SameGame:
                 self.state = GameState.HIGH_SCORE_DISPLAY
     
         elif self.state == GameState.HIGH_SCORE_DISPLAY:
-            if self.current_bgm != "opening":
+            if self.current_bgm != GameState.OPENING:
                 self.play_bgm(GameState.OPENING)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.state = GameState.OPENING
@@ -314,18 +340,18 @@ class SameGame:
     def handle_state_change(self):
         """ステータス変更時のBGMを再生"""
         bgm_mapping = {
-            GameState.GAME_START: "gameplay_start",
-            GameState.GAME_MID: "gameplay_mid",
-            GameState.GAME_END: "gameplay_end",
-            GameState.TIME_UP: "time_up",
-            GameState.NO_MOVES: "no_moves",
-            GameState.GAME_CLEARED: "victory",
-            GameState.OPENING: "opening",
-            GameState.DIFFICULTY_SELECTION: "selection",
+            GameState.GAME_START: GameState.GAME_START,
+            GameState.GAME_MID: GameState.GAME_MID,
+            GameState.GAME_END: GameState.GAME_END,
+            GameState.TIME_UP: GameState.TIME_UP,
+            GameState.NO_MOVES: GameState.NO_MOVES,
+            GameState.GAME_CLEARED: GameState.GAME_CLEARED,
+            GameState.OPENING: GameState.OPENING,
+            GameState.DIFFICULTY_SELECTION: GameState.DIFFICULTY_SELECTION,
         }
-        bgm = bgm_mapping.get(self.state)
-        if bgm:
-            self.play_bgm(bgm)
+        bgm_state = bgm_mapping.get(self.state)
+        if bgm_state:
+            self.play_bgm(bgm_state)
 
     def find_connected_blocks(self, x, y, color):
         stack = [(x, y)]
