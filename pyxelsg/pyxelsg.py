@@ -6,6 +6,7 @@
 # version: 0.1
 
 import pyxel
+import os
 import json
 import copy
 from enum import Enum
@@ -69,6 +70,7 @@ class SameGame:
             GameState.GAME_CLEARED: "assets/cleared_music.json",      # ゲームクリア時のBGM
         }
         self.bgm_data = {}
+        self.base_path = os.path.dirname(os.path.abspath(__file__))
         self.current_bgm = None
 
         self.load_bgms()
@@ -110,14 +112,17 @@ class SameGame:
 
     def load_bgms(self):
         for state, file_path in self.bgm_files.items():
+            # 絶対パスを計算
+            absolute_path = os.path.join(self.base_path, file_path)
             try:
-                with open(file_path, "rt") as fin:
+                if not os.path.exists(absolute_path):
+                    raise FileNotFoundError(f"File not found: {absolute_path}")
+                with open(absolute_path, "r") as fin:
                     self.bgm_data[state] = json.loads(fin.read())
-#                    print(f"BGM data loaded for {state.name}: {self.bgm_data[state]}")  # デバッグ用
             except FileNotFoundError:
-                print(f"BGM file not found: {file_path}")
+                print(f"BGM file not found: {absolute_path}")
             except json.JSONDecodeError:
-                print(f"BGM file is not valid JSON: {file_path}")
+                print(f"BGM file is not valid JSON: {absolute_path}")
             except Exception as e:
                 print(f"Error loading BGM file for state {state.name}: {e}")
 
