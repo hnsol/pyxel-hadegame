@@ -77,10 +77,10 @@ class SameGame:
 
         self.difficulty_levels = {
             "Easy": {"grid_rows": 5, "grid_cols": 5, "colors": 3, "time_limit": None, "score_multiplier": 1.0},
-            "Normal": {"grid_rows": 7, "grid_cols": 12, "colors": 4, "time_limit": None, "score_multiplier": 1.2},
-            "Hard": {"grid_rows": 9, "grid_cols": 15, "colors": 5, "time_limit": 60, "score_multiplier": 1.5},
-            "Very Hard": {"grid_rows": 8, "grid_cols": 15, "colors": 6, "time_limit": 45, "score_multiplier": 2.0},
-            "Expert": {"grid_rows": 10, "grid_cols": 20, "colors": 8, "time_limit": 30, "score_multiplier": 3.0},
+            "Normal": {"grid_rows": 6, "grid_cols": 10, "colors": 4, "time_limit": None, "score_multiplier": 1.2},
+            "Hard": {"grid_rows": 8, "grid_cols": 12, "colors": 5, "time_limit": 90, "score_multiplier": 1.5},
+            "Very Hard": {"grid_rows": 9, "grid_cols": 15, "colors": 6, "time_limit": 60, "score_multiplier": 2.0},
+            "Expert": {"grid_rows": 10, "grid_cols": 18, "colors": 8, "time_limit": 45, "score_multiplier": 2.7},
         }
         self.current_difficulty = "Easy"
         self.grid_rows = self.difficulty_levels[self.current_difficulty]["grid_rows"]
