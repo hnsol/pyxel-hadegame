@@ -260,7 +260,8 @@ class SameGame:
                 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)
             ):
                 print("Quit button clicked")
-                self.state = GameState.OPENING  # OPENING画面に戻る
+                self.update_high_scores()  # スコアランキングを更新
+                self.state = GameState.SCORE_DISPLAY  # SCORE_DISPLAY画面に遷移
                 return
 
         if self.state == GameState.OPENING:
