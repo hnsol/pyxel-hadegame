@@ -234,34 +234,35 @@ class SameGame:
     def update(self):
         """ゲームの状態を更新"""
         mx, my = pyxel.mouse_x, pyxel.mouse_y
-
-        # Retryボタンの処理
-        retry_x = BUTTON_SPACING
-        retry_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
-        if (
-            retry_x <= mx <= retry_x + BUTTON_WIDTH
-            and retry_y <= my <= retry_y + BUTTON_HEIGHT
-            and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)
-        ):
-            print("Retry button clicked")
-            self.reset_game(use_saved_initial_state=True)  # 保存済みの初期状態に戻す
-            self.state = GameState.GAME_START  # ゲームを最初から開始
-            return
-
-        # Quitボタンの処理
-        quit_x = BUTTON_SPACING + BUTTON_WIDTH + BUTTON_SPACING
-        quit_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
-        if (
-            quit_x <= mx <= quit_x + BUTTON_WIDTH
-            and quit_y <= my <= quit_y + BUTTON_HEIGHT
-            and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)
-        ):
-            print("Quit button clicked")
-            self.state = GameState.SCORE_DISPLAY  # SCORE_DISPLAY画面に遷移
-            return
-
         previous_state = self.state  # ステータスの変更を追跡
+
+        # RetryボタンとQuitボタンの処理を特定の状態に限定
+        if self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
+            # Retryボタンの処理
+            retry_x = BUTTON_SPACING
+            retry_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
+            if (
+                retry_x <= mx <= retry_x + BUTTON_WIDTH
+                and retry_y <= my <= retry_y + BUTTON_HEIGHT
+                and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)
+            ):
+                print("Retry button clicked")
+                self.reset_game(use_saved_initial_state=True)  # 保存済みの初期状態に戻す
+                self.state = GameState.GAME_START  # ゲームを最初から開始
+                return
     
+            # Quitボタンの処理
+            quit_x = BUTTON_SPACING + BUTTON_WIDTH + BUTTON_SPACING
+            quit_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
+            if (
+                quit_x <= mx <= quit_x + BUTTON_WIDTH
+                and quit_y <= my <= quit_y + BUTTON_HEIGHT
+                and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)
+            ):
+                print("Quit button clicked")
+                self.state = GameState.OPENING  # OPENING画面に戻る
+                return
+
         if self.state == GameState.OPENING:
 #            print("GameState is OPENING")  # デバッグ出力
             if self.current_bgm != GameState.OPENING:
@@ -282,7 +283,9 @@ class SameGame:
                 if button.is_hovered(mx, my):
                     if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                         self.current_difficulty = button.label
+                        print(f"Difficulty button clicked: {self.current_difficulty}")  # デバッグ出力
                         self.apply_difficulty_settings()
+                        print(f"Current difficulty after apply: {self.current_difficulty}")  # デバッグ出力
                         self.state = GameState.GAME_START
     
         elif self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
@@ -365,12 +368,14 @@ class SameGame:
             self.handle_state_change()
 
     def apply_difficulty_settings(self):
+        print(f"Applying difficulty: {self.current_difficulty}")  # デバッグ出力
         settings = self.difficulty_levels[self.current_difficulty]
         self.grid_rows = settings["grid_rows"]
         self.grid_cols = settings["grid_cols"]
         self.num_colors = settings["colors"]
         self.time_limit = settings["time_limit"]
         self.score_multiplier = settings["score_multiplier"]
+        print(f"Settings applied: rows={self.grid_rows}, cols={self.grid_cols}, colors={self.num_colors}, time_limit={self.time_limit}, multiplier={self.score_multiplier}")
         # 難易度変更時に盤面をリセット
         self.reset_game(use_saved_initial_state=False)
 
