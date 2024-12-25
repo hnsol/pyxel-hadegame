@@ -102,7 +102,6 @@ class SameGame:
         self.current_bgm = None
 
         self.reset_game(use_saved_initial_state=False)
-        self.create_sounds()
 
         self.difficulty_buttons = []
         self.create_difficulty_buttons()
@@ -140,8 +139,8 @@ class SameGame:
     def play_bgm(self, state):
         """指定された状態に対応するBGMを再生"""
         if self.current_bgm == state:
+            print(f"BGM already playing for state: {state.name}")
             return  # 既に再生中の場合は何もしない
-    
         print(f"Switching to BGM for state in play_bgm: {state.name}")  # デバッグ用
 
         # 現在のBGMを停止
@@ -155,20 +154,13 @@ class SameGame:
             for ch, sound in zip(bgm_channels, self.bgm_data[state]):
                 pyxel.sounds[ch].set(*sound)
                 pyxel.play(ch, ch, loop=True)  # チャンネルごとにループ再生
-#                if not pyxel.play_pos(ch):  # チャンネルが再生されていない場合のみ再生
-#                    pyxel.play(ch, ch, loop=True)
         else:
             print(f"BGM data not found for state: {state.name}")  # デバッグ用
     
     def stop_bgm(self):
-#        """現在再生中のBGMを停止する"""
-#        if self.current_bgm is not None:
-#            bgm_channels = [1, 2, 3]  # BGM用のチャンネル
-#            for ch in bgm_channels:
-#                pyxel.stop(ch)
-#            self.current_bgm = None  # 現在のBGM状態をリセット
-#        bgm_channels = [1, 2, 3]  # BGM用のチャンネル
-        bgm_channels = [0, 1, 2, 3]  # 全チャンネル消す
+        print(f"Stopping all BGM channels")
+#        bgm_channels = [0, 1, 2, 3]  # 全チャンネル消す
+        bgm_channels = [1, 2, 3]  # 全チャンネル消す
         for ch in bgm_channels:
             pyxel.stop(ch)  # チャンネルごとに停止
         self.current_bgm = None  # 現在のBGM状態をリセット
@@ -191,16 +183,29 @@ class SameGame:
             self.difficulty_buttons.append(Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, diff["label"]))
         self.difficulties = difficulties  # 説明のために保持
 
-    def create_sounds(self):
-        """ゲーム内の効果音を準備"""
-        self.base_notes = ["c2", "d2", "e2", "f2", "g2", "a2", "b2", "c3"]
+    def play_effect(self, blocks_to_remove):
+        """消したマスの数に応じて上昇音階の効果音を再生"""
+        num_blocks = len(blocks_to_remove)
+    
+        # 基本となる上昇音階の定義
+        base_notes = ["c2", "d2", "e2", "g2", "a2", "c3"]
+        max_notes = min(len(base_notes), num_blocks)  # 消したマス数に応じて音階を制限
+        notes = base_notes[:max_notes]  # 必要な音階だけを取得
+    
+        # 再生速度を調整（少ない場合は速く、多い場合は少しゆっくり）
+        speed = max(5, 15 - (num_blocks // 2))
+    
+        # 効果音を設定
         pyxel.sounds[0].set(
-            notes=self.base_notes[0], #消したマスの色によって音を変えるのは未実装
-            tones="p",
-            volumes="5",
-            effects="n",
-            speed=15,
+            notes="".join(notes),  # 上昇音階を生成
+            tones="p",            # パルス音（爽やかな音）
+            volumes="5" * max_notes,  # 音量を一定に
+            effects="n" * max_notes,  # 効果なし（シンプルに）
+            speed=speed,          # スピード設定
         )
+    
+        # 効果音を再生
+        pyxel.play(0, 0)
 
     def calculate_progress(self):
         """盤面の進行状況を計算"""
@@ -403,7 +408,10 @@ class SameGame:
                     self.grid[by][bx] = -1
     
                 # 効果音専用チャンネル（0番）で再生
-                pyxel.play(0, color)
+#                pyxel.play(0, color)
+                # 固定の効果音を再生
+#                pyxel.play(0, 0)  # サウンド番号 0 をチャンネル 0 で再生
+                self.play_effect(blocks_to_remove)
                 self.score += int(len(blocks_to_remove) * (len(blocks_to_remove) ** 2) * self.score_multiplier)
                 self.apply_gravity()
                 self.shift_columns_left()
