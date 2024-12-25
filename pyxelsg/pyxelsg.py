@@ -616,7 +616,7 @@ class SameGame:
             draw_text(40, "Top 10 High Scores", pyxel.COLOR_YELLOW)
             for i, score in enumerate(self.high_scores):
                 color = pyxel.COLOR_YELLOW if i == self.current_score_rank else pyxel.COLOR_WHITE
-                pyxel.text(WINDOW_WIDTH // 2 - 30, 70 + i * 10, f"{i + 1}: {score}", color)
+                pyxel.text(WINDOW_WIDTH // 2 - 20, 70 + i * 10, f"{i + 1}: {score}", color)
 #            pyxel.text(WINDOW_WIDTH // 2 - 40, WINDOW_HEIGHT - 20, "Click to Return", pyxel.COLOR_WHITE)
             draw_text(200, "Click to Return", pyxel.COLOR_WHITE)
 
