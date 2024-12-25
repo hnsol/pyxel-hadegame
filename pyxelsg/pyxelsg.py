@@ -26,6 +26,19 @@ STATUS_AREA_HEIGHT = 30   # 表示エリアの高さ
 COLORS = [8, 11, 12, 13, 14, 15, 6, 7]  # 使用可能なPyxelの色番号
 DEFAULT_TOP_SCORES = [10000, 5000, 2500, 1000, 500, 250, 100, 50, 25, 10]  # デフォルトのトップ10スコア
 
+def draw_text(y, text, color, align="center", x_offset=0):
+    text_width = len(text) * 4
+    if align == "center":
+        x = (WINDOW_WIDTH - text_width) // 2
+    elif align == "left":
+        x = x_offset
+    elif align == "right":
+        x = WINDOW_WIDTH - text_width - x_offset
+    else:
+        raise ValueError(f"Invalid alignment: {align}")
+    
+    pyxel.text(x, y, text, color)
+    
 class GameState(Enum):
     OPENING = "opening"
     DIFFICULTY_SELECTION = "difficulty_selection"
@@ -37,6 +50,24 @@ class GameState(Enum):
     GAME_CLEARED = "game_cleared"
     SCORE_DISPLAY = "score_display"
     HIGH_SCORE_DISPLAY = "high_score_display"
+
+#class Button:
+#    def __init__(self, x, y, width, height, label):
+#        self.x = x
+#        self.y = y
+#        self.width = width
+#        self.height = height
+#        self.label = label
+#
+#    def is_hovered(self, mx, my):
+#        return self.x <= mx <= self.x + self.width and self.y <= my <= self.y + self.height
+#
+#    def draw(self, is_hovered):
+#        color = pyxel.COLOR_LIGHT_BLUE if is_hovered else pyxel.COLOR_GRAY
+#        pyxel.rect(self.x, self.y, self.width, self.height, color)
+#        text_x = self.x + (self.width // 2) - (len(self.label) * 2)
+#        text_y = self.y + (self.height // 2) - 4
+#        pyxel.text(text_x, text_y, self.label.capitalize(), pyxel.COLOR_WHITE)
 
 class Button:
     def __init__(self, x, y, width, height, label):
@@ -50,10 +81,14 @@ class Button:
         return self.x <= mx <= self.x + self.width and self.y <= my <= self.y + self.height
 
     def draw(self, is_hovered):
+        # ボタンの塗りつぶし
         color = pyxel.COLOR_LIGHT_BLUE if is_hovered else pyxel.COLOR_GRAY
         pyxel.rect(self.x, self.y, self.width, self.height, color)
-        text_x = self.x + (self.width // 2) - (len(self.label) * 2)
-        text_y = self.y + (self.height // 2) - 4
+
+        # テキストの中央配置
+        text_width = len(self.label) * 4  # 1文字あたりの幅を4ピクセルと仮定
+        text_x = self.x + (self.width - text_width) // 2
+        text_y = self.y + (self.height - 6) // 2  # テキスト高さをおおよそ6ピクセルと仮定
         pyxel.text(text_x, text_y, self.label.capitalize(), pyxel.COLOR_WHITE)
 
 class SameGame:
@@ -176,7 +211,8 @@ class SameGame:
         ]
         # ボタンを縦に並べるための開始位置を計算（中央に配置）
         start_x = (WINDOW_WIDTH - BUTTON_WIDTH) // 2 - 60
-        start_y = 40
+#        start_y = 40
+        start_y = 70
         for i, diff in enumerate(difficulties):
             x = start_x
             y = start_y + i * (BUTTON_HEIGHT + BUTTON_SPACING)
@@ -499,17 +535,37 @@ class SameGame:
         pyxel.cls(0)
     
         if self.state == GameState.OPENING:
-            pyxel.text(80, 50, "Welcome to SameGame", pyxel.COLOR_WHITE)
-            pyxel.text(30, 70, "How to Play:", pyxel.COLOR_YELLOW)
-            pyxel.text(30, 90, "1. Click connected blocks to remove them.", pyxel.COLOR_WHITE)
-            pyxel.text(30, 100, "2. Remove more blocks at once for higher scores.", pyxel.COLOR_WHITE)
-            pyxel.text(30, 110, "3. Clear all blocks for a bonus!", pyxel.COLOR_WHITE)
-            pyxel.text(30, 120, "4. Higher difficulty means higher scores!", pyxel.COLOR_WHITE)
-            pyxel.text(30, 130, "5. No moves left? Game over.", pyxel.COLOR_WHITE)
-            pyxel.text(80, 160, "Click to Start", pyxel.COLOR_WHITE)
+#            pyxel.text(80, 50, "Welcome to SameGame", pyxel.COLOR_WHITE)
+#            pyxel.text(30, 70, "How to Play:", pyxel.COLOR_YELLOW)
+#            pyxel.text(30, 90, "1. Click connected blocks to remove them.", pyxel.COLOR_WHITE)
+#            pyxel.text(30, 100, "2. Remove more blocks at once for higher scores.", pyxel.COLOR_WHITE)
+#            pyxel.text(30, 110, "3. Clear all blocks for a bonus!", pyxel.COLOR_WHITE)
+#            pyxel.text(30, 120, "4. Higher difficulty means higher scores!", pyxel.COLOR_WHITE)
+#            pyxel.text(30, 130, "5. No moves left? Game over.", pyxel.COLOR_WHITE)
+#            pyxel.text(80, 160, "Click to Start", pyxel.COLOR_WHITE)
+            # センタリングするテキスト
+            centered_texts = [
+                (40, "Welcome to SameGame", pyxel.COLOR_WHITE),
+                (180, "Click to Start", pyxel.COLOR_WHITE),
+            ]
+            for y, text, color in centered_texts:
+                draw_text(y, text, color, align="center")
+            
+            # 左揃えにするテキスト
+            left_aligned_texts = [
+                (70, "How to Play:", pyxel.COLOR_YELLOW),
+                (90, "1. Click connected blocks to remove them.", pyxel.COLOR_WHITE),
+                (100, "2. Remove more blocks at once for higher scores.", pyxel.COLOR_WHITE),
+                (110, "3. Clear all blocks for a bonus!", pyxel.COLOR_WHITE),
+                (120, "4. Higher difficulty means higher scores!", pyxel.COLOR_WHITE),
+                (130, "5. No moves left? Game over.", pyxel.COLOR_WHITE),
+            ]
+            for y, text, color in left_aligned_texts:
+                draw_text(y, text, color, align="left", x_offset=25)
 
         elif self.state == GameState.DIFFICULTY_SELECTION:
-            pyxel.text(WINDOW_WIDTH // 2 - 60, 10, "Select Difficulty", pyxel.COLOR_YELLOW)
+#            pyxel.text(WINDOW_WIDTH // 2 - 60, 10, "Select Difficulty", pyxel.COLOR_YELLOW)
+            draw_text(40, "Select Difficulty", pyxel.COLOR_YELLOW)
             for i, button in enumerate(self.difficulty_buttons):
                 is_hovered = button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
                 button.draw(is_hovered)
@@ -531,26 +587,38 @@ class SameGame:
     
             # それぞれの状態に応じたメッセージを上書き
             if self.state == GameState.TIME_UP:
-                pyxel.text(WINDOW_WIDTH // 2 - 30, WINDOW_HEIGHT // 2 - 10, "Time's Up!", pyxel.COLOR_RED)
+#                pyxel.text(WINDOW_WIDTH // 2 - 30, WINDOW_HEIGHT // 2 - 10, "Time's Up!", pyxel.COLOR_RED)
+                draw_text(WINDOW_HEIGHT // 2 - 10, "Time's Up!", pyxel.COLOR_RED)
             elif self.state == GameState.NO_MOVES:
-                pyxel.text(WINDOW_WIDTH // 2 - 50, WINDOW_HEIGHT // 2 - 10, "No Moves Available!", pyxel.COLOR_RED)
+#                pyxel.text(WINDOW_WIDTH // 2 - 50, WINDOW_HEIGHT // 2 - 10, "No Moves Available!", pyxel.COLOR_RED)
+                draw_text(WINDOW_HEIGHT // 2 - 10, "No Moves Available!", pyxel.COLOR_RED)
             elif self.state == GameState.GAME_CLEARED:
-                pyxel.text(WINDOW_WIDTH // 2 - 70, WINDOW_HEIGHT // 2 - 10, "Congratulations!", pyxel.COLOR_GREEN)
-                pyxel.text(WINDOW_WIDTH // 2 - 80, WINDOW_HEIGHT // 2 + 10, "You cleared the game!", pyxel.COLOR_WHITE)
-                pyxel.text(WINDOW_WIDTH // 2 - 50, WINDOW_HEIGHT // 2 + 30, f"Bonus: {int(self.score * 0.5)}", pyxel.COLOR_YELLOW)
-                pyxel.text(WINDOW_WIDTH // 2 - 40, WINDOW_HEIGHT // 2 + 50, "Click to Continue", pyxel.COLOR_WHITE)
+#                pyxel.text(WINDOW_WIDTH // 2 - 70, WINDOW_HEIGHT // 2 - 10, "Congratulations!", pyxel.COLOR_GREEN)
+#                pyxel.text(WINDOW_WIDTH // 2 - 80, WINDOW_HEIGHT // 2 + 10, "You cleared the game!", pyxel.COLOR_WHITE)
+#                
+#                pyxel.text(WINDOW_WIDTH // 2 - 50, WINDOW_HEIGHT // 2 + 30, f"Bonus: {int(self.score * 0.5)}", pyxel.COLOR_YELLOW)
+#                pyxel.text(WINDOW_WIDTH // 2 - 40, WINDOW_HEIGHT // 2 + 50, "Click to Continue", pyxel.COLOR_WHITE)
+                draw_text(WINDOW_HEIGHT // 2 - 30, "Congratulations!", pyxel.COLOR_GREEN)
+                draw_text(WINDOW_HEIGHT // 2 - 10, "You cleared the game!", pyxel.COLOR_WHITE)
+                draw_text(WINDOW_HEIGHT // 2 + 10, f"Bonus: {int(self.score * 0.5)}", pyxel.COLOR_YELLOW)
+                draw_text(WINDOW_HEIGHT // 2 + 30, "Click to Continue", pyxel.COLOR_WHITE)
 
         elif self.state == GameState.SCORE_DISPLAY:
-            pyxel.text(WINDOW_WIDTH // 2 - 30, WINDOW_HEIGHT // 2 - 20, "Your Score", pyxel.COLOR_YELLOW)
-            pyxel.text(WINDOW_WIDTH // 2 - 20, WINDOW_HEIGHT // 2, f"{int(self.score)}", pyxel.COLOR_YELLOW)
-            pyxel.text(WINDOW_WIDTH // 2 - 40, WINDOW_HEIGHT // 2 + 20, "Click to Continue", pyxel.COLOR_WHITE)
+#            pyxel.text(WINDOW_WIDTH // 2 - 30, WINDOW_HEIGHT // 2 - 20, "Your Score", pyxel.COLOR_YELLOW)
+#            pyxel.text(WINDOW_WIDTH // 2 - 20, WINDOW_HEIGHT // 2, f"{int(self.score)}", pyxel.COLOR_YELLOW)
+#            pyxel.text(WINDOW_WIDTH // 2 - 40, WINDOW_HEIGHT // 2 + 20, "Click to Continue", pyxel.COLOR_WHITE)
+            draw_text(WINDOW_HEIGHT // 2 - 20, "Your Score", pyxel.COLOR_YELLOW)
+            draw_text(WINDOW_HEIGHT // 2,      f"{int(self.score)}", pyxel.COLOR_YELLOW)
+            draw_text(WINDOW_HEIGHT // 2 + 20, "Click to Continue", pyxel.COLOR_WHITE)
     
         elif self.state == GameState.HIGH_SCORE_DISPLAY:
-            pyxel.text(WINDOW_WIDTH // 2 - 60, 10, "Top 10 High Scores", pyxel.COLOR_YELLOW)
+#            pyxel.text(WINDOW_WIDTH // 2 - 60, 10, "Top 10 High Scores", pyxel.COLOR_YELLOW)
+            draw_text(40, "Top 10 High Scores", pyxel.COLOR_YELLOW)
             for i, score in enumerate(self.high_scores):
                 color = pyxel.COLOR_YELLOW if i == self.current_score_rank else pyxel.COLOR_WHITE
-                pyxel.text(WINDOW_WIDTH // 2 - 30, 30 + i * 10, f"{i + 1}: {score}", color)
-            pyxel.text(WINDOW_WIDTH // 2 - 40, WINDOW_HEIGHT - 20, "Click to Return", pyxel.COLOR_WHITE)
+                pyxel.text(WINDOW_WIDTH // 2 - 30, 70 + i * 10, f"{i + 1}: {score}", color)
+#            pyxel.text(WINDOW_WIDTH // 2 - 40, WINDOW_HEIGHT - 20, "Click to Return", pyxel.COLOR_WHITE)
+            draw_text(200, "Click to Return", pyxel.COLOR_WHITE)
 
     def draw_buttons(self):
         """
