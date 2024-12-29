@@ -205,7 +205,7 @@ class SameGame:
 
         self.difficulty_buttons = []
         self.create_difficulty_buttons()
-
+        self.create_language_button()  # 言語切り替えボタンを作成
         self.current_bgm = None  # 現在再生中のBGMを記録
         pyxel.run(self.update, self.draw)
 
@@ -271,6 +271,14 @@ class SameGame:
         for ch in bgm_channels:
             pyxel.stop(ch)  # チャンネルごとに停止
         self.current_bgm = None  # 現在のBGM状態をリセット
+
+    def create_language_button(self):
+        """オープニング画面用の言語切り替えボタンを作成"""
+        button_width = 20
+        button_height = 20
+        x = WINDOW_WIDTH - 30 # 画面右に配置
+        y =  10 # 画面上部に配置
+        self.language_button = Button(x, y, button_width, button_height, "EN")
 
     def create_difficulty_buttons(self):
         # 各難易度のラベルと説明
@@ -381,7 +389,19 @@ class SameGame:
 #            print("GameState is OPENING")  # デバッグ出力
             if self.current_bgm != GameState.OPENING:
                 self.play_bgm(GameState.OPENING)
-            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+
+            # 言語切り替えボタンのクリック処理
+            language_button_clicked = False  # フラグを初期化
+            if self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y):
+                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                    self.current_language = "en" if self.current_language == "ja" else "ja"
+                    print(f"Language changed to: {self.current_language}")  # デバッグ用
+                    # ボタンラベルを更新
+                    self.language_button.label = "EN" if self.current_language == "ja" else "JA"
+                    language_button_clicked = True  # ボタンが押されたことを記録
+
+            # 言語ボタンがクリックされていない場合のみ、次の処理を実行
+            if not language_button_clicked and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 print("Clicked in opening screen")  # デバッグ出力
                 self.state = GameState.DIFFICULTY_SELECTION
                 print(f"State changed to: {self.state}")  # 状態変更後の確認
@@ -654,6 +674,10 @@ class SameGame:
             left_aligned_texts = translations[self.current_language]["left_aligned_texts"]
             for y, text, color in left_aligned_texts:
                 self.draw_text(y, text, color, align="left", x_offset=10)
+
+            # 言語切り替えボタンの描画
+            is_hovered = self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
+            self.language_button.draw(is_hovered)
 
         elif self.state == GameState.DIFFICULTY_SELECTION:
 #            pyxel.text(WINDOW_WIDTH // 2 - 60, 10, "Select Difficulty", pyxel.COLOR_YELLOW)
