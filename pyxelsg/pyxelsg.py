@@ -45,11 +45,11 @@ translations = {
         ],
         "difficulty_text": "Select Difficulty",
         "difficulty_levels": [
-            {"label": "Easy", "description": "Small grid, few colors"},
-            {"label": "Normal", "description": "Larger grid, more colors"},
-            {"label": "Hard", "description": "Timed play, more colors"},
-            {"label": "Very Hard", "description": "Shorter time, even more colors"},
-            {"label": "Expert", "description": "Maximum grid size, most colors"},
+            {"key": "easy", "label": "Easy", "description": "Small grid, few colors"},
+            {"key": "normal", "label": "Normal", "description": "Larger grid, more colors"},
+            {"key": "hard", "label": "Hard", "description": "Timed play, more colors"},
+            {"key": "very_hard", "label": "Very Hard", "description": "Shorter time, even more colors"},
+            {"key": "expert", "label": "Expert", "description": "Maximum grid size, most colors"},
         ],
     },
     "ja": {
@@ -68,11 +68,11 @@ translations = {
         ],
         "difficulty_text": "難易度を選んでください",
         "difficulty_levels": [
-            {"label": "かんたん", "description": "小さい盤面、少ない色"},
-            {"label": "ふつう", "description": "大きな盤面、やや多い色"},
-            {"label": "むずかしい", "description": "制限時間あり、色が増える"},
-            {"label": "めちゃむず", "description": "短い制限時間、さらに多い色"},
-            {"label": "たつじん", "description": "最大盤面、最も多い色"},
+            {"key": "easy", "label": "かんたん", "description": "小さい盤面、少ない色"},
+            {"key": "normal", "label": "ふつう", "description": "大きな盤面、やや多い色"},
+            {"key": "hard", "label": "むずかしい", "description": "制限時間あり、色が増える"},
+            {"key": "very_hard", "label": "めちゃむず", "description": "短い制限時間、さらに多い色"},
+            {"key": "expert", "label": "たつじん", "description": "最大盤面、最も多い色"},
         ],
     },
 }
@@ -216,13 +216,13 @@ class SameGame:
         self.load_bgms()
 
         self.difficulty_levels = {
-            "Easy": {"grid_rows": 5, "grid_cols": 5, "colors": 3, "time_limit": None, "score_multiplier": 1.0},
-            "Normal": {"grid_rows": 6, "grid_cols": 10, "colors": 4, "time_limit": None, "score_multiplier": 1.2},
-            "Hard": {"grid_rows": 8, "grid_cols": 12, "colors": 5, "time_limit": 90, "score_multiplier": 1.5},
-            "Very Hard": {"grid_rows": 9, "grid_cols": 15, "colors": 5, "time_limit": 60, "score_multiplier": 2.0},
-            "Expert": {"grid_rows": 10, "grid_cols": 18, "colors": 5, "time_limit": 45, "score_multiplier": 2.7},
+            "easy": {"grid_rows": 5, "grid_cols": 5, "colors": 3, "time_limit": None, "score_multiplier": 1.0},
+            "normal": {"grid_rows": 6, "grid_cols": 10, "colors": 4, "time_limit": None, "score_multiplier": 1.2},
+            "hard": {"grid_rows": 8, "grid_cols": 12, "colors": 5, "time_limit": 90, "score_multiplier": 1.5},
+            "very_Hard": {"grid_rows": 9, "grid_cols": 15, "colors": 5, "time_limit": 60, "score_multiplier": 2.0},
+            "expert": {"grid_rows": 10, "grid_cols": 18, "colors": 5, "time_limit": 45, "score_multiplier": 2.7},
         }
-        self.current_difficulty = "Easy"
+        self.current_difficulty = "easy"
         self.grid_rows = self.difficulty_levels[self.current_difficulty]["grid_rows"]
         self.grid_cols = self.difficulty_levels[self.current_difficulty]["grid_cols"]
         self.num_colors = self.difficulty_levels[self.current_difficulty]["colors"]
@@ -351,10 +351,12 @@ class SameGame:
         for i, diff in enumerate(difficulty_levels):
             x = start_x
             y = start_y + i * (BUTTON_HEIGHT + BUTTON_SPACING)
-#            self.difficulty_buttons.append(Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, diff["label"]))
-            label = diff["label"]  # 現在の言語に応じたラベル
-            print(f"Creating button with label: {label}")  # デバッグ用
-            self.difficulty_buttons.append(Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, label))
+#            label = diff["label"]  # 現在の言語に応じたラベル
+#            print(f"Creating button with label: {label}")  # デバッグ用
+#            self.difficulty_buttons.append(Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, label))
+            button = Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, diff["label"])
+            button.key = diff["key"]  # 内部キーをボタンに追加
+            self.difficulty_buttons.append(button)
 
     def play_effect(self, blocks_to_remove):
         """消したマスの数に応じて上昇音階の効果音を再生"""
@@ -474,13 +476,17 @@ class SameGame:
                 print(f"Switching to BGM for state game state: {GameState.DIFFICULTY_SELECTION}")  # デバッグ用
             self.reset_game(use_saved_initial_state=False)
             for button in self.difficulty_buttons:
-                if button.is_hovered(mx, my):
-                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                        self.current_difficulty = button.label
-                        print(f"Difficulty button clicked: {self.current_difficulty}")  # デバッグ出力
-                        self.apply_difficulty_settings()
-                        print(f"Current difficulty after apply: {self.current_difficulty}")  # デバッグ出力
-                        self.state = GameState.GAME_START
+#                if button.is_hovered(mx, my):
+#                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+#                        self.current_difficulty = button.label
+#                        print(f"Difficulty button clicked: {self.current_difficulty}")  # デバッグ出力
+#                        self.apply_difficulty_settings()
+#                        print(f"Current difficulty after apply: {self.current_difficulty}")  # デバッグ出力
+#                        self.state = GameState.GAME_START
+                if button.is_hovered(pyxel.mouse_x, pyxel.mouse_y) and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                    print(f"Difficulty button clicked: {button.key}")
+                    self.apply_difficulty_settings(button.key)
+                    self.state = GameState.GAME_START
     
         elif self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
             # 序盤、中盤、終盤の進行状態を確認
@@ -561,15 +567,16 @@ class SameGame:
         if self.state != previous_state:
             self.handle_state_change()
 
-    def apply_difficulty_settings(self):
+    def apply_difficulty_settings(self, difficulty_key):
         print(f"Applying difficulty: {self.current_difficulty}")  # デバッグ出力
-        settings = self.difficulty_levels[self.current_difficulty]
+#        settings = self.difficulty_levels[self.current_difficulty]
+        settings = self.difficulty_levels[difficulty_key]  # 内部キーで設定を取得
         self.grid_rows = settings["grid_rows"]
         self.grid_cols = settings["grid_cols"]
         self.num_colors = settings["colors"]
         self.time_limit = settings["time_limit"]
         self.score_multiplier = settings["score_multiplier"]
-        print(f"Settings applied: rows={self.grid_rows}, cols={self.grid_cols}, colors={self.num_colors}, time_limit={self.time_limit}, multiplier={self.score_multiplier}")
+        print(f"Settings applied: {settings}")
         # 難易度変更時に盤面をリセット
         self.reset_game(use_saved_initial_state=False)
 
