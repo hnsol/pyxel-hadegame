@@ -12,7 +12,7 @@ import copy
 from enum import Enum
 
 # 定数の設定
-WINDOW_WIDTH = 240
+WINDOW_WIDTH = 256
 WINDOW_HEIGHT = 240
 
 #BUTTON_WIDTH = 80
@@ -30,31 +30,49 @@ DEFAULT_TOP_SCORES = [10000, 5000, 2500, 1000, 500, 250, 100, 50, 25, 10]  # デ
 # 翻訳データを辞書形式で定義 将来的にはファイルに切り出す予定
 translations = {
     "en": {
+        "language_button_label": "JA",  # 言語切り替えボタンのラベル
         "centered_texts": [
             (40, "Welcome to SameGame", pyxel.COLOR_WHITE),
             (180, "Click to Start", pyxel.COLOR_WHITE),
         ],
         "left_aligned_texts": [
             (70, "How to Play:", pyxel.COLOR_YELLOW),
-            (90, "1. Click connected blocks to remove them.", pyxel.COLOR_WHITE),
-            (100, "2. Remove more blocks at once for higher scores.", pyxel.COLOR_WHITE),
-            (110, "3. Clear all blocks for a bonus!", pyxel.COLOR_WHITE),
-            (120, "4. Higher difficulty means higher scores!", pyxel.COLOR_WHITE),
-            (130, "5. No moves left? Game over.", pyxel.COLOR_WHITE),
+            (95, "1. Click connected blocks to remove them.", pyxel.COLOR_WHITE),
+            (110, "2. Remove more blocks at once for higher scores.", pyxel.COLOR_WHITE),
+            (125, "3. Clear all blocks for a bonus!", pyxel.COLOR_WHITE),
+            (140, "4. Higher difficulty means higher scores!", pyxel.COLOR_WHITE),
+            (155, "5. No moves left? Game over.", pyxel.COLOR_WHITE),
+        ],
+        "difficulty_text": "Select Difficulty",
+        "difficulty_levels": [
+            {"label": "Easy", "description": "Small grid, few colors"},
+            {"label": "Normal", "description": "Larger grid, more colors"},
+            {"label": "Hard", "description": "Timed play, more colors"},
+            {"label": "Very Hard", "description": "Shorter time, even more colors"},
+            {"label": "Expert", "description": "Maximum grid size, most colors"},
         ],
     },
     "ja": {
+        "language_button_label": "EN",  # 言語切り替えボタンのラベル
         "centered_texts": [
             (40, "さめがめ にようこそ", pyxel.COLOR_WHITE),
             (180, "クリックして開始", pyxel.COLOR_WHITE),
         ],
         "left_aligned_texts": [
-            (70,  "あそびかた:", pyxel.COLOR_YELLOW),
-            (95,  "1. 同じ色のブロックをクリックして消しましょう。", pyxel.COLOR_WHITE),
+            (70, "あそびかた:", pyxel.COLOR_YELLOW),
+            (95, "1. 同じ色のブロックをクリックして消しましょう。", pyxel.COLOR_WHITE),
             (110, "2. 一度に多くのブロックを消すとスコアが上がります。", pyxel.COLOR_WHITE),
             (125, "3. 全てのブロックを消すとボーナス！", pyxel.COLOR_WHITE),
             (140, "4. むずかしいほど高いスコアが得られます！", pyxel.COLOR_WHITE),
             (155, "5. 消せるブロックがなくなったらゲームオーバー。", pyxel.COLOR_WHITE),
+        ],
+        "difficulty_text": "難易度を選んでください",
+        "difficulty_levels": [
+            {"label": "かんたん", "description": "小さい盤面、少ない色"},
+            {"label": "ふつう", "description": "大きな盤面、やや多い色"},
+            {"label": "むずかしい", "description": "制限時間あり、色が増える"},
+            {"label": "めちゃむず", "description": "短い制限時間、さらに多い色"},
+            {"label": "たつじん", "description": "最大盤面、最も多い色"},
         ],
     },
 }
@@ -131,16 +149,38 @@ class Button:
     def is_hovered(self, mx, my):
         return self.x <= mx <= self.x + self.width and self.y <= my <= self.y + self.height
 
-    def draw(self, is_hovered):
+    def draw(self, is_hovered, draw_text_func=None, font=None):
         # ボタンの塗りつぶし
         color = pyxel.COLOR_LIGHT_BLUE if is_hovered else pyxel.COLOR_GRAY
         pyxel.rect(self.x, self.y, self.width, self.height, color)
 
         # テキストの中央配置
-        text_width = len(self.label) * 4  # 1文字あたりの幅を4ピクセルと仮定
-        text_x = self.x + (self.width - text_width) // 2
-        text_y = self.y + (self.height - 6) // 2  # テキスト高さをおおよそ6ピクセルと仮定
-        pyxel.text(text_x, text_y, self.label.capitalize(), pyxel.COLOR_WHITE)
+#        text_width = len(self.label) * 4  # 1文字あたりの幅を4ピクセルと仮定
+#        text_x = self.x + (self.width - text_width) // 2
+#        text_y = self.y + (self.height - 6) // 2  # テキスト高さをおおよそ6ピクセルと仮定
+#        pyxel.text(text_x, text_y, self.label.capitalize(), pyxel.COLOR_WHITE)
+        # テキストの中央配置
+#        if self.label:  # ラベルがある場合にのみ描画
+##            print(f"Class Button, label exists: {self.label}")  # デバッグ用
+#            text_width = len(self.label) * 4  # 1文字あたりの幅を4ピクセルと仮定
+#            text_x = self.x + (self.width - text_width) // 2
+#            text_y = self.y + (self.height - 6) // 2  # テキスト高さをおおよそ6ピクセルと仮定
+#            pyxel.text(text_x, text_y, self.label, pyxel.COLOR_WHITE)
+        # ボタンラベルの描画
+        if self.label and draw_text_func:
+            # 今までの単純な "pyxel.text()" をやめて、draw_text() を呼び出す
+            text_width = font.text_width(self.label)
+            text_x = self.x + (self.width - text_width) // 2
+            text_y = self.y + (self.height - 12) // 2 # テキスト高さをおおよそ12ピクセルの場合
+            draw_text_func(
+                y=text_y,
+                text=self.label,
+                color=pyxel.COLOR_WHITE,
+                align="left",        # 中央揃えっぽくしたければ 'left' + x_offset を工夫
+                x_offset=text_x,
+                font=font
+            )
+
 
 class SameGame:
     def __init__(self):
@@ -179,8 +219,8 @@ class SameGame:
             "Easy": {"grid_rows": 5, "grid_cols": 5, "colors": 3, "time_limit": None, "score_multiplier": 1.0},
             "Normal": {"grid_rows": 6, "grid_cols": 10, "colors": 4, "time_limit": None, "score_multiplier": 1.2},
             "Hard": {"grid_rows": 8, "grid_cols": 12, "colors": 5, "time_limit": 90, "score_multiplier": 1.5},
-            "Very Hard": {"grid_rows": 9, "grid_cols": 15, "colors": 6, "time_limit": 60, "score_multiplier": 2.0},
-            "Expert": {"grid_rows": 10, "grid_cols": 18, "colors": 8, "time_limit": 45, "score_multiplier": 2.7},
+            "Very Hard": {"grid_rows": 9, "grid_cols": 15, "colors": 5, "time_limit": 60, "score_multiplier": 2.0},
+            "Expert": {"grid_rows": 10, "grid_cols": 18, "colors": 5, "time_limit": 45, "score_multiplier": 2.7},
         }
         self.current_difficulty = "Easy"
         self.grid_rows = self.difficulty_levels[self.current_difficulty]["grid_rows"]
@@ -280,24 +320,41 @@ class SameGame:
         y =  10 # 画面上部に配置
         self.language_button = Button(x, y, button_width, button_height, "EN")
 
+#    def create_difficulty_buttons(self):
+#        # 各難易度のラベルと説明
+#        difficulties = [
+#            {"label": "Easy",      "description": "Small grid, few colors"},
+#            {"label": "Normal",    "description": "Larger grid, more colors"},
+#            {"label": "Hard",      "description": "Timed play, more colors"},
+#            {"label": "Very Hard", "description": "Shorter time, even more colors"},
+#            {"label": "Expert",    "description": "Maximum grid size, most colors"},
+#        ]
+#        # ボタンを縦に並べるための開始位置を計算（中央に配置）
+#        start_x = (WINDOW_WIDTH - BUTTON_WIDTH) // 2 - 60
+##        start_y = 40
+#        start_y = 70
+#        for i, diff in enumerate(difficulties):
+#            x = start_x
+#            y = start_y + i * (BUTTON_HEIGHT + BUTTON_SPACING)
+#            self.difficulty_buttons.append(Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, diff["label"]))
+#        self.difficulties = difficulties  # 説明のために保持
+
     def create_difficulty_buttons(self):
-        # 各難易度のラベルと説明
-        difficulties = [
-            {"label": "Easy",      "description": "Small grid, few colors"},
-            {"label": "Normal",    "description": "Larger grid, more colors"},
-            {"label": "Hard",      "description": "Timed play, more colors"},
-            {"label": "Very Hard", "description": "Shorter time, even more colors"},
-            {"label": "Expert",    "description": "Maximum grid size, most colors"},
-        ]
-        # ボタンを縦に並べるための開始位置を計算（中央に配置）
+        # 現在の言語で難易度情報を取得
+        difficulty_levels = translations[self.current_language]["difficulty_levels"]
+    
+        # ボタンを縦に並べるための開始位置を計算
         start_x = (WINDOW_WIDTH - BUTTON_WIDTH) // 2 - 60
-#        start_y = 40
         start_y = 70
-        for i, diff in enumerate(difficulties):
+        self.difficulty_buttons = []
+    
+        for i, diff in enumerate(difficulty_levels):
             x = start_x
             y = start_y + i * (BUTTON_HEIGHT + BUTTON_SPACING)
-            self.difficulty_buttons.append(Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, diff["label"]))
-        self.difficulties = difficulties  # 説明のために保持
+#            self.difficulty_buttons.append(Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, diff["label"]))
+            label = diff["label"]  # 現在の言語に応じたラベル
+            print(f"Creating button with label: {label}")  # デバッグ用
+            self.difficulty_buttons.append(Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, label))
 
     def play_effect(self, blocks_to_remove):
         """消したマスの数に応じて上昇音階の効果音を再生"""
@@ -396,8 +453,11 @@ class SameGame:
                 if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                     self.current_language = "en" if self.current_language == "ja" else "ja"
                     print(f"Language changed to: {self.current_language}")  # デバッグ用
-                    # ボタンラベルを更新
-                    self.language_button.label = "EN" if self.current_language == "ja" else "JA"
+#                    # ボタンラベルを更新
+#                    self.language_button.label = "EN" if self.current_language == "ja" else "JA"
+                    # ボタンのラベルを翻訳データから取得して更新
+                    self.language_button.label = translations[self.current_language]["language_button_label"]
+                    self.create_difficulty_buttons()  # 言語切り替え時にボタンを再生成
                     language_button_clicked = True  # ボタンが押されたことを記録
 
             # 言語ボタンがクリックされていない場合のみ、次の処理を実行
@@ -673,7 +733,7 @@ class SameGame:
     
             left_aligned_texts = translations[self.current_language]["left_aligned_texts"]
             for y, text, color in left_aligned_texts:
-                self.draw_text(y, text, color, align="left", x_offset=10)
+                self.draw_text(y, text, color, align="left", x_offset=25)
 
             # 言語切り替えボタンの描画
             is_hovered = self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
@@ -681,13 +741,41 @@ class SameGame:
 
         elif self.state == GameState.DIFFICULTY_SELECTION:
 #            pyxel.text(WINDOW_WIDTH // 2 - 60, 10, "Select Difficulty", pyxel.COLOR_YELLOW)
-            draw_text(40, "Select Difficulty", pyxel.COLOR_YELLOW)
+#            draw_text(40, "Select Difficulty", pyxel.COLOR_YELLOW)
+#            for i, button in enumerate(self.difficulty_buttons):
+#                is_hovered = button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
+#                button.draw(is_hovered)
+#                # 説明文をボタンの右側に表示
+#                description = self.difficulties[i]["description"]
+#                pyxel.text(button.x + button.width + 10, button.y + 5, description, pyxel.COLOR_WHITE)
+
+            # タイトルを描画
+            difficulty_text = translations[self.current_language]["difficulty_text"]
+            self.draw_text(40, difficulty_text, pyxel.COLOR_YELLOW, align="center")
+            
+            # ボタンと説明の描画
+            difficulty_levels = translations[self.current_language]["difficulty_levels"]
             for i, button in enumerate(self.difficulty_buttons):
                 is_hovered = button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
-                button.draw(is_hovered)
+#                button.draw(is_hovered)
+                button.draw(
+                    is_hovered,
+                    draw_text_func=self.draw_text,  # ← ボタン側に渡す
+                    font=self.font_small            # ← BDF フォントを指定する
+                )
+
                 # 説明文をボタンの右側に表示
-                description = self.difficulties[i]["description"]
-                pyxel.text(button.x + button.width + 10, button.y + 5, description, pyxel.COLOR_WHITE)
+                description = difficulty_levels[i]["description"]
+#                self.draw_text(button.x + button.width + 10, button.y + 5, description, pyxel.COLOR_WHITE, align="left", font=self.font_small)
+#                self.draw_text(button.y + 2, description, pyxel.COLOR_WHITE, align="left", x_offset=button.x + button.width + 10, font=self.font_small)
+                self.draw_text(
+                    y=button.y + 2,
+                    text=description,
+                    color=pyxel.COLOR_WHITE,
+                    align="left",
+                    x_offset=button.x + button.width + 10,
+                    font=self.font_small
+                )
     
         elif self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
             # 盤面とボタン・ステータスを描画
