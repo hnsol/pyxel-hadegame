@@ -26,19 +26,70 @@ STATUS_AREA_HEIGHT = 30   # 表示エリアの高さ
 COLORS = [8, 11, 12, 13, 14, 15, 6, 7]  # 使用可能なPyxelの色番号
 DEFAULT_TOP_SCORES = [10000, 5000, 2500, 1000, 500, 250, 100, 50, 25, 10]  # デフォルトのトップ10スコア
 
-def draw_text(y, text, color, align="center", x_offset=0):
-    text_width = len(text) * 4
-    if align == "center":
-        x = (WINDOW_WIDTH - text_width) // 2
-    elif align == "left":
-        x = x_offset
-    elif align == "right":
-        x = WINDOW_WIDTH - text_width - x_offset
-    else:
-        raise ValueError(f"Invalid alignment: {align}")
+
+# 翻訳データを辞書形式で定義 将来的にはファイルに切り出す予定
+translations = {
+    "en": {
+        "centered_texts": [
+            (40, "Welcome to SameGame", pyxel.COLOR_WHITE),
+            (180, "Click to Start", pyxel.COLOR_WHITE),
+        ],
+        "left_aligned_texts": [
+            (70, "How to Play:", pyxel.COLOR_YELLOW),
+            (90, "1. Click connected blocks to remove them.", pyxel.COLOR_WHITE),
+            (100, "2. Remove more blocks at once for higher scores.", pyxel.COLOR_WHITE),
+            (110, "3. Clear all blocks for a bonus!", pyxel.COLOR_WHITE),
+            (120, "4. Higher difficulty means higher scores!", pyxel.COLOR_WHITE),
+            (130, "5. No moves left? Game over.", pyxel.COLOR_WHITE),
+        ],
+    },
+    "ja": {
+        "centered_texts": [
+            (40, "セイムゲームへようこそ", pyxel.COLOR_WHITE),
+            (180, "クリックして開始", pyxel.COLOR_WHITE),
+        ],
+        "left_aligned_texts": [
+            (70, "遊び方:", pyxel.COLOR_YELLOW),
+            (90, "1. 同じ色のブロックをクリックして消しましょう。", pyxel.COLOR_WHITE),
+            (100, "2. 一度に多くのブロックを消すとスコアが上がります。", pyxel.COLOR_WHITE),
+            (110, "3. 全てのブロックを消すとボーナス！", pyxel.COLOR_WHITE),
+            (120, "4. 難しい設定ほど高いスコアが得られます！", pyxel.COLOR_WHITE),
+            (130, "5. 動ける手がなくなったらゲームオーバー。", pyxel.COLOR_WHITE),
+        ],
+    },
+}
+
+def get_translated_texts(key):
+    """現在の言語に基づいてテキストを取得"""
+    return translations[current_language].get(key, [])
+
+# def draw_text(y, text, color, align="center", x_offset=0):
+#     text_width = len(text) * 4
+#     if align == "center":
+#         x = (WINDOW_WIDTH - text_width) // 2
+#     elif align == "left":
+#         x = x_offset
+#     elif align == "right":
+#         x = WINDOW_WIDTH - text_width - x_offset
+#     else:
+#         raise ValueError(f"Invalid alignment: {align}")
     
-    pyxel.text(x, y, text, color)
-    
+#     pyxel.text(x, y, text, color)
+
+#def draw_text(self, y, text, color, align="center", x_offset=0, font=None):
+#    """指定したフォントでテキストを描画"""
+#    font = font or self.font_small
+#    text_width = font.text_width(text)
+#    if align == "center":
+#        x = (WINDOW_WIDTH - text_width) // 2
+#    elif align == "left":
+#        x = x_offset
+#    elif align == "right":
+#        x = WINDOW_WIDTH - text_width - x_offset
+#    else:
+#        raise ValueError(f"Invalid alignment: {align}")
+#    pyxel.text(x, y, text, color, font)
+
 class GameState(Enum):
     OPENING = "opening"
     DIFFICULTY_SELECTION = "difficulty_selection"
@@ -93,6 +144,19 @@ class Button:
 
 class SameGame:
     def __init__(self):
+        self.current_language = "ja"
+
+        # ベースパスを取得
+        self.base_path = os.path.dirname(os.path.abspath(__file__))
+
+        # フォントの読み込み
+        try:
+            self.font_small = self.load_font("assets/umplus_j10r.bdf")
+            self.font_large = self.load_font("assets/umplus_j12r.bdf")  # 必要であれば
+        except FileNotFoundError as e:
+            print(f"Error loading font: {e}")
+            exit(1)  # フォントがない場合はエラー終了
+
         # BGM関連の初期化
         self.bgm_files = {
             GameState.OPENING: "assets/opening_music.json",            # オープニング画面のBGM
@@ -143,6 +207,13 @@ class SameGame:
 
         self.current_bgm = None  # 現在再生中のBGMを記録
         pyxel.run(self.update, self.draw)
+
+    def load_font(self, relative_path):
+        """BDFフォントを絶対パスで読み込む"""
+        absolute_path = os.path.join(self.base_path, relative_path)
+        if not os.path.exists(absolute_path):
+            raise FileNotFoundError(f"Font file not found: {absolute_path}")
+        return pyxel.Font(absolute_path)
 
     def load_bgms(self):
         for state, file_path in self.bgm_files.items():
@@ -530,38 +601,58 @@ class SameGame:
         except ValueError:
             self.current_score_rank = None
 
+    def draw_text(self, y, text, color, align="center", x_offset=0, font=None):
+        """BDFフォントを使用してテキストを描画"""
+        font = font or self.font_small  # デフォルトで self.font_small を使用
+#        text_width = len(text) * 4  # フォントの幅を計算（適切に変更可能）
+        text_width = font.text_width(text)  # フォントの幅を計算（適切に変更可能）
+        
+        if align == "center":
+            x = (WINDOW_WIDTH - text_width) // 2
+        elif align == "left":
+            x = x_offset
+        elif align == "right":
+            x = WINDOW_WIDTH - text_width - x_offset
+        else:
+            raise ValueError(f"Invalid alignment: {align}")
+        
+        # Pyxelでのテキスト描画
+#        pyxel.text(x, y, text, color)
+        pyxel.text(x, y, text, color, font)
+
     def draw(self):
         # 画面をクリア
         pyxel.cls(0)
     
         if self.state == GameState.OPENING:
-#            pyxel.text(80, 50, "Welcome to SameGame", pyxel.COLOR_WHITE)
-#            pyxel.text(30, 70, "How to Play:", pyxel.COLOR_YELLOW)
-#            pyxel.text(30, 90, "1. Click connected blocks to remove them.", pyxel.COLOR_WHITE)
-#            pyxel.text(30, 100, "2. Remove more blocks at once for higher scores.", pyxel.COLOR_WHITE)
-#            pyxel.text(30, 110, "3. Clear all blocks for a bonus!", pyxel.COLOR_WHITE)
-#            pyxel.text(30, 120, "4. Higher difficulty means higher scores!", pyxel.COLOR_WHITE)
-#            pyxel.text(30, 130, "5. No moves left? Game over.", pyxel.COLOR_WHITE)
-#            pyxel.text(80, 160, "Click to Start", pyxel.COLOR_WHITE)
-            # センタリングするテキスト
-            centered_texts = [
-                (40, "Welcome to SameGame", pyxel.COLOR_WHITE),
-                (180, "Click to Start", pyxel.COLOR_WHITE),
-            ]
+#            # センタリングするテキスト
+#            centered_texts = [
+#                (40, "Welcome to SameGame", pyxel.COLOR_WHITE),
+#                (180, "Click to Start", pyxel.COLOR_WHITE),
+#            ]
+#            for y, text, color in centered_texts:
+#                draw_text(y, text, color, align="center")
+#            
+#            # 左揃えにするテキスト
+#            left_aligned_texts = [
+#                (70, "How to Play:", pyxel.COLOR_YELLOW),
+#                (90, "1. Click connected blocks to remove them.", pyxel.COLOR_WHITE),
+#                (100, "2. Remove more blocks at once for higher scores.", pyxel.COLOR_WHITE),
+#                (110, "3. Clear all blocks for a bonus!", pyxel.COLOR_WHITE),
+#                (120, "4. Higher difficulty means higher scores!", pyxel.COLOR_WHITE),
+#                (130, "5. No moves left? Game over.", pyxel.COLOR_WHITE),
+#            ]
+#            for y, text, color in left_aligned_texts:
+#                draw_text(y, text, color, align="left", x_offset=25)
+
+            """開始画面のテキストを描画"""
+            centered_texts = translations[self.current_language]["centered_texts"]
             for y, text, color in centered_texts:
-                draw_text(y, text, color, align="center")
-            
-            # 左揃えにするテキスト
-            left_aligned_texts = [
-                (70, "How to Play:", pyxel.COLOR_YELLOW),
-                (90, "1. Click connected blocks to remove them.", pyxel.COLOR_WHITE),
-                (100, "2. Remove more blocks at once for higher scores.", pyxel.COLOR_WHITE),
-                (110, "3. Clear all blocks for a bonus!", pyxel.COLOR_WHITE),
-                (120, "4. Higher difficulty means higher scores!", pyxel.COLOR_WHITE),
-                (130, "5. No moves left? Game over.", pyxel.COLOR_WHITE),
-            ]
+                self.draw_text(y, text, color, align="center")
+    
+            left_aligned_texts = translations[self.current_language]["left_aligned_texts"]
             for y, text, color in left_aligned_texts:
-                draw_text(y, text, color, align="left", x_offset=25)
+                self.draw_text(y, text, color, align="left", x_offset=10)
 
         elif self.state == GameState.DIFFICULTY_SELECTION:
 #            pyxel.text(WINDOW_WIDTH // 2 - 60, 10, "Select Difficulty", pyxel.COLOR_YELLOW)
