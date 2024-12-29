@@ -219,7 +219,7 @@ class SameGame:
             "easy": {"grid_rows": 5, "grid_cols": 5, "colors": 3, "time_limit": None, "score_multiplier": 1.0},
             "normal": {"grid_rows": 6, "grid_cols": 10, "colors": 4, "time_limit": None, "score_multiplier": 1.2},
             "hard": {"grid_rows": 8, "grid_cols": 12, "colors": 5, "time_limit": 90, "score_multiplier": 1.5},
-            "very_Hard": {"grid_rows": 9, "grid_cols": 15, "colors": 5, "time_limit": 60, "score_multiplier": 2.0},
+            "very_hard": {"grid_rows": 9, "grid_cols": 15, "colors": 5, "time_limit": 60, "score_multiplier": 2.0},
             "expert": {"grid_rows": 10, "grid_cols": 18, "colors": 5, "time_limit": 45, "score_multiplier": 2.7},
         }
         self.current_difficulty = "easy"
@@ -455,8 +455,6 @@ class SameGame:
                 if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                     self.current_language = "en" if self.current_language == "ja" else "ja"
                     print(f"Language changed to: {self.current_language}")  # デバッグ用
-#                    # ボタンラベルを更新
-#                    self.language_button.label = "EN" if self.current_language == "ja" else "JA"
                     # ボタンのラベルを翻訳データから取得して更新
                     self.language_button.label = translations[self.current_language]["language_button_label"]
                     self.create_difficulty_buttons()  # 言語切り替え時にボタンを再生成
@@ -476,13 +474,6 @@ class SameGame:
                 print(f"Switching to BGM for state game state: {GameState.DIFFICULTY_SELECTION}")  # デバッグ用
             self.reset_game(use_saved_initial_state=False)
             for button in self.difficulty_buttons:
-#                if button.is_hovered(mx, my):
-#                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-#                        self.current_difficulty = button.label
-#                        print(f"Difficulty button clicked: {self.current_difficulty}")  # デバッグ出力
-#                        self.apply_difficulty_settings()
-#                        print(f"Current difficulty after apply: {self.current_difficulty}")  # デバッグ出力
-#                        self.state = GameState.GAME_START
                 if button.is_hovered(pyxel.mouse_x, pyxel.mouse_y) and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                     print(f"Difficulty button clicked: {button.key}")
                     self.apply_difficulty_settings(button.key)
@@ -569,7 +560,9 @@ class SameGame:
 
     def apply_difficulty_settings(self, difficulty_key):
         print(f"Applying difficulty: {self.current_difficulty}")  # デバッグ出力
-#        settings = self.difficulty_levels[self.current_difficulty]
+        # ここで現在のdifficultyを更新する
+        self.current_difficulty = difficulty_key
+
         settings = self.difficulty_levels[difficulty_key]  # 内部キーで設定を取得
         self.grid_rows = settings["grid_rows"]
         self.grid_cols = settings["grid_cols"]
@@ -831,6 +824,29 @@ class SameGame:
 #            pyxel.text(WINDOW_WIDTH // 2 - 40, WINDOW_HEIGHT - 20, "Click to Return", pyxel.COLOR_WHITE)
             draw_text(200, "Click to Return", pyxel.COLOR_WHITE)
 
+#    def draw_buttons(self):
+#        """
+#        ボタンエリア(上部)の描画
+#        Retry/ Quit ボタンを左に配置し、
+#        難易度を右端に表示する。
+#        """
+#        # Retry ボタン
+#        retry_x = BUTTON_SPACING
+#        retry_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
+#        pyxel.rect(retry_x, retry_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
+#        pyxel.text(retry_x + 10, retry_y + 5, "Retry", pyxel.COLOR_WHITE)
+#
+#        # Quit ボタン
+#        quit_x = BUTTON_SPACING + BUTTON_WIDTH + BUTTON_SPACING
+#        quit_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
+#        pyxel.rect(quit_x, quit_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
+#        pyxel.text(quit_x + 10, quit_y + 5, "Quit", pyxel.COLOR_WHITE)
+#
+#        # 難易度名をボタンエリア右端に表示
+#        difficulty_text_x = WINDOW_WIDTH - 60
+#        difficulty_text_y = (BUTTON_AREA_HEIGHT - 8) // 2
+#        pyxel.text(difficulty_text_x, difficulty_text_y, self.current_difficulty, pyxel.COLOR_WHITE)
+
     def draw_buttons(self):
         """
         ボタンエリア(上部)の描画
@@ -842,17 +858,33 @@ class SameGame:
         retry_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
         pyxel.rect(retry_x, retry_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
         pyxel.text(retry_x + 10, retry_y + 5, "Retry", pyxel.COLOR_WHITE)
-
+#        pyxel.rect(retry_x, retry_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
+#        self.draw_text(retry_y + 5, "Retry", pyxel.COLOR_WHITE, align="center", x_offset=retry_x + (BUTTON_WIDTH // 2))
+    
         # Quit ボタン
         quit_x = BUTTON_SPACING + BUTTON_WIDTH + BUTTON_SPACING
         quit_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
+#        pyxel.rect(quit_x, quit_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
+#        self.draw_text(quit_y + 5, "Quit", pyxel.COLOR_WHITE, align="center", x_offset=quit_x + (BUTTON_WIDTH // 2))
         pyxel.rect(quit_x, quit_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
         pyxel.text(quit_x + 10, quit_y + 5, "Quit", pyxel.COLOR_WHITE)
-
+    
+        # 現在の言語に応じて、表示する難易度ラベルを取得
+        difficulty_levels = translations[self.current_language]["difficulty_levels"]
+        difficulty_keys = list(self.difficulty_levels.keys())  # 難易度キーを取得
+    
+        # 現在の難易度に対応するラベルを検索
+        current_difficulty_label = None
+        for key, level in zip(difficulty_keys, difficulty_levels):
+            if key == self.current_difficulty:
+                current_difficulty_label = level["label"]
+                break
+    
         # 難易度名をボタンエリア右端に表示
-        difficulty_text_x = WINDOW_WIDTH - 60
-        difficulty_text_y = (BUTTON_AREA_HEIGHT - 8) // 2
-        pyxel.text(difficulty_text_x, difficulty_text_y, self.current_difficulty, pyxel.COLOR_WHITE)
+        if current_difficulty_label:
+            difficulty_text_x = WINDOW_WIDTH - 60
+            difficulty_text_y = (BUTTON_AREA_HEIGHT - 14) // 2
+            self.draw_text(difficulty_text_y, current_difficulty_label, pyxel.COLOR_WHITE, align="right", x_offset=10)
 
     def draw_grid(self):
         """
