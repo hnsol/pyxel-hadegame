@@ -121,6 +121,10 @@ translations = {
             "title": {"ja": "トップ 10スコア", "en": "Top 10 High Scores"},
             "action": {"ja": "クリックして もどる", "en": "Click to Return"}
         }
+    },
+    "button_labels": {
+        "retry": {"ja": "やりなおす", "en": "Retry"},
+        "quit": {"ja": "ギブアップ", "en": "Quit"}
     }
 }
 
@@ -257,6 +261,7 @@ class SameGame:
         self.difficulty_buttons = []
         self.create_difficulty_buttons()
         self.create_language_button()  # 言語切り替えボタンを作成
+        self.create_game_buttons()
         self.current_bgm = None  # 現在再生中のBGMを記録
         pyxel.run(self.update, self.draw)
 
@@ -783,12 +788,16 @@ class SameGame:
     
         elif self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
             # 盤面とボタン・ステータスを描画
-            self.draw_buttons()
+#            self.draw_buttons()
+            self.draw_game_buttons()
+            self.draw_difficulty_label()
             self.draw_grid()
             self.draw_score_and_time()
     
         elif self.state in [GameState.TIME_UP, GameState.NO_MOVES, GameState.GAME_CLEARED]:
-            self.draw_buttons()
+#            self.draw_buttons()
+            self.draw_game_buttons()
+            self.draw_difficulty_label()
             self.draw_grid()
             self.draw_score_and_time()
 
@@ -833,50 +842,148 @@ class SameGame:
             self.draw_text(200, high_score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
 
 
-    def draw_buttons(self):
+#    def draw_buttons(self):
+#        """
+#        ボタンエリア(上部)の描画
+#        Retry/ Quit ボタンを左に配置し、
+#        難易度を右端に表示する。
+#        """
+#        # Retry ボタン
+#        retry_x = BUTTON_SPACING
+#        retry_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
+#        pyxel.rect(retry_x, retry_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
+##        pyxel.text(retry_x + 10, retry_y + 5, "Retry", pyxel.COLOR_WHITE)
+##        pyxel.rect(retry_x, retry_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
+##        self.draw_text(retry_y + 5, "Retry", pyxel.COLOR_WHITE, align="center", x_offset=retry_x + (BUTTON_WIDTH // 2))
+#        retry_label = translations["button_labels"]["retry"][self.current_language]
+#        self.draw_text(
+#            retry_y + (BUTTON_HEIGHT // 2) - 4,  # ボタンの垂直中央 (フォント高さを考慮)
+#            retry_label,
+#            pyxel.COLOR_WHITE,
+#            align="center",
+#            x_offset=retry_x + (BUTTON_WIDTH // 2),
+#            border_color=pyxel.COLOR_DARK_BLUE
+#        )
+#
+#        # Quit ボタン
+#        quit_x = BUTTON_SPACING + BUTTON_WIDTH + BUTTON_SPACING
+#        quit_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
+###        pyxel.rect(quit_x, quit_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
+###        self.draw_text(quit_y + 5, "Quit", pyxel.COLOR_WHITE, align="center", x_offset=quit_x + (BUTTON_WIDTH // 2))
+#        pyxel.rect(quit_x, quit_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
+##        pyxel.text(quit_x + 10, quit_y + 5, "Quit", pyxel.COLOR_WHITE)
+#        # Quit ボタン
+#        quit_label = translations["button_labels"]["quit"][self.current_language]
+#        self.draw_text(
+#            quit_y + (BUTTON_HEIGHT // 2) - 4,  # ボタンの垂直中央 (フォント高さを考慮)
+#            quit_label,
+#            pyxel.COLOR_WHITE,
+#            align="center",
+#            x_offset=quit_x + (BUTTON_WIDTH // 2),
+#            border_color=pyxel.COLOR_DARK_BLUE
+#        )
+#
+#        # 現在の言語に応じて、表示する難易度ラベルを取得
+##        difficulty_levels = translations[self.current_language]["difficulty_levels"]
+##        difficulty_keys = list(self.difficulty_levels.keys())  # 難易度キーを取得
+#        difficulty_options = translations["difficulty_options"]
+#        difficulty_levels = [
+#            {"key": option["key"], "label": option["label"][self.current_language]}
+#            for option in difficulty_options
+#        ]
+#        difficulty_keys = [level["key"] for level in difficulty_levels]  # 難易度キーを取得
+#    
+#        # 現在の難易度に対応するラベルを検索
+#        current_difficulty_label = None
+#        for key, level in zip(difficulty_keys, difficulty_levels):
+#            if key == self.current_difficulty:
+#                current_difficulty_label = level["label"]
+#                break
+#    
+#        # 難易度名をボタンエリア右端に表示
+#        if current_difficulty_label:
+#            difficulty_text_x = WINDOW_WIDTH - 60
+#            difficulty_text_y = (BUTTON_AREA_HEIGHT - 14) // 2
+#            self.draw_text(difficulty_text_y, current_difficulty_label, pyxel.COLOR_WHITE, align="right", x_offset=10, border_color=pyxel.COLOR_DARK_BLUE)
+
+    def create_game_buttons(self):
         """
-        ボタンエリア(上部)の描画
-        Retry/ Quit ボタンを左に配置し、
-        難易度を右端に表示する。
+        Retry, Quit などのゲーム用ボタンをインスタンス生成
         """
         # Retry ボタン
         retry_x = BUTTON_SPACING
         retry_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
-        pyxel.rect(retry_x, retry_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
-        pyxel.text(retry_x + 10, retry_y + 5, "Retry", pyxel.COLOR_WHITE)
-#        pyxel.rect(retry_x, retry_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
-#        self.draw_text(retry_y + 5, "Retry", pyxel.COLOR_WHITE, align="center", x_offset=retry_x + (BUTTON_WIDTH // 2))
+        retry_label = translations["button_labels"]["retry"][self.current_language]
+        self.retry_button = Button(retry_x, retry_y, BUTTON_WIDTH, BUTTON_HEIGHT, retry_label)
     
         # Quit ボタン
         quit_x = BUTTON_SPACING + BUTTON_WIDTH + BUTTON_SPACING
         quit_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
-#        pyxel.rect(quit_x, quit_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
-#        self.draw_text(quit_y + 5, "Quit", pyxel.COLOR_WHITE, align="center", x_offset=quit_x + (BUTTON_WIDTH // 2))
-        pyxel.rect(quit_x, quit_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
-        pyxel.text(quit_x + 10, quit_y + 5, "Quit", pyxel.COLOR_WHITE)
+        quit_label = translations["button_labels"]["quit"][self.current_language]
+        self.quit_button = Button(quit_x, quit_y, BUTTON_WIDTH, BUTTON_HEIGHT, quit_label)
     
-        # 現在の言語に応じて、表示する難易度ラベルを取得
-#        difficulty_levels = translations[self.current_language]["difficulty_levels"]
-#        difficulty_keys = list(self.difficulty_levels.keys())  # 難易度キーを取得
+    def update_game_buttons(self):
+        """
+        Retry, Quit ボタンのクリック判定を行う
+        """
+        mx, my = pyxel.mouse_x, pyxel.mouse_y
+        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+            # Retry
+            if self.retry_button.is_hovered(mx, my):
+                # リセットしてステートを変更
+                self.reset_game(use_saved_initial_state=True)
+                self.state = GameState.GAME_START
+                return
+            
+            # Quit
+            if self.quit_button.is_hovered(mx, my):
+                self.update_high_scores()
+                self.state = GameState.SCORE_DISPLAY
+                return
+    
+    def draw_game_buttons(self):
+        """
+        Retry, Quit ボタンを描画
+        """
+        mx, my = pyxel.mouse_x, pyxel.mouse_y
+        # Retry
+        self.retry_button.draw(
+            is_hovered=self.retry_button.is_hovered(mx, my),
+            draw_text_func=self.draw_text,
+            font=self.font_small
+        )
+        # Quit
+        self.quit_button.draw(
+            is_hovered=self.quit_button.is_hovered(mx, my),
+            draw_text_func=self.draw_text,
+            font=self.font_small
+        )
+
+    def draw_difficulty_label(self):
         difficulty_options = translations["difficulty_options"]
         difficulty_levels = [
             {"key": option["key"], "label": option["label"][self.current_language]}
             for option in difficulty_options
         ]
-        difficulty_keys = [level["key"] for level in difficulty_levels]  # 難易度キーを取得
-    
-        # 現在の難易度に対応するラベルを検索
+        difficulty_keys = [level["key"] for level in difficulty_levels]
+        
         current_difficulty_label = None
         for key, level in zip(difficulty_keys, difficulty_levels):
             if key == self.current_difficulty:
                 current_difficulty_label = level["label"]
                 break
-    
-        # 難易度名をボタンエリア右端に表示
+        
         if current_difficulty_label:
             difficulty_text_x = WINDOW_WIDTH - 60
             difficulty_text_y = (BUTTON_AREA_HEIGHT - 14) // 2
-            self.draw_text(difficulty_text_y, current_difficulty_label, pyxel.COLOR_WHITE, align="right", x_offset=10, border_color=pyxel.COLOR_DARK_BLUE)
+            self.draw_text(
+                difficulty_text_y,
+                current_difficulty_label,
+                pyxel.COLOR_WHITE,
+                align="right",
+                x_offset=10,
+                border_color=pyxel.COLOR_DARK_BLUE
+            )
 
     def draw_grid(self):
         """
