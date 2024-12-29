@@ -23,7 +23,10 @@ BUTTON_SPACING = 10
 BUTTON_AREA_HEIGHT = 100  # ボタンエリアの高さ（縦にボタンを並べるため拡大）
 STATUS_AREA_HEIGHT = 30   # 表示エリアの高さ
 
-COLORS = [8, 11, 12, 13, 14, 15, 6, 7]  # 使用可能なPyxelの色番号
+#COLORS = [8, 11, 12, 13, 14, 15, 6, 7]  # 使用可能なPyxelの色番号
+#COLORS = [12, 9, 11, 10, 2]  # 色覚多様性対応
+#COLORS = [1, 4, 3, 2, 6]  # 色覚多様性対応 rev02
+COLORS = [1, 4, 3, 6, 2]  # 色覚多様性対応 rev02
 DEFAULT_TOP_SCORES = [10000, 5000, 2500, 1000, 500, 250, 100, 50, 25, 10]  # デフォルトのトップ10スコア
 
 translations = {
