@@ -122,6 +122,20 @@ translations = {
             "action": {"ja": "クリックして もどる", "en": "Click to Return"}
         }
     },
+    "score_and_time": {
+        "score_label": {
+            "ja": "スコア:",
+            "en": "Score:"
+        },
+        "time_label": {
+            "ja": "タイム:",
+            "en": "Time:"
+        },
+        "time_no_limit": {
+            "ja": "--",
+            "en": "--"
+        }
+    },
     "button_labels": {
         "retry": {"ja": "やりなおす", "en": "Retry"},
         "quit": {"ja": "ギブアップ", "en": "Quit"}
@@ -817,7 +831,7 @@ class SameGame:
             elif self.state == GameState.GAME_CLEARED:
                 # ゲームクリア画面の描画
                 cleared_msg = messages["game_cleared"]
-                self.draw_text(WINDOW_HEIGHT // 2 - 40, cleared_msg["title"][self.current_language], pyxel.COLOR_GREEN, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+                self.draw_text(WINDOW_HEIGHT // 2 - 40, cleared_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
                 self.draw_text(WINDOW_HEIGHT // 2 - 20, cleared_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
                 bonus_text = cleared_msg["bonus"][self.current_language].format(bonus=int(self.score * 0.5))
                 self.draw_text(WINDOW_HEIGHT // 2, bonus_text, pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
@@ -840,71 +854,6 @@ class SameGame:
                 color = pyxel.COLOR_YELLOW if i == self.current_score_rank else pyxel.COLOR_WHITE
                 self.draw_text(60 + i * 12, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
             self.draw_text(200, high_score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-
-
-#    def draw_buttons(self):
-#        """
-#        ボタンエリア(上部)の描画
-#        Retry/ Quit ボタンを左に配置し、
-#        難易度を右端に表示する。
-#        """
-#        # Retry ボタン
-#        retry_x = BUTTON_SPACING
-#        retry_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
-#        pyxel.rect(retry_x, retry_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
-##        pyxel.text(retry_x + 10, retry_y + 5, "Retry", pyxel.COLOR_WHITE)
-##        pyxel.rect(retry_x, retry_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
-##        self.draw_text(retry_y + 5, "Retry", pyxel.COLOR_WHITE, align="center", x_offset=retry_x + (BUTTON_WIDTH // 2))
-#        retry_label = translations["button_labels"]["retry"][self.current_language]
-#        self.draw_text(
-#            retry_y + (BUTTON_HEIGHT // 2) - 4,  # ボタンの垂直中央 (フォント高さを考慮)
-#            retry_label,
-#            pyxel.COLOR_WHITE,
-#            align="center",
-#            x_offset=retry_x + (BUTTON_WIDTH // 2),
-#            border_color=pyxel.COLOR_DARK_BLUE
-#        )
-#
-#        # Quit ボタン
-#        quit_x = BUTTON_SPACING + BUTTON_WIDTH + BUTTON_SPACING
-#        quit_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
-###        pyxel.rect(quit_x, quit_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
-###        self.draw_text(quit_y + 5, "Quit", pyxel.COLOR_WHITE, align="center", x_offset=quit_x + (BUTTON_WIDTH // 2))
-#        pyxel.rect(quit_x, quit_y, BUTTON_WIDTH, BUTTON_HEIGHT, pyxel.COLOR_GRAY)
-##        pyxel.text(quit_x + 10, quit_y + 5, "Quit", pyxel.COLOR_WHITE)
-#        # Quit ボタン
-#        quit_label = translations["button_labels"]["quit"][self.current_language]
-#        self.draw_text(
-#            quit_y + (BUTTON_HEIGHT // 2) - 4,  # ボタンの垂直中央 (フォント高さを考慮)
-#            quit_label,
-#            pyxel.COLOR_WHITE,
-#            align="center",
-#            x_offset=quit_x + (BUTTON_WIDTH // 2),
-#            border_color=pyxel.COLOR_DARK_BLUE
-#        )
-#
-#        # 現在の言語に応じて、表示する難易度ラベルを取得
-##        difficulty_levels = translations[self.current_language]["difficulty_levels"]
-##        difficulty_keys = list(self.difficulty_levels.keys())  # 難易度キーを取得
-#        difficulty_options = translations["difficulty_options"]
-#        difficulty_levels = [
-#            {"key": option["key"], "label": option["label"][self.current_language]}
-#            for option in difficulty_options
-#        ]
-#        difficulty_keys = [level["key"] for level in difficulty_levels]  # 難易度キーを取得
-#    
-#        # 現在の難易度に対応するラベルを検索
-#        current_difficulty_label = None
-#        for key, level in zip(difficulty_keys, difficulty_levels):
-#            if key == self.current_difficulty:
-#                current_difficulty_label = level["label"]
-#                break
-#    
-#        # 難易度名をボタンエリア右端に表示
-#        if current_difficulty_label:
-#            difficulty_text_x = WINDOW_WIDTH - 60
-#            difficulty_text_y = (BUTTON_AREA_HEIGHT - 14) // 2
-#            self.draw_text(difficulty_text_y, current_difficulty_label, pyxel.COLOR_WHITE, align="right", x_offset=10, border_color=pyxel.COLOR_DARK_BLUE)
 
     def create_game_buttons(self):
         """
@@ -1007,23 +956,58 @@ class SameGame:
                         COLORS[color]
                     )
 
+#    def draw_score_and_time(self):
+#        """
+#        画面下部にスコアと時間のみを描画
+#        """
+#        # スコア表示
+#        score_text = f"Score: {int(self.score)}"
+#        pyxel.text(10, WINDOW_HEIGHT - STATUS_AREA_HEIGHT + 5, score_text, pyxel.COLOR_WHITE)
+#
+#        # タイマー表示
+#        if self.time_limit:
+#            remaining_time = max(0, self.time_limit - (pyxel.frame_count - self.start_time) // 30)
+#            time_text = f"Time: {remaining_time}s"
+#        else:
+#            time_text = "Time: --"
+#        time_text_width = len(time_text) * 4  # おおまかな文字幅
+#        pyxel.text(WINDOW_WIDTH - time_text_width - 10, WINDOW_HEIGHT - STATUS_AREA_HEIGHT + 5, time_text, pyxel.COLOR_WHITE)
+
     def draw_score_and_time(self):
         """
-        画面下部にスコアと時間のみを描画
+        画面下部にスコアと時間を描画
         """
         # スコア表示
-        score_text = f"Score: {int(self.score)}"
-        pyxel.text(10, WINDOW_HEIGHT - STATUS_AREA_HEIGHT + 5, score_text, pyxel.COLOR_WHITE)
-
+        score_label = translations["score_and_time"]["score_label"][self.current_language]
+        score_value = f"{int(self.score)}"
+        self.draw_text(
+            y=WINDOW_HEIGHT - STATUS_AREA_HEIGHT + 5,
+            text=f"{score_label} {score_value}",
+            color=pyxel.COLOR_WHITE,
+            align="left",
+            x_offset=10,
+            font=self.font_small,
+            border_color=pyxel.COLOR_DARK_BLUE
+        )
+    
         # タイマー表示
         if self.time_limit:
             remaining_time = max(0, self.time_limit - (pyxel.frame_count - self.start_time) // 30)
-            time_text = f"Time: {remaining_time}s"
+            time_label = translations["score_and_time"]["time_label"][self.current_language]
+            time_value = f"{remaining_time}s"
         else:
-            time_text = "Time: --"
-        time_text_width = len(time_text) * 4  # おおまかな文字幅
-        pyxel.text(WINDOW_WIDTH - time_text_width - 10, WINDOW_HEIGHT - STATUS_AREA_HEIGHT + 5, time_text, pyxel.COLOR_WHITE)
-
+            time_label = translations["score_and_time"]["time_label"][self.current_language]
+            time_value = translations["score_and_time"]["time_no_limit"][self.current_language]
+    
+        self.draw_text(
+            y=WINDOW_HEIGHT - STATUS_AREA_HEIGHT + 5,
+            text=f"{time_label} {time_value}",
+            color=pyxel.COLOR_WHITE,
+            align="right",
+            x_offset=10,
+            font=self.font_small,
+            border_color=pyxel.COLOR_DARK_BLUE
+        )
 
 # ゲームの開始
 SameGame()
