@@ -26,93 +26,6 @@ STATUS_AREA_HEIGHT = 30   # 表示エリアの高さ
 COLORS = [8, 11, 12, 13, 14, 15, 6, 7]  # 使用可能なPyxelの色番号
 DEFAULT_TOP_SCORES = [10000, 5000, 2500, 1000, 500, 250, 100, 50, 25, 10]  # デフォルトのトップ10スコア
 
-
-# 翻訳データを辞書形式で定義 将来的にはファイルに切り出す予定
-#translations = {
-#    "en": {
-#        "language_button_label": "JA",  # 言語切り替えボタンのラベル
-#        "centered_texts": [
-#            (40, "Welcome to SameGame", pyxel.COLOR_WHITE),
-#            (180, "Click to Start", pyxel.COLOR_WHITE),
-#        ],
-#        "left_aligned_texts": [
-#            (70, "How to Play:", pyxel.COLOR_YELLOW),
-#            (95, "1. Click connected blocks to remove them.", pyxel.COLOR_WHITE),
-#            (110, "2. Remove more blocks at once for higher scores.", pyxel.COLOR_WHITE),
-#            (125, "3. Clear all blocks for a bonus!", pyxel.COLOR_WHITE),
-#            (140, "4. Higher difficulty means higher scores!", pyxel.COLOR_WHITE),
-#            (155, "5. No moves left? Game over.", pyxel.COLOR_WHITE),
-#        ],
-#        "difficulty_text": "Select Difficulty",
-#        "difficulty_levels": [
-#            {"key": "easy", "label": "Easy", "description": "Small grid, few colors"},
-#            {"key": "normal", "label": "Normal", "description": "Larger grid, more colors"},
-#            {"key": "hard", "label": "Hard", "description": "Timed play, more colors"},
-#            {"key": "very_hard", "label": "Very Hard", "description": "Shorter time, even more colors"},
-#            {"key": "expert", "label": "Expert", "description": "Maximum grid size, most colors"},
-#        ],
-#        "state_messages": {
-#            "time_up": "Time's Up!",
-#            "no_moves": "No Moves Available!",
-#            "game_cleared": {
-#                "line1": "Congratulations!",
-#                "line2": "You cleared the game!",
-#                "bonus": "Bonus: {bonus}",
-#                "continue": "Click to Continue"
-#            },
-#            "score_display": {
-#                "title": "Your Score",
-#                "continue": "Click to Continue"
-#            },
-#            "high_score_display": {
-#                "title": "Top 10 High Scores",
-#                "return": "Click to Return"
-#            }
-#        }
-#    },
-#    "ja": {
-#        "language_button_label": "EN",  # 言語切り替えボタンのラベル
-#        "centered_texts": [
-#            (40, "さめがめ にようこそ", pyxel.COLOR_WHITE),
-#            (180, "クリックして開始", pyxel.COLOR_WHITE),
-#        ],
-#        "left_aligned_texts": [
-#            (70, "あそびかた:", pyxel.COLOR_YELLOW),
-#            (95, "1. 同じ色のブロックをクリックして消しましょう。", pyxel.COLOR_WHITE),
-#            (110, "2. 一度に多くのブロックを消すとスコアが上がります。", pyxel.COLOR_WHITE),
-#            (125, "3. 全てのブロックを消すとボーナス！", pyxel.COLOR_WHITE),
-#            (140, "4. むずかしいほど高いスコアが得られます！", pyxel.COLOR_WHITE),
-#            (155, "5. 消せるブロックがなくなったらゲームオーバー。", pyxel.COLOR_WHITE),
-#        ],
-#        "difficulty_text": "難易度を選んでください",
-#        "difficulty_levels": [
-#            {"key": "easy", "label": "かんたん", "description": "小さい盤面、少ない色"},
-#            {"key": "normal", "label": "ふつう", "description": "大きな盤面、やや多い色"},
-#            {"key": "hard", "label": "むずかしい", "description": "制限時間あり、色が増える"},
-#            {"key": "very_hard", "label": "めちゃむず", "description": "短い制限時間、さらに多い色"},
-#            {"key": "expert", "label": "たつじん", "description": "最大盤面、最も多い色"},
-#        ],
-#        "state_messages": {
-#            "time_up": "タイムアップ！",
-#            "no_moves": "手詰まりです！",
-#            "game_cleared": {
-#                "line1": "おめでとうございます！",
-#                "line2": "ゲームをクリアしました！",
-#                "bonus": "ボーナス: {bonus}",
-#                "continue": "クリックして続行"
-#            },
-#            "score_display": {
-#                "title": "スコア",
-#                "continue": "クリックして続行"
-#            },
-#            "high_score_display": {
-#                "title": "トップ10スコア",
-#                "return": "クリックして戻る"
-#            }
-#        }
-#    },
-#}
-
 translations = {
     "language_button": {"ja": "EN", "en": "JA"},  # 言語切り替えボタンのラベル
 #    "titles": {
@@ -275,7 +188,8 @@ class Button:
                 color=pyxel.COLOR_WHITE,
                 align="left",        # 中央揃えっぽくしたければ 'left' + x_offset を工夫
                 x_offset=text_x,
-                font=font
+                font=font,
+                border_color=pyxel.COLOR_DARK_BLUE
             )
 
 
@@ -437,9 +351,6 @@ class SameGame:
         for i, diff in enumerate(difficulty_levels):
             x = start_x
             y = start_y + i * (BUTTON_HEIGHT + BUTTON_SPACING)
-#            label = diff["label"]  # 現在の言語に応じたラベル
-#            print(f"Creating button with label: {label}")  # デバッグ用
-#            self.difficulty_buttons.append(Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, label))
             button = Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, diff["label"])
             button.key = diff["key"]  # 内部キーをボタンに追加
             self.difficulty_buttons.append(button)
@@ -769,7 +680,8 @@ class SameGame:
         except ValueError:
             self.current_score_rank = None
 
-    def draw_text(self, y, text, color, align="center", x_offset=0, font=None):
+#    def draw_text(self, y, text, color, align="center", x_offset=0, font=None):
+    def draw_text(self, y, text, color, align="center", x_offset=0, font=None, border_color=None):
         """BDFフォントを使用してテキストを描画"""
         font = font or self.font_small  # デフォルトで self.font_small を使用
 #        text_width = len(text) * 4  # フォントの幅を計算（適切に変更可能）
@@ -783,7 +695,13 @@ class SameGame:
             x = WINDOW_WIDTH - text_width - x_offset
         else:
             raise ValueError(f"Invalid alignment: {align}")
-        
+
+        if border_color is not None:
+            for dx in range(-1, 2):
+                for dy in range(-1, 2):
+                    if dx != 0 or dy != 0:  # 中心位置 (0, 0) はスキップ
+                        pyxel.text(x + dx, y + dy, text, border_color, font)
+
         pyxel.text(x, y, text, color, font)
 
     def draw(self):
@@ -796,19 +714,10 @@ class SameGame:
         if self.state == GameState.OPENING:
 
             """開始画面のテキストを描画"""
-#            centered_texts = translations[self.current_language]["centered_texts"]
-#            for y, text, color in centered_texts:
-#                self.draw_text(y, text, color, align="center")
-#            game_title = translations["titles"]["game_title"][self.current_language]
-#            self.draw_text(50, game_title, pyxel.COLOR_YELLOW, align="center") 
             game_title = translations["titles"]["game_title"][self.current_language]
             for y, text, color in game_title:
-                self.draw_text(y, text, color, align="center")
+                self.draw_text(y, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
     
-#            left_aligned_texts = translations[self.current_language]["left_aligned_texts"]
-#            for y, text, color in left_aligned_texts:
-#                self.draw_text(y, text, color, align="left", x_offset=25)
-
             """左揃えのテキストを描画"""
             instruction_data = translations["instructions"]["intro"][self.current_language]
             base_y = instruction_data["base_y"]
@@ -820,7 +729,7 @@ class SameGame:
             ]
             
             for y, text, color in left_aligned_texts:
-                self.draw_text(y, text, color, align="left", x_offset=25)
+                self.draw_text(y, text, color, align="left", x_offset=25, border_color=pyxel.COLOR_DARK_BLUE)
 
             # 言語切り替えボタンの描画
             is_hovered = self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
@@ -829,8 +738,6 @@ class SameGame:
 
         elif self.state == GameState.DIFFICULTY_SELECTION:
             # タイトルを描画
-#            difficulty_text = translations[self.current_language]["difficulty_text"]
-#            self.draw_text(40, difficulty_text, pyxel.COLOR_YELLOW, align="center")
             """難易度選択画面のタイトルを描画"""
             difficulty_data = translations["titles"]["difficulty_selection"][self.current_language]
         
@@ -839,33 +746,10 @@ class SameGame:
                 difficulty_data["y"], 
                 difficulty_data["text"], 
                 difficulty_data["color"], 
-                align="center"
+                align="center",
+                border_color=pyxel.COLOR_DARK_BLUE
             )
             
-#            # ボタンと説明の描画
-#            difficulty_levels = translations[self.current_language]["difficulty_levels"]
-#            for i, button in enumerate(self.difficulty_buttons):
-#                is_hovered = button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
-##                button.draw(is_hovered)
-#                button.draw(
-#                    is_hovered,
-#                    draw_text_func=self.draw_text,  # ← ボタン側に渡す
-#                    font=self.font_small            # ← BDF フォントを指定する
-#                )
-#
-#                # 説明文をボタンの右側に表示
-#                description = difficulty_levels[i]["description"]
-##                self.draw_text(button.x + button.width + 10, button.y + 5, description, pyxel.COLOR_WHITE, align="left", font=self.font_small)
-##                self.draw_text(button.y + 2, description, pyxel.COLOR_WHITE, align="left", x_offset=button.x + button.width + 10, font=self.font_small)
-#                self.draw_text(
-#                    y=button.y + 2,
-#                    text=description,
-#                    color=pyxel.COLOR_WHITE,
-#                    align="left",
-#                    x_offset=button.x + button.width + 10,
-#                    font=self.font_small
-#                )
-
             """難易度選択画面のボタンと説明を描画"""
             difficulty_options = translations["difficulty_options"]
             
@@ -893,7 +777,8 @@ class SameGame:
                     color=pyxel.COLOR_WHITE,
                     align="left",
                     x_offset=button.x + button.width + 10,
-                    font=self.font_small
+                    font=self.font_small,
+                    border_color=pyxel.COLOR_DARK_BLUE
                 )
     
         elif self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
@@ -911,41 +796,41 @@ class SameGame:
             if self.state == GameState.TIME_UP:
                 # タイムアップ画面の描画
                 time_up_msg = messages["time_up"]
-                self.draw_text(WINDOW_HEIGHT // 2 - 20, time_up_msg["title"][self.current_language], pyxel.COLOR_RED, align="center")
-                self.draw_text(WINDOW_HEIGHT // 2, time_up_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center")
+                self.draw_text(WINDOW_HEIGHT // 2 - 20, time_up_msg["title"][self.current_language], pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+                self.draw_text(WINDOW_HEIGHT // 2, time_up_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
             
             elif self.state == GameState.NO_MOVES:
                 # 手詰まり画面の描画
                 no_moves_msg = messages["no_moves"]
-                self.draw_text(WINDOW_HEIGHT // 2 - 20, no_moves_msg["title"][self.current_language], pyxel.COLOR_RED, align="center")
-                self.draw_text(WINDOW_HEIGHT // 2, no_moves_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center")
+                self.draw_text(WINDOW_HEIGHT // 2 - 20, no_moves_msg["title"][self.current_language], pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+                self.draw_text(WINDOW_HEIGHT // 2, no_moves_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
             
             elif self.state == GameState.GAME_CLEARED:
                 # ゲームクリア画面の描画
                 cleared_msg = messages["game_cleared"]
-                self.draw_text(WINDOW_HEIGHT // 2 - 40, cleared_msg["title"][self.current_language], pyxel.COLOR_GREEN, align="center")
-                self.draw_text(WINDOW_HEIGHT // 2 - 20, cleared_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center")
+                self.draw_text(WINDOW_HEIGHT // 2 - 40, cleared_msg["title"][self.current_language], pyxel.COLOR_GREEN, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+                self.draw_text(WINDOW_HEIGHT // 2 - 20, cleared_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
                 bonus_text = cleared_msg["bonus"][self.current_language].format(bonus=int(self.score * 0.5))
-                self.draw_text(WINDOW_HEIGHT // 2, bonus_text, pyxel.COLOR_YELLOW, align="center")
-                self.draw_text(WINDOW_HEIGHT // 2 + 20, cleared_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center")
+                self.draw_text(WINDOW_HEIGHT // 2, bonus_text, pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+                self.draw_text(WINDOW_HEIGHT // 2 + 20, cleared_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
             
         elif self.state == GameState.SCORE_DISPLAY:
             # スコア表示画面の描画
             score_msg = messages["score_display"]
-            self.draw_text(WINDOW_HEIGHT // 2 - 20, score_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center")
-            self.draw_text(WINDOW_HEIGHT // 2, f"{int(self.score)}", pyxel.COLOR_YELLOW, align="center")
-            self.draw_text(WINDOW_HEIGHT // 2 + 20, score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center")
+            self.draw_text(WINDOW_HEIGHT // 2 - 20, score_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+            self.draw_text(WINDOW_HEIGHT // 2, f"{int(self.score)}", pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+            self.draw_text(WINDOW_HEIGHT // 2 + 20, score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
         
         elif self.state == GameState.HIGH_SCORE_DISPLAY:
             # ハイスコア表示画面の描画
             high_score_msg = messages["high_score_display"]
-            self.draw_text(35, high_score_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center")
+            self.draw_text(35, high_score_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
             for i, score in enumerate(self.high_scores):
                 rank = f"{i + 1:>2}"  # 順位を右詰めで整形
                 text = f"{rank}: {score:>6}"  # スコアを右詰めで整形
                 color = pyxel.COLOR_YELLOW if i == self.current_score_rank else pyxel.COLOR_WHITE
-                self.draw_text(60 + i * 12, text, color, align="center")
-            self.draw_text(200, high_score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center")
+                self.draw_text(60 + i * 12, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+            self.draw_text(200, high_score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
 
 
     def draw_buttons(self):
@@ -991,7 +876,7 @@ class SameGame:
         if current_difficulty_label:
             difficulty_text_x = WINDOW_WIDTH - 60
             difficulty_text_y = (BUTTON_AREA_HEIGHT - 14) // 2
-            self.draw_text(difficulty_text_y, current_difficulty_label, pyxel.COLOR_WHITE, align="right", x_offset=10)
+            self.draw_text(difficulty_text_y, current_difficulty_label, pyxel.COLOR_WHITE, align="right", x_offset=10, border_color=pyxel.COLOR_DARK_BLUE)
 
     def draw_grid(self):
         """
