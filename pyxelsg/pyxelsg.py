@@ -45,16 +45,16 @@ translations = {
     },
     "ja": {
         "centered_texts": [
-            (40, "セイムゲームへようこそ", pyxel.COLOR_WHITE),
+            (40, "さめがめ にようこそ", pyxel.COLOR_WHITE),
             (180, "クリックして開始", pyxel.COLOR_WHITE),
         ],
         "left_aligned_texts": [
-            (70, "遊び方:", pyxel.COLOR_YELLOW),
-            (90, "1. 同じ色のブロックをクリックして消しましょう。", pyxel.COLOR_WHITE),
-            (100, "2. 一度に多くのブロックを消すとスコアが上がります。", pyxel.COLOR_WHITE),
-            (110, "3. 全てのブロックを消すとボーナス！", pyxel.COLOR_WHITE),
-            (120, "4. 難しい設定ほど高いスコアが得られます！", pyxel.COLOR_WHITE),
-            (130, "5. 動ける手がなくなったらゲームオーバー。", pyxel.COLOR_WHITE),
+            (70,  "あそびかた:", pyxel.COLOR_YELLOW),
+            (95,  "1. 同じ色のブロックをクリックして消しましょう。", pyxel.COLOR_WHITE),
+            (110, "2. 一度に多くのブロックを消すとスコアが上がります。", pyxel.COLOR_WHITE),
+            (125, "3. 全てのブロックを消すとボーナス！", pyxel.COLOR_WHITE),
+            (140, "4. むずかしいほど高いスコアが得られます！", pyxel.COLOR_WHITE),
+            (155, "5. 消せるブロックがなくなったらゲームオーバー。", pyxel.COLOR_WHITE),
         ],
     },
 }
@@ -151,8 +151,9 @@ class SameGame:
 
         # フォントの読み込み
         try:
-            self.font_small = self.load_font("assets/umplus_j10r.bdf")
-            self.font_large = self.load_font("assets/umplus_j12r.bdf")  # 必要であれば
+#            self.font_small = self.load_font("assets/umplus_j10r.bdf")
+            self.font_small = self.load_font("assets/k8x12S.bdf")
+#            self.font_large = self.load_font("assets/umplus_j12r.bdf")  # 必要であれば
         except FileNotFoundError as e:
             print(f"Error loading font: {e}")
             exit(1)  # フォントがない場合はエラー終了
