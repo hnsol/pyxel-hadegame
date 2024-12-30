@@ -343,8 +343,8 @@ class SameGame:
     
     def stop_bgm(self):
         print(f"Stopping all BGM channels")
-#        bgm_channels = [0, 1, 2, 3]  # 全チャンネル消す
-        bgm_channels = [1, 2, 3]  # 全チャンネル消す
+        bgm_channels = [0, 1, 2, 3]  # 全チャンネル消す
+#        bgm_channels = [1, 2, 3]  # 0以外を消す
         for ch in bgm_channels:
             pyxel.stop(ch)  # チャンネルごとに停止
         self.current_bgm = None  # 現在のBGM状態をリセット
