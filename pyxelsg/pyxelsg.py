@@ -21,7 +21,8 @@ WINDOW_HEIGHT = 240
 BUTTON_WIDTH = 75
 BUTTON_HEIGHT = 15
 BUTTON_SPACING = 10
-BUTTON_AREA_HEIGHT = 100  # ボタンエリアの高さ（縦にボタンを並べるため拡大）
+#BUTTON_AREA_HEIGHT = 100  # ボタンエリアの高さ（縦にボタンを並べるため拡大）
+BUTTON_AREA_HEIGHT = 40  # ボタンエリアの高さ（縦にボタンを並べるため拡大）
 STATUS_AREA_HEIGHT = 30   # 表示エリアの高さ
 
 #COLORS = [8, 11, 12, 13, 14, 15, 6, 7]  # 使用可能なPyxelの色番号
@@ -343,8 +344,8 @@ class SameGame:
     
     def stop_bgm(self):
         print(f"Stopping all BGM channels")
-        bgm_channels = [0, 1, 2, 3]  # 全チャンネル消す
-#        bgm_channels = [1, 2, 3]  # 0以外を消す
+#        bgm_channels = [0, 1, 2, 3]  # 全チャンネル消す
+        bgm_channels = [1, 2, 3]  # 0以外を消す
         for ch in bgm_channels:
             pyxel.stop(ch)  # チャンネルごとに停止
         self.current_bgm = None  # 現在のBGM状態をリセット
@@ -949,10 +950,23 @@ class SameGame:
         """
         盤面を描画
         """
+#        game_area_y = BUTTON_AREA_HEIGHT
+#        game_area_height = WINDOW_HEIGHT - BUTTON_AREA_HEIGHT - STATUS_AREA_HEIGHT
+#        cell_size = min(WINDOW_WIDTH // self.grid_cols, game_area_height // self.grid_rows)
+#        grid_x_start = (WINDOW_WIDTH - (cell_size * self.grid_cols)) // 2
+#        grid_y_start = game_area_y + (game_area_height - (cell_size * self.grid_rows)) // 2
+
+        left_margin = 4  # 左側の最小余白
         game_area_y = BUTTON_AREA_HEIGHT
         game_area_height = WINDOW_HEIGHT - BUTTON_AREA_HEIGHT - STATUS_AREA_HEIGHT
-        cell_size = min(WINDOW_WIDTH // self.grid_cols, game_area_height // self.grid_rows)
-        grid_x_start = (WINDOW_WIDTH - (cell_size * self.grid_cols)) // 2
+        
+        # グリッドのセルサイズを計算（左右余白を考慮）
+        cell_size = min((WINDOW_WIDTH - 2 * left_margin) // self.grid_cols, game_area_height // self.grid_rows)
+        
+        # グリッドのX座標の開始位置を計算
+        grid_x_start = left_margin + ((WINDOW_WIDTH - 2 * left_margin) - (cell_size * self.grid_cols)) // 2
+        
+        # グリッドのY座標の開始位置を計算
         grid_y_start = game_area_y + (game_area_height - (cell_size * self.grid_rows)) // 2
 
         for y in range(self.grid_rows):
