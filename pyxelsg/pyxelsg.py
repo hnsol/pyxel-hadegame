@@ -10,6 +10,7 @@ import os
 import json
 import copy
 from enum import Enum
+from board_generator import BoardGenerator
 
 # 定数の設定
 WINDOW_WIDTH = 256
@@ -273,6 +274,9 @@ class SameGame:
         self.bgm_tracks = self.setup_bgm()
         self.current_bgm = None
 
+        # BoardGenerator のインスタンスを作成
+        self.board_generator = BoardGenerator()
+
         self.reset_game(use_saved_initial_state=False)
 
         self.difficulty_buttons = []
@@ -419,10 +423,18 @@ class SameGame:
             self.grid = copy.deepcopy(self.initial_grid)
         else:
             # 新しいランダムな盤面を生成し、初期状態を保存
-            self.grid = [
-                [pyxel.rndi(0, self.num_colors - 1) for _ in range(self.grid_cols)]
-                for _ in range(self.grid_rows)
-            ]
+#            self.grid = [
+#                [pyxel.rndi(0, self.num_colors - 1) for _ in range(self.grid_cols)]
+#                for _ in range(self.grid_rows)
+#            ]
+            # BoardGenerator を使って盤面を生成
+            self.grid = self.board_generator.generate_filled_solvable_board(
+                rows=self.grid_rows,
+                cols=self.grid_cols,
+                colors=self.num_colors
+            )
+#            self.board_generator.print_board(self.grid) #debug
+            print(f"Grid are generated: {self.grid}")  # デバッグ用
             self.initial_grid = copy.deepcopy(self.grid)
 
         # ゲームのスコアと時間をリセット
