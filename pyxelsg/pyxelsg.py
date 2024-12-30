@@ -504,7 +504,7 @@ class SameGame:
                 self.play_bgm(GameState.DIFFICULTY_SELECTION)
                 print(f"Switching to BGM for state state name: {state.name}")  # デバッグ用
                 print(f"Switching to BGM for state game state: {GameState.DIFFICULTY_SELECTION}")  # デバッグ用
-            self.reset_game(use_saved_initial_state=False)
+#            self.reset_game(use_saved_initial_state=False)
             for button in self.difficulty_buttons:
                 if button.is_hovered(pyxel.mouse_x, pyxel.mouse_y) and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                     print(f"Difficulty button clicked: {button.key}")
