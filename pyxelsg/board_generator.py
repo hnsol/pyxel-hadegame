@@ -1,6 +1,6 @@
 import random
 from collections import deque
-
+import time
 
 class BoardGenerator:
     def __init__(self, max_tries=1000):
@@ -10,27 +10,35 @@ class BoardGenerator:
         self.max_tries = max_tries
         self.EMPTY = -1  # 空セルの表現
 
-    def generate_filled_solvable_board(self, rows, cols, colors):
+    def generate_filled_solvable_board(self, rows, cols, colors, timeout=3):
         """
         1) 大きめブロックを意図的に作る方式で盤面をランダム生成
         2) 解ソルバでチェック
         3) 解けたら返す
         """
+        start_time = time.time()  # 処理開始時刻
+        last_board = None  # 最後に生成した盤面
+
         for i in range(self.max_tries):
+            if time.time() - start_time > timeout:  # タイムアウトチェック
+                print(f"Debug: Timeout reached after {timeout} seconds.")
+                return last_board
             if i % 1 == 0:
                 print(f"Debug: Attempt {i}")
                 print(f"Debug: rows min max {rows} {round(rows/5)} {int(rows/2)}")
-            board = self._generate_blocky_board(rows, cols, colors,
-#                                                min_block_size=3,
-#                                                max_block_size=8)
-#                                                min_block_size=1,
-#                                                min_block_size=2,
-                                                min_block_size=round(rows/5),
-                                                max_block_size=int(rows/1.8))
-            if self._is_solvable(board):
-                return board
+            board = self._generate_blocky_board(
+                rows, cols, colors,
+                min_block_size=round(rows / 5),
+#                max_block_size=int(rows / 1.8)
+                max_block_size=min(2, int(rows / 2))
+            )
+            last_board = board
 
-        return None
+            if self._is_solvable(board, start_time, timeout):  # タイムアウト対応版
+                return board
+    
+        print("Debug: Max tries reached.")
+        return last_board
 
     def _generate_blocky_board(self, rows, cols, colors,
                                min_block_size=3, max_block_size=8):
@@ -109,35 +117,65 @@ class BoardGenerator:
     #  大きい盤面だと時間がかかるので、メモ化など工夫が推奨
     # --------------------------------------------------
 
-    def _is_solvable(self, board):
+    def _is_solvable(self, board, start_time, timeout):
         """
         この盤面が最後まで消せるかどうかを判定する（簡易版）。
         必要に応じてメモ化を入れると高速化できます。
         """
         # すぐ済む軽いケース向けの簡易実装。
         # 大きいサイズ・色数5などでは計算量が跳ね上がるため注意。
-        board_key = self._board_to_key(board)
         memo = {}
-        return self._is_solvable_impl(board, memo, board_key)
+        board_key = self._board_to_key(board)
+        return self._is_solvable_impl(board, memo, board_key, start_time, timeout)
 
-    def _is_solvable_impl(self, board, memo, board_key):
-        if self._is_all_empty(board):
+#    def _is_solvable_impl(self, board, memo, board_key):
+#        if self._is_all_empty(board):
+#            return True
+#        if board_key in memo:
+#            return memo[board_key]
+#
+#        groups = self._find_groups(board)
+#        if not groups:
+#            # 消せる塊がないのに空でない → 解けない
+#            memo[board_key] = False
+#            return False
+#
+#        for group in groups:
+#            new_board = self._remove_group(board, group)
+#            self._apply_gravity(new_board)
+#            self._apply_compression(new_board)
+#            new_key = self._board_to_key(new_board)
+#            if self._is_solvable_impl(new_board, memo, new_key):
+#                memo[board_key] = True
+#                return True
+#
+#        memo[board_key] = False
+#        return False
+
+    def _is_solvable_impl(self, board, memo, board_key, start_time, timeout, timeout_flag=[False]):
+        if time.time() - start_time > timeout:  # タイムアウトチェック
+            if not timeout_flag[0]:  # 初めてタイムアウトが発生した場合のみプリント
+                print("Debug: Timeout reached inside _is_solvable_impl.")
+                timeout_flag[0] = True  # フラグを立てる
+            return False
+    
+        if self._is_all_empty(board):  # 盤面が空かチェック
             return True
-        if board_key in memo:
+    
+        if board_key in memo:  # メモ化チェック
             return memo[board_key]
-
+    
         groups = self._find_groups(board)
         if not groups:
-            # 消せる塊がないのに空でない → 解けない
             memo[board_key] = False
             return False
-
+    
         for group in groups:
             new_board = self._remove_group(board, group)
             self._apply_gravity(new_board)
             self._apply_compression(new_board)
             new_key = self._board_to_key(new_board)
-            if self._is_solvable_impl(new_board, memo, new_key):
+            if self._is_solvable_impl(new_board, memo, new_key, start_time, timeout):
                 memo[board_key] = True
                 return True
 

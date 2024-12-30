@@ -422,11 +422,6 @@ class SameGame:
             # 保存した初期盤面を復元
             self.grid = copy.deepcopy(self.initial_grid)
         else:
-            # 新しいランダムな盤面を生成し、初期状態を保存
-#            self.grid = [
-#                [pyxel.rndi(0, self.num_colors - 1) for _ in range(self.grid_cols)]
-#                for _ in range(self.grid_rows)
-#            ]
             # BoardGenerator を使って盤面を生成
             self.grid = self.board_generator.generate_filled_solvable_board(
                 rows=self.grid_rows,
