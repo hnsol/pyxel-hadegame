@@ -74,7 +74,7 @@ translations = {
                 "line_spacing": 15,
                 "lines": [
                     {"line": "あそびかた:", "color": pyxel.COLOR_YELLOW},
-                    {"line": "1. 同じ色のブロックをクリックして消しましょう。", "color": pyxel.COLOR_WHITE},
+                    {"line": "1. 同色ブロックをクリックで消しましょう。", "color": pyxel.COLOR_WHITE},
                     {"line": "2. 一度に多くのブロックを消すとスコアが上がります。", "color": pyxel.COLOR_WHITE},
                     {"line": "3. 全てのブロックを消すとボーナス！", "color": pyxel.COLOR_WHITE},
                     {"line": "4. むずかしいほど高いスコアが得られます！", "color": pyxel.COLOR_WHITE},
@@ -108,11 +108,11 @@ translations = {
             "subtitle": {"ja": "次はスコアが伸びそうですね。", "en": "Try again to improve your score."}
         },
         "no_moves": {
-            "title": {"ja": "手詰まりです！", "en": "No Moves Available!"},
+            "title": {"ja": "ああっ！おしい！", "en": "No Moves Available!"},
             "subtitle": {"ja": "次はきっといける！", "en": "Better luck next time!"}
         },
         "game_cleared": {
-            "title": {"ja": "おめでとうございます！", "en": "Congratulations!"},
+            "title": {"ja": "おおお！すごいですね！！！", "en": "Congratulations!"},
             "subtitle": {"ja": "ゲームをクリアしました！", "en": "You cleared the game!"},
             "bonus": {"ja": "ボーナス: {bonus}", "en": "Bonus: {bonus}"},
             "action": {"ja": "クリックして続行", "en": "Click to Continue"}
@@ -203,7 +203,7 @@ class Button:
             # 今までの単純な "pyxel.text()" をやめて、draw_text() を呼び出す
             text_width = font.text_width(self.label)
             text_x = self.x + (self.width - text_width) // 2
-            text_y = self.y + (self.height - 12) // 2 # テキスト高さをおおよそ12ピクセルの場合
+            text_y = self.y + (self.height - 10) // 2 # テキスト高さをおおよそ12ピクセルの場合
             draw_text_func(
                 y=text_y,
                 text=self.label,
@@ -224,8 +224,7 @@ class SameGame:
 
         # フォントの読み込み
         try:
-#            self.font_small = self.load_font("assets/umplus_j10r.bdf")
-            self.font_small = self.load_font("assets/k8x12S.bdf")
+            self.font_small = self.load_font("assets/k8x12.bdf")
 #            self.font_large = self.load_font("assets/umplus_j12r.bdf")  # 必要であれば
         except FileNotFoundError as e:
             print(f"Error loading font: {e}")
