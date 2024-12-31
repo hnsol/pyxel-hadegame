@@ -257,7 +257,7 @@ class SameGame:
         # BoardGenerator のインスタンスを作成
         self.board_generator = BoardGenerator()
 
-        self.reset_game(use_saved_initial_state=False)
+#        self.reset_game(use_saved_initial_state=False)
 
         self.difficulty_buttons = []
         self.create_difficulty_buttons()
@@ -392,53 +392,60 @@ class SameGame:
         removed_percentage = (total_cells - remaining_cells) / total_cells
         return remaining_cells, removed_percentage
 
-    def generate_board(self):
-        """新しい盤面を生成する"""
-        return self.board_generator.generate_filled_solvable_board(
-            rows=self.grid_rows,
-            cols=self.grid_cols,
-            colors=self.num_colors
-        )
+#    def generate_board(self):
+#        """新しい盤面を生成する"""
+#        return self.board_generator.generate_filled_solvable_board(
+#            rows=self.grid_rows,
+#            cols=self.grid_cols,
+#            colors=self.num_colors,
+#            timeout=3  # 3秒タイムアウト
+#        )
 
-    def reset_game(self, use_saved_initial_state=False):
+#    def reset_game(self, use_saved_initial_state=False):
 #        """
 #        ゲームをリセット。盤面生成を別メソッドに分離。
-#        use_saved_initial_stateがTrueの場合、保存した初期状態に戻す。
-#        それ以外の場合は新しいランダムな盤面を生成する。
 #        """
 #        if use_saved_initial_state and hasattr(self, 'initial_grid'):
-#            # 保存した初期盤面を復元
 #            self.grid = copy.deepcopy(self.initial_grid)
 #        else:
-#            self.stop_bgm()
-#            # BoardGenerator を使って盤面を生成
-#            self.grid = self.board_generator.generate_filled_solvable_board(
-#                rows=self.grid_rows,
-#                cols=self.grid_cols,
-#                colors=self.num_colors
-#            )
-##            self.board_generator.print_board(self.grid) #debug
-#            print(f"Grid are generated: {self.grid}")  # デバッグ用
+#            self.grid = self.generate_board()
 #            self.initial_grid = copy.deepcopy(self.grid)
-#
-#        # ゲームのスコアと時間をリセット
-#        self.start_time = pyxel.frame_count if self.time_limit else None
+#    
+#        # スコアと時間をリセット
+##        self.start_time = pyxel.frame_count if self.time_limit else 0
+#        self.start_time = pyxel.frame_count  # 常に現在のフレーム数で初期化
 #        self.score = 0
-#        self.bonus_added = False  # ゲームリセット時にフラグをリセット
+#        self.bonus_added = False
+
+    def reset_game_state(self):
         """
-        ゲームをリセット。盤面生成を別メソッドに分離。
+        盤面以外の情報（スコアやタイマーなど）だけをリセットする処理。
+        """
+        # タイマーリセット
+        self.start_time = pyxel.frame_count if self.time_limit else 0
+        
+        # スコアやボーナスフラグのリセット
+        self.score = 0
+        self.bonus_added = False
+        
+        # BGM停止などが必要であればここに入れる
+        self.stop_bgm()
+
+    def generate_new_board(self, use_saved_initial_state=False):
+        """
+        新たに盤面を生成する。
+        すでに self.initial_grid を持っているなら使う／使わないの制御もここで。
         """
         if use_saved_initial_state and hasattr(self, 'initial_grid'):
             self.grid = copy.deepcopy(self.initial_grid)
         else:
-            self.grid = self.generate_board()
+            self.grid = self.board_generator.generate_filled_solvable_board(
+                rows=self.grid_rows,
+                cols=self.grid_cols,
+                colors=self.num_colors,
+                timeout=3
+            )
             self.initial_grid = copy.deepcopy(self.grid)
-    
-        # スコアと時間をリセット
-        self.start_time = pyxel.frame_count if self.time_limit else None
-        self.score = 0
-        self.bonus_added = False
-
 
     def update(self):
         """ゲームの状態を更新"""
@@ -456,7 +463,9 @@ class SameGame:
                 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)
             ):
                 print("Retry button clicked")
-                self.reset_game(use_saved_initial_state=True)  # 保存済みの初期状態に戻す
+#                self.reset_game(use_saved_initial_state=True)  # 保存済みの初期状態に戻す
+                self.generate_new_board(use_saved_initial_state=True) # 盤面は変えずに
+                self.reset_game_state()  # タイマーとスコアだけリセット
                 self.state = GameState.GAME_START  # ゲームを最初から開始
                 return
     
@@ -510,21 +519,39 @@ class SameGame:
                     self.stop_bgm()
 
         elif self.state == GameState.BOARD_GENERATION:
-            if not hasattr(self, 'generation_complete'):
-                self.generation_complete = False
+            if not hasattr(self, 'board_generated'):
+                self.board_generated = False
         
-                def generate_board():
-                    self.reset_game(use_saved_initial_state=False)
-                    self.generation_complete = True
+            if not self.board_generated:
+#                # 描画中に盤面生成
+#                self.draw_text(
+#                    WINDOW_HEIGHT // 2,
+#                    "Generating Board...",
+#                    pyxel.COLOR_YELLOW,
+#                    align="center",
+#                    border_color=pyxel.COLOR_DARK_BLUE
+#                )
+#                pyxel.flip()  # 即時描画
         
-                import threading
-                threading.Thread(target=generate_board).start()
-        
-#            self.draw_text(WINDOW_HEIGHT // 2, "Generating Board...", pyxel.COLOR_YELLOW, align="center")
-        
-            if self.generation_complete:
-                del self.generation_complete
+#                # 非同期で盤面生成（例えば threading を利用）
+#                self.grid = self.generate_board()
+#                self.board_generated = True
+
+                # 盤面を新たに生成（リセットはタイミングに応じて）
+                self.generate_new_board(use_saved_initial_state=False)
+                
+                # スコアやタイマーはここでリセットしたい場合に呼ぶ
+                self.reset_game_state()
+                
+                self.board_generated = True
+ 
+            else:
+                # 生成が完了したら次のステートへ移行
+                del self.board_generated
                 self.state = GameState.GAME_START
+                self.play_bgm(GameState.GAME_START)  # BGM開始
+
+
     
         elif self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
             # 序盤、中盤、終盤の進行状態を確認
@@ -926,6 +953,8 @@ class SameGame:
             # Quit
             if self.quit_button.is_hovered(mx, my):
                 self.update_high_scores()
+                # ゲーム状態を初期化してOPENINGに戻る
+                self.reset_game(use_saved_initial_state=False)
                 self.state = GameState.SCORE_DISPLAY
                 return
     
@@ -977,12 +1006,6 @@ class SameGame:
         """
         盤面を描画
         """
-#        game_area_y = BUTTON_AREA_HEIGHT
-#        game_area_height = WINDOW_HEIGHT - BUTTON_AREA_HEIGHT - STATUS_AREA_HEIGHT
-#        cell_size = min(WINDOW_WIDTH // self.grid_cols, game_area_height // self.grid_rows)
-#        grid_x_start = (WINDOW_WIDTH - (cell_size * self.grid_cols)) // 2
-#        grid_y_start = game_area_y + (game_area_height - (cell_size * self.grid_rows)) // 2
-
         left_margin = 4  # 左側の最小余白
         game_area_y = BUTTON_AREA_HEIGHT
         game_area_height = WINDOW_HEIGHT - BUTTON_AREA_HEIGHT - STATUS_AREA_HEIGHT
@@ -1007,23 +1030,6 @@ class SameGame:
                         cell_size,
                         COLORS[color]
                     )
-
-#    def draw_score_and_time(self):
-#        """
-#        画面下部にスコアと時間のみを描画
-#        """
-#        # スコア表示
-#        score_text = f"Score: {int(self.score)}"
-#        pyxel.text(10, WINDOW_HEIGHT - STATUS_AREA_HEIGHT + 5, score_text, pyxel.COLOR_WHITE)
-#
-#        # タイマー表示
-#        if self.time_limit:
-#            remaining_time = max(0, self.time_limit - (pyxel.frame_count - self.start_time) // 30)
-#            time_text = f"Time: {remaining_time}s"
-#        else:
-#            time_text = "Time: --"
-#        time_text_width = len(time_text) * 4  # おおまかな文字幅
-#        pyxel.text(WINDOW_WIDTH - time_text_width - 10, WINDOW_HEIGHT - STATUS_AREA_HEIGHT + 5, time_text, pyxel.COLOR_WHITE)
 
     def draw_score_and_time(self):
         """
