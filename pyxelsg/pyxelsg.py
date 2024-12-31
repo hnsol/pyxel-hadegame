@@ -326,6 +326,14 @@ class SameGame:
 #        bgm_channels = [0, 1, 2, 3]  # 全チャンネル消す
         bgm_channels = [1, 2, 3]  # 0以外を消す
         for ch in bgm_channels:
+            # サウンドデータをリセット（空データを設定）
+            pyxel.sounds[ch].set(
+                notes="",
+                tones="",
+                volumes="",
+                effects="",
+                speed=1
+            )
             pyxel.stop(ch)  # チャンネルごとに停止
         self.current_bgm = None  # 現在のBGM状態をリセット
 
