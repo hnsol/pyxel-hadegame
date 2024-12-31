@@ -148,13 +148,10 @@ translations = {
     }
 }
 
-#def get_translated_texts(key):
-#    """現在の言語に基づいてテキストを取得"""
-#    return translations[current_language].get(key, [])
-
 class GameState(Enum):
     OPENING = "opening"
     DIFFICULTY_SELECTION = "difficulty_selection"
+    BOARD_GENERATION = "board_generation"      # 盤面生成中
     GAME_START = "game_start"
     GAME_MID = "game_mid"
     GAME_END = "game_end"
@@ -163,24 +160,6 @@ class GameState(Enum):
     GAME_CLEARED = "game_cleared"
     SCORE_DISPLAY = "score_display"
     HIGH_SCORE_DISPLAY = "high_score_display"
-
-#class Button:
-#    def __init__(self, x, y, width, height, label):
-#        self.x = x
-#        self.y = y
-#        self.width = width
-#        self.height = height
-#        self.label = label
-#
-#    def is_hovered(self, mx, my):
-#        return self.x <= mx <= self.x + self.width and self.y <= my <= self.y + self.height
-#
-#    def draw(self, is_hovered):
-#        color = pyxel.COLOR_LIGHT_BLUE if is_hovered else pyxel.COLOR_GRAY
-#        pyxel.rect(self.x, self.y, self.width, self.height, color)
-#        text_x = self.x + (self.width // 2) - (len(self.label) * 2)
-#        text_y = self.y + (self.height // 2) - 4
-#        pyxel.text(text_x, text_y, self.label.capitalize(), pyxel.COLOR_WHITE)
 
 class Button:
     def __init__(self, x, y, width, height, label):
@@ -413,31 +392,53 @@ class SameGame:
         removed_percentage = (total_cells - remaining_cells) / total_cells
         return remaining_cells, removed_percentage
 
+    def generate_board(self):
+        """新しい盤面を生成する"""
+        return self.board_generator.generate_filled_solvable_board(
+            rows=self.grid_rows,
+            cols=self.grid_cols,
+            colors=self.num_colors
+        )
+
     def reset_game(self, use_saved_initial_state=False):
+#        """
+#        ゲームをリセット。盤面生成を別メソッドに分離。
+#        use_saved_initial_stateがTrueの場合、保存した初期状態に戻す。
+#        それ以外の場合は新しいランダムな盤面を生成する。
+#        """
+#        if use_saved_initial_state and hasattr(self, 'initial_grid'):
+#            # 保存した初期盤面を復元
+#            self.grid = copy.deepcopy(self.initial_grid)
+#        else:
+#            self.stop_bgm()
+#            # BoardGenerator を使って盤面を生成
+#            self.grid = self.board_generator.generate_filled_solvable_board(
+#                rows=self.grid_rows,
+#                cols=self.grid_cols,
+#                colors=self.num_colors
+#            )
+##            self.board_generator.print_board(self.grid) #debug
+#            print(f"Grid are generated: {self.grid}")  # デバッグ用
+#            self.initial_grid = copy.deepcopy(self.grid)
+#
+#        # ゲームのスコアと時間をリセット
+#        self.start_time = pyxel.frame_count if self.time_limit else None
+#        self.score = 0
+#        self.bonus_added = False  # ゲームリセット時にフラグをリセット
         """
-        ゲームをリセット
-        use_saved_initial_stateがTrueの場合、保存した初期状態に戻す。
-        それ以外の場合は新しいランダムな盤面を生成する。
+        ゲームをリセット。盤面生成を別メソッドに分離。
         """
         if use_saved_initial_state and hasattr(self, 'initial_grid'):
-            # 保存した初期盤面を復元
             self.grid = copy.deepcopy(self.initial_grid)
         else:
-            self.stop_bgm()
-            # BoardGenerator を使って盤面を生成
-            self.grid = self.board_generator.generate_filled_solvable_board(
-                rows=self.grid_rows,
-                cols=self.grid_cols,
-                colors=self.num_colors
-            )
-#            self.board_generator.print_board(self.grid) #debug
-            print(f"Grid are generated: {self.grid}")  # デバッグ用
+            self.grid = self.generate_board()
             self.initial_grid = copy.deepcopy(self.grid)
-
-        # ゲームのスコアと時間をリセット
+    
+        # スコアと時間をリセット
         self.start_time = pyxel.frame_count if self.time_limit else None
         self.score = 0
-        self.bonus_added = False  # ゲームリセット時にフラグをリセット
+        self.bonus_added = False
+
 
     def update(self):
         """ゲームの状態を更新"""
@@ -501,12 +502,29 @@ class SameGame:
                 self.play_bgm(GameState.DIFFICULTY_SELECTION)
                 print(f"Switching to BGM for state state name: {state.name}")  # デバッグ用
                 print(f"Switching to BGM for state game state: {GameState.DIFFICULTY_SELECTION}")  # デバッグ用
-#            self.reset_game(use_saved_initial_state=False)
             for button in self.difficulty_buttons:
                 if button.is_hovered(pyxel.mouse_x, pyxel.mouse_y) and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                     print(f"Difficulty button clicked: {button.key}")
                     self.apply_difficulty_settings(button.key)
-                    self.state = GameState.GAME_START
+                    self.state = GameState.BOARD_GENERATION
+                    self.stop_bgm()
+
+        elif self.state == GameState.BOARD_GENERATION:
+            if not hasattr(self, 'generation_complete'):
+                self.generation_complete = False
+        
+                def generate_board():
+                    self.reset_game(use_saved_initial_state=False)
+                    self.generation_complete = True
+        
+                import threading
+                threading.Thread(target=generate_board).start()
+        
+#            self.draw_text(WINDOW_HEIGHT // 2, "Generating Board...", pyxel.COLOR_YELLOW, align="center")
+        
+            if self.generation_complete:
+                del self.generation_complete
+                self.state = GameState.GAME_START
     
         elif self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
             # 序盤、中盤、終盤の進行状態を確認
@@ -599,8 +617,8 @@ class SameGame:
         self.time_limit = settings["time_limit"]
         self.score_multiplier = settings["score_multiplier"]
         print(f"Settings applied: {settings}")
-        # 難易度変更時に盤面をリセット
-        self.reset_game(use_saved_initial_state=False)
+#        # 難易度変更時に盤面をリセット
+#        self.reset_game(use_saved_initial_state=False)
 
     def handle_click(self, mx, my):
         """盤面クリック時の処理"""
@@ -811,7 +829,16 @@ class SameGame:
                     font=self.font_small,
                     border_color=pyxel.COLOR_DARK_BLUE
                 )
-    
+
+        elif self.state == GameState.BOARD_GENERATION:
+            self.draw_text(
+                WINDOW_HEIGHT // 2,
+                "Generating Board...",
+                pyxel.COLOR_YELLOW,
+                align="center",
+                border_color=pyxel.COLOR_DARK_BLUE,
+            )
+
         elif self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
             # 盤面とボタン・ステータスを描画
 #            self.draw_buttons()
