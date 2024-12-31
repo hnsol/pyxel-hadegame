@@ -25,10 +25,13 @@ class BoardGenerator:
                 return last_board
             if i % 1 == 0:
                 print(f"Debug: Attempt {i}")
-                print(f"Debug: rows min max {rows} {round(rows/5)} {int(rows/2)}")
+#                print(f"Debug: rows min max {rows} {round(rows/5)} {int(rows/2)}")
+                print(f"Debug: rows min max {rows} {round(rows/7)} {int(rows/2)}")
             board = self._generate_blocky_board(
                 rows, cols, colors,
-                min_block_size=round(rows / 5),
+#                min_block_size=round(rows / 5),
+#                min_block_size=1,
+                min_block_size=round(rows / 7),
 #                max_block_size=int(rows / 1.8)
                 max_block_size=min(2, int(rows / 2))
             )
