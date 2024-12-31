@@ -34,13 +34,6 @@ DEFAULT_TOP_SCORES = [50000, 25000, 7500, 5000, 2500, 750, 500, 250, 75, 50]  # 
 
 translations = {
     "language_button": {"ja": "EN", "en": "JA"},  # 言語切り替えボタンのラベル
-#    "titles": {
-#        "game_title": {
-#            "ja": "さめがめ にようこそ",
-#            "en": "Welcome to SameGame"},
-#        "difficulty_selection": {"ja": "難易度を選んでください",
-#        "en": "Select Difficulty"}
-#    },
     "titles": {
         "game_title": {
             "ja": [
@@ -59,16 +52,6 @@ translations = {
             "en": {"y": 40, "text": "Select Difficulty", "color": pyxel.COLOR_YELLOW}
         }
     },
-#    "instructions": {
-#        "intro": [
-#            {"line": {"ja": "あそびかた:", "en": "How to Play:"}, "color": pyxel.COLOR_YELLOW},
-#            {"line": {"ja": "1. 同じ色のブロックをクリックして消しましょう。", "en": "1. Click connected blocks to remove them."}, "color": pyxel.COLOR_WHITE},
-#            {"line": {"ja": "2. 一度に多くのブロックを消すとスコアが上がります。", "en": "2. Remove more blocks at once for higher scores."}, "color": pyxel.COLOR_WHITE},
-#            {"line": {"ja": "3. 全てのブロックを消すとボーナス！", "en": "3. Clear all blocks for a bonus!"}, "color": pyxel.COLOR_WHITE},
-#            {"line": {"ja": "4. むずかしいほど高いスコアが得られます！", "en": "4. Higher difficulty means higher scores!"}, "color": pyxel.COLOR_WHITE},
-#            {"line": {"ja": "5. 消せるブロックがなくなったらゲームオーバー。", "en": "5. No moves left? Game over."}, "color": pyxel.COLOR_WHITE}
-#        ]
-#    },
     "instructions": {
         "intro": {
             "ja": {
@@ -76,11 +59,11 @@ translations = {
                 "line_spacing": 15,
                 "lines": [
                     {"line": "あそびかた:", "color": pyxel.COLOR_YELLOW},
-                    {"line": "1. 同色ブロックをクリックで消しましょう。", "color": pyxel.COLOR_WHITE},
-                    {"line": "2. 一度に多くのブロックを消すとスコアが上がります。", "color": pyxel.COLOR_WHITE},
+                    {"line": "1. つながっているブロックを消せます", "color": pyxel.COLOR_WHITE},
+                    {"line": "2. 多くのブロックを消すと高得点", "color": pyxel.COLOR_WHITE},
                     {"line": "3. 全てのブロックを消すとボーナス！", "color": pyxel.COLOR_WHITE},
-                    {"line": "4. むずかしいほど高いスコアが得られます！", "color": pyxel.COLOR_WHITE},
-                    {"line": "5. 消せるブロックがなくなったらゲームオーバー。", "color": pyxel.COLOR_WHITE}
+                    {"line": "4. むずかしいほど高得点！", "color": pyxel.COLOR_WHITE},
+                    {"line": "5. 消せるブロックがなくなったらおわり", "color": pyxel.COLOR_WHITE}
                 ]
             },
             "en": {
@@ -102,9 +85,16 @@ translations = {
         {"key": "normal", "label": {"ja": "ふつう", "en": "Normal"}, "description": {"ja": "中ぐらいのばんめん、やや多い色", "en": "Medium-sized grid, slightly more colors"}},
         {"key": "hard", "label": {"ja": "むずかしい", "en": "Hard"}, "description": {"ja": "制限時間あり、多い色", "en": "Timed play, many colors"}},
         {"key": "very_hard", "label": {"ja": "めちゃむず", "en": "Very Hard"}, "description": {"ja": "短い制限時間、大きなばんめん", "en": "Short time limit, large grid"}},
-        {"key": "expert", "label": {"ja": "たつじん", "en": "Expert"}, "description": {"ja": "最大ばんめん、最も短い時間", "en": "Largest grid, shortest time limit"}}
+        {"key": "expert", "label": {"ja": "たつじん", "en": "Expert"}, "description": {"ja": "とても短い時間、最大ばんめん", "en": "Largest grid, shortest time limit"}}
     ],
     "game_state_messages": {
+        "board_generation": {
+            "message": {
+                "ja": "ばんめんを生成ちゅう...",
+                "en": "Generating Board..."
+            },
+            "color": pyxel.COLOR_YELLOW
+        },
         "time_up": {
             "title": {"ja": "タイムアップ！", "en": "Time's Up!"},
             "subtitle": {"ja": "次はスコアが伸びそうですね。", "en": "Try again to improve your score."}
@@ -115,7 +105,7 @@ translations = {
         },
         "game_cleared": {
             "title": {"ja": "おおお！すごいですね！！！", "en": "Congratulations!"},
-            "subtitle": {"ja": "ゲームをクリアしました！", "en": "You cleared the game!"},
+            "subtitle": {"ja": "すべてのブロックを消しました！", "en": "You cleared the game!"},
             "bonus": {"ja": "ボーナス: {bonus}", "en": "Bonus: {bonus}"},
             "action": {"ja": "クリックして続行", "en": "Click to Continue"}
         },
@@ -655,13 +645,31 @@ class SameGame:
 #        # 難易度変更時に盤面をリセット
 #        self.reset_game(use_saved_initial_state=False)
 
-    def handle_click(self, mx, my):
-        """盤面クリック時の処理"""
+    def get_grid_layout(self):
+        """
+        グリッドを描画・クリックする際の cell_size / grid_x_start / grid_y_start を統一計算する
+        """
+        left_margin = 4
         game_area_y = BUTTON_AREA_HEIGHT
         game_area_height = WINDOW_HEIGHT - BUTTON_AREA_HEIGHT - STATUS_AREA_HEIGHT
-        cell_size = min(WINDOW_WIDTH // self.grid_cols, game_area_height // self.grid_rows)
-        grid_x_start = (WINDOW_WIDTH - (cell_size * self.grid_cols)) // 2
+        
+        cell_size = min((WINDOW_WIDTH - 2 * left_margin) // self.grid_cols,
+                        game_area_height // self.grid_rows)
+        grid_x_start = left_margin + ((WINDOW_WIDTH - 2 * left_margin)
+                                      - (cell_size * self.grid_cols)) // 2
         grid_y_start = game_area_y + (game_area_height - (cell_size * self.grid_rows)) // 2
+    
+        return cell_size, grid_x_start, grid_y_start
+
+    def handle_click(self, mx, my):
+        """盤面クリック時の処理"""
+#        game_area_y = BUTTON_AREA_HEIGHT
+#        game_area_height = WINDOW_HEIGHT - BUTTON_AREA_HEIGHT - STATUS_AREA_HEIGHT
+#        cell_size = min(WINDOW_WIDTH // self.grid_cols, game_area_height // self.grid_rows)
+#        grid_x_start = (WINDOW_WIDTH - (cell_size * self.grid_cols)) // 2
+#        grid_y_start = game_area_y + (game_area_height - (cell_size * self.grid_rows)) // 2
+
+        cell_size, grid_x_start, grid_y_start = self.get_grid_layout()
     
         x = (mx - grid_x_start) // cell_size
         y = (my - grid_y_start) // cell_size
@@ -813,7 +821,7 @@ class SameGame:
             ]
             
             for y, text, color in left_aligned_texts:
-                self.draw_text(y, text, color, align="left", x_offset=25, border_color=pyxel.COLOR_DARK_BLUE)
+                self.draw_text(y, text, color, align="left", x_offset=50, border_color=pyxel.COLOR_DARK_BLUE)
 
             # 言語切り替えボタンの描画
             is_hovered = self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
@@ -865,11 +873,23 @@ class SameGame:
                     border_color=pyxel.COLOR_DARK_BLUE
                 )
 
+#        elif self.state == GameState.BOARD_GENERATION:
+#            self.draw_text(
+#                WINDOW_HEIGHT // 2,
+#                "Generating Board...",
+#                pyxel.COLOR_YELLOW,
+#                align="center",
+#                border_color=pyxel.COLOR_DARK_BLUE,
+#            )
+
         elif self.state == GameState.BOARD_GENERATION:
+            board_gen_msg = translations["game_state_messages"]["board_generation"]
+            text = board_gen_msg["message"][self.current_language]
+            color = board_gen_msg["color"]
             self.draw_text(
                 WINDOW_HEIGHT // 2,
-                "Generating Board...",
-                pyxel.COLOR_YELLOW,
+                text,
+                color,
                 align="center",
                 border_color=pyxel.COLOR_DARK_BLUE,
             )
@@ -1014,18 +1034,20 @@ class SameGame:
         """
         盤面を描画
         """
-        left_margin = 4  # 左側の最小余白
-        game_area_y = BUTTON_AREA_HEIGHT
-        game_area_height = WINDOW_HEIGHT - BUTTON_AREA_HEIGHT - STATUS_AREA_HEIGHT
-        
-        # グリッドのセルサイズを計算（左右余白を考慮）
-        cell_size = min((WINDOW_WIDTH - 2 * left_margin) // self.grid_cols, game_area_height // self.grid_rows)
-        
-        # グリッドのX座標の開始位置を計算
-        grid_x_start = left_margin + ((WINDOW_WIDTH - 2 * left_margin) - (cell_size * self.grid_cols)) // 2
-        
-        # グリッドのY座標の開始位置を計算
-        grid_y_start = game_area_y + (game_area_height - (cell_size * self.grid_rows)) // 2
+#        left_margin = 4  # 左側の最小余白
+#        game_area_y = BUTTON_AREA_HEIGHT
+#        game_area_height = WINDOW_HEIGHT - BUTTON_AREA_HEIGHT - STATUS_AREA_HEIGHT
+#        
+#        # グリッドのセルサイズを計算（左右余白を考慮）
+#        cell_size = min((WINDOW_WIDTH - 2 * left_margin) // self.grid_cols, game_area_height // self.grid_rows)
+#        
+#        # グリッドのX座標の開始位置を計算
+#        grid_x_start = left_margin + ((WINDOW_WIDTH - 2 * left_margin) - (cell_size * self.grid_cols)) // 2
+#        
+#        # グリッドのY座標の開始位置を計算
+#        grid_y_start = game_area_y + (game_area_height - (cell_size * self.grid_rows)) // 2
+
+        cell_size, grid_x_start, grid_y_start = self.get_grid_layout()
 
         for y in range(self.grid_rows):
             for x in range(self.grid_cols):
