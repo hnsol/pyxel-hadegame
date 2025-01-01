@@ -135,6 +135,8 @@ translations = {
     }
 }
 
+
+
 class GameState(Enum):
     OPENING = "opening"
     DIFFICULTY_SELECTION = "difficulty_selection"
@@ -182,6 +184,53 @@ class Button:
 
 
 class SameGame:
+# 各ゲームステートごとのカスタムパラメータ
+    GAME_STATE_BGM_PARAMS = {
+        GameState.GAME_START: {
+            "preset": 1,
+            "speed": 240,
+            "transpose": 0,
+            "instrumentation": 0,
+            "chord": 0,
+            "base": [3, 4, 5],
+            "base_quantize": 14,
+            "drums": 0,
+            "melo_tone": 1,
+            "melo_lowest_note": 28,
+            "melo_density": 2,
+            "melo_use16": True,
+        },
+        GameState.GAME_MID: {
+            "preset": 1,
+            "speed": 216,
+            "transpose": 0,
+            "instrumentation": 0,
+            "chord": 0,
+            "base": [0, 1, 2],
+            "base_quantize": 14,
+            "drums": 0,
+            "melo_tone": 2,
+            "melo_lowest_note": 28,
+            "melo_density": 0,
+            "melo_use16": True,
+        },
+        GameState.GAME_END: {
+            "preset": 1,
+            "speed": 192,
+            "transpose": 0,
+            "instrumentation": 0,
+            "chord": 0,
+            "base": [6, 7],
+            "base_quantize": 14,
+            "drums": 0,
+            "melo_tone": 1,
+            "melo_lowest_note": 28,
+            "melo_density": 2,
+            "melo_use16": True,
+        },
+        # 他のステートも追加可能
+    }
+
     def __init__(self):
         self.current_language = "ja"
 
@@ -275,17 +324,6 @@ class SameGame:
             except Exception as e:
                 print(f"Error loading BGM file for state {state.name}: {e}")
 
-#    def setup_bgm(self):
-#        """Initialize BGM mappings for states and game logic."""
-#        return {
-#            GameState.OPENING: 0,              # Intro BGM (track 0)
-#            GameState.DIFFICULTY_SELECTION: 1, # Difficulty selection BGM (track 1)
-#            GameState.GAME_START: 2,           # Main game BGM (track 2)
-#            GameState.TIME_UP: 3,              # Game over BGM (track 3)
-#            GameState.NO_MOVES: 4,             # No moves BGM (track 4)
-#            GameState.GAME_CLEARED: 5,         # Game cleared BGM (track 5)
-#        }
-
     def play_bgm(self, state):
         """指定された状態に対応するBGMを再生"""
         if self.current_bgm == state:
@@ -298,56 +336,31 @@ class SameGame:
 
         self.current_bgm = state
 
-        if state == GameState.GAME_START:
-            # カスタムパラメータをセット
-#            custom_parm = {
-#                "preset": 2,
-#                "transpose": 0,
-#                "melo_tone": 1,
-#                "sub_tone": 2,
-#                "speed": 312,
-#                "instrumentation": 3,
-#            }
-            custom_parm_options = {
-                "preset": 2,
-                "speed": 312,
-                "transpose": 0,
-                "instrumentation": 3,   # 忘れがちな追加
-                "chord": 6,
-                "base": [0, 1, 2],
-                "base_quantize": 13,
-                "drums": 0,
-                "melo_tone": 5,
-                "melo_lowest_note": 30,
-                "melo_density": [0, 2],
-                "melo_use16": False,
-            }
-#            # 各パラメータからランダムに選択しパラメータをセット
-#            custom_parm = {key: random.choice(values) for key, values in custom_parm_options.items()}
-            # 各パラメータからランダムに選択（リストの場合のみ）
+        # 指定されたステートがカスタムパラメータを持つ場合
+        if state in self.GAME_STATE_BGM_PARAMS:
+            custom_parm_options = self.GAME_STATE_BGM_PARAMS[state]
             custom_parm = {
                 key: random.choice(values) if isinstance(values, list) else values
                 for key, values in custom_parm_options.items()
             }
+            print(f"Custom parameters for {state.name}: {custom_parm}")  # デバッグ用
             self.bgm.set_parm(custom_parm)
-            # 音楽を生成
             self.bgm.generate_music()
-            # 音楽を再生
             self.bgm.play()
-        
-        # 指定されたステートのBGMが存在する場合、再生
         elif state in self.bgm_data:
+            # 既存のデータを使ったBGM再生
             bgm_channels = [1, 2, 3]  # チャンネル1〜3をBGM用に使用
             for ch, sound in zip(bgm_channels, self.bgm_data[state]):
                 pyxel.sounds[ch].set(*sound)
                 pyxel.play(ch, ch, loop=True)  # チャンネルごとにループ再生
         else:
             print(f"BGM data not found for state: {state.name}")  # デバッグ用
-    
+
     def stop_bgm(self):
         print(f"Stopping all BGM channels")
 #        bgm_channels = [0, 1, 2, 3]  # 全チャンネル消す
-        bgm_channels = [1, 2, 3]  # 0以外を消す
+#        bgm_channels = [1, 2, 3]  # 0以外を消す
+        bgm_channels = [0, 1, 2]  # 0以外を消す
         for ch in bgm_channels:
             # サウンドデータをリセット（空データを設定）
             pyxel.sounds[ch].set(
@@ -405,7 +418,7 @@ class SameGame:
         speed = max(5, 15 - (num_blocks // 2))
     
         # 効果音を設定
-        pyxel.sounds[0].set(
+        pyxel.sounds[3].set(
             notes="".join(notes),  # 上昇音階を生成
             tones="p",            # パルス音（爽やかな音）
             volumes="5" * max_notes,  # 音量を一定に
@@ -554,19 +567,6 @@ class SameGame:
                 self.board_generated = False
         
             if not self.board_generated:
-#                # 描画中に盤面生成
-#                self.draw_text(
-#                    WINDOW_HEIGHT // 2,
-#                    "Generating Board...",
-#                    pyxel.COLOR_YELLOW,
-#                    align="center",
-#                    border_color=pyxel.COLOR_DARK_BLUE
-#                )
-#                pyxel.flip()  # 即時描画
-        
-#                # 非同期で盤面生成（例えば threading を利用）
-#                self.grid = self.generate_board()
-#                self.board_generated = True
 
                 # 盤面を新たに生成（リセットはタイミングに応じて）
                 self.generate_new_board(use_saved_initial_state=False)
