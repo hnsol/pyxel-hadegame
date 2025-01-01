@@ -410,7 +410,8 @@ class SameGame:
         num_blocks = len(blocks_to_remove)
     
         # 基本となる上昇音階の定義
-        base_notes = ["c2", "d2", "e2", "g2", "a2", "c3"]
+#        base_notes = ["c2", "d2", "e2", "g2", "a2", "c3"]
+        base_notes = ["c2", "d2", "e2", "g2", "a2", "c3", "d3", "e3", "g3", "a3"]
         max_notes = min(len(base_notes), num_blocks)  # 消したマス数に応じて音階を制限
         notes = base_notes[:max_notes]  # 必要な音階だけを取得
     
@@ -418,7 +419,7 @@ class SameGame:
         speed = max(5, 15 - (num_blocks // 2))
     
         # 効果音を設定
-        pyxel.sounds[3].set(
+        pyxel.sounds[0].set(
             notes="".join(notes),  # 上昇音階を生成
             tones="p",            # パルス音（爽やかな音）
             volumes="5" * max_notes,  # 音量を一定に
@@ -427,7 +428,7 @@ class SameGame:
         )
     
         # 効果音を再生
-        pyxel.play(0, 0)
+        pyxel.play(3, 0)
 
     def calculate_progress(self):
         """盤面の進行状況を計算"""
