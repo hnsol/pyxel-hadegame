@@ -236,7 +236,7 @@ class SameGame:
         self.current_score_rank = None
         self.start_time = None
         self.initial_grid = []
-        self.bgm_tracks = self.setup_bgm()
+#        self.bgm_tracks = self.setup_bgm()
         self.current_bgm = None
 
         # BoardGenerator のインスタンスを作成
@@ -274,16 +274,16 @@ class SameGame:
             except Exception as e:
                 print(f"Error loading BGM file for state {state.name}: {e}")
 
-    def setup_bgm(self):
-        """Initialize BGM mappings for states and game logic."""
-        return {
-            GameState.OPENING: 0,              # Intro BGM (track 0)
-            GameState.DIFFICULTY_SELECTION: 1, # Difficulty selection BGM (track 1)
-            GameState.GAME_START: 2,           # Main game BGM (track 2)
-            GameState.TIME_UP: 3,              # Game over BGM (track 3)
-            GameState.NO_MOVES: 4,             # No moves BGM (track 4)
-            GameState.GAME_CLEARED: 5,         # Game cleared BGM (track 5)
-        }
+#    def setup_bgm(self):
+#        """Initialize BGM mappings for states and game logic."""
+#        return {
+#            GameState.OPENING: 0,              # Intro BGM (track 0)
+#            GameState.DIFFICULTY_SELECTION: 1, # Difficulty selection BGM (track 1)
+#            GameState.GAME_START: 2,           # Main game BGM (track 2)
+#            GameState.TIME_UP: 3,              # Game over BGM (track 3)
+#            GameState.NO_MOVES: 4,             # No moves BGM (track 4)
+#            GameState.GAME_CLEARED: 5,         # Game cleared BGM (track 5)
+#        }
 
     def play_bgm(self, state):
         """指定された状態に対応するBGMを再生"""
@@ -296,9 +296,38 @@ class SameGame:
         self.stop_bgm()
 
         self.current_bgm = state
-    
+
+        if state == GameState.GAME_START:
+            # カスタムパラメータをセット
+#            custom_parm = {
+#                "preset": 2,
+#                "transpose": 0,
+#                "melo_tone": 1,
+#                "sub_tone": 2,
+#                "speed": 312,
+#                "instrumentation": 3,
+#            }
+            custom_parm = {
+                "preset": 2,
+                "speed": 312,
+                "melo_density": 4,
+                "chord": 6,
+                "base": 1,
+                "base_quantize": 13,
+                "drums": 0,
+                "melo_tone": 5,
+                "melo_lowest_note": 30,  # 修正: パラメータ名は "melo_lowest_note"
+                "melo_use16": False,
+                "instrumentation": 3,   # 忘れがちな追加
+            }
+            self.bgm.set_parm(custom_parm)
+            # 音楽を生成
+            self.bgm.generate_music()
+            # 音楽を再生
+            self.bgm.play()
+        
         # 指定されたステートのBGMが存在する場合、再生
-        if state in self.bgm_data:
+        elif state in self.bgm_data:
             bgm_channels = [1, 2, 3]  # チャンネル1〜3をBGM用に使用
             for ch, sound in zip(bgm_channels, self.bgm_data[state]):
                 pyxel.sounds[ch].set(*sound)
