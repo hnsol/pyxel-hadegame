@@ -11,6 +11,7 @@ import json
 import copy
 from enum import Enum
 from board_generator import BoardGenerator
+from bgm_generator import BGMGenerator
 
 # 定数の設定
 WINDOW_WIDTH = 256
@@ -195,6 +196,7 @@ class SameGame:
             exit(1)  # フォントがない場合はエラー終了
 
         # BGM関連の初期化
+        self.bgm = BGMGenerator()
         self.bgm_files = {
             GameState.OPENING: "assets/opening_music.json",            # オープニング画面のBGM
             GameState.DIFFICULTY_SELECTION: "assets/selection_music.json", # 難易度選択画面のBGM

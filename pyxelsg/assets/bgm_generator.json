@@ -1,0 +1,290 @@
+{
+  "chords": [
+    {
+      "description": "Ⅰ - Ⅶ♭",
+      "progression": [
+        { "loc": 0, "notes": "209019030909" },
+        { "loc": 16, "notes": "901093090920" },
+        { "loc": 32, "notes": "209019030909" },
+        { "loc": 48, "notes": "901093090920" },
+        { "loc": 64, "repeat": 0 },
+        { "loc": 80, "repeat": 1 },
+        { "loc": 96, "notes": "209019030909" },
+        { "loc": 112, "notes": "901093090920" },
+        { "loc": 120, "notes": "901099010902" }
+      ]
+    },
+    {
+      "description": "Ⅳ - Ⅴ／Ⅳ",
+      "progression": [
+        { "loc": 0, "notes": "309092090109" },
+        { "loc": 16, "notes": "903092010901" },
+        { "loc": 32, "notes": "309092090109" },
+        { "loc": 48, "notes": "903092010901" },
+        { "loc": 64, "notes": "909209030930" },
+        { "loc": 80, "notes": "309201090190" },
+        { "loc": 96, "notes": "909209030930" },
+        { "loc": 112, "notes": "309201090190" }
+      ]
+    },
+    {
+      "description": "Ⅰ - Ⅴ - Ⅵ♭ - Ⅶ♭",
+      "progression": [
+        { "loc": 0, "notes": "209019030909" },
+        { "loc": 16, "notes": "903099020901" },
+        { "loc": 32, "notes": "109309092090" },
+        { "loc": 48, "notes": "901903099020" },
+        { "loc": 64, "repeat": 0 },
+        { "loc": 80, "repeat": 1 },
+        { "loc": 96, "notes": "109309092090" },
+        { "loc": 104, "notes": "901903099020" },
+        { "loc": 112, "notes": "209091030909" },
+        { "loc": 120, "notes": "209019030909" }
+      ]
+    },
+    {
+      "description": "ⅣＭ７ - ⅢＭ７ - Ⅵ７ - Ⅰ",
+      "progression": [
+        { "loc": 0, "notes": "309012090109" },
+        { "loc": 16, "notes": "901020901903" },
+        { "loc": 32, "notes": "109039010209" },
+        { "loc": 48, "notes": "209019030909" },
+        { "loc": 64, "repeat": 0 },
+        { "loc": 80, "repeat": 1 },
+        { "loc": 96, "notes": "901039090209" },
+        { "loc": 112, "notes": "019039010209" }
+      ]
+    },
+    {
+      "description": "Ⅵｍ - Ⅴ - Ⅳ - Ⅴ",
+      "progression": [
+        { "loc": 0, "notes": "109039090209" },
+        { "loc": 16, "notes": "903099020901" },
+        { "loc": 32, "notes": "309092090109" },
+        { "loc": 48, "notes": "903099020901" },
+        { "loc": 64, "repeat": 0 },
+        { "loc": 80, "repeat": 1 },
+        { "loc": 96, "repeat": 2 },
+        { "loc": 112, "notes": "903099020901" },
+        { "loc": 120, "notes": "903090902901" }
+      ]
+    },
+    {
+      "description": "Ⅵｍ - Ⅳ - Ⅴ - Ⅰ",
+      "progression": [
+        { "loc": 0, "notes": "109039090209" },
+        { "loc": 16, "notes": "309092090109" },
+        { "loc": 32, "notes": "903099020901" },
+        { "loc": 48, "notes": "209019030909" },
+        { "loc": 56, "notes": "109019030902" },
+        { "loc": 64, "repeat": 0 },
+        { "loc": 80, "repeat": 1 },
+        { "loc": 96, "repeat": 2 },
+        { "loc": 112, "notes": "209019030909" },
+        { "loc": 120, "notes": "903093090302" },
+        { "loc": 124, "notes": "903029030903" }
+      ]
+    },
+    {
+      "description": "Ⅵｍ - Ⅱ",
+      "progression": [
+        { "loc": 0, "notes": "109030909209" },
+        { "loc": 16, "notes": "902090109309" },
+        { "loc": 32, "notes": "109030909209" },
+        { "loc": 48, "notes": "902090109309" },
+        { "loc": 64, "repeat": 0 },
+        { "loc": 80, "repeat": 1 },
+        { "loc": 96, "notes": "109030909209" },
+        { "loc": 112, "notes": "902090109309" },
+        { "loc": 120, "notes": "909020901903" }
+      ]
+    },
+    {
+      "description": "Ⅲｍ７ - ⅣＭ７ - Ⅴ６ - Ⅵｍ９",
+      "progression": [
+        { "loc": 0, "notes": "901029010903" },
+        { "loc": 16, "notes": "309012090109" },
+        { "loc": 32, "notes": "903019020901" },
+        { "loc": 48, "notes": "109039030201" },
+        { "loc": 64, "repeat": 0 },
+        { "loc": 80, "repeat": 1 },
+        { "loc": 96, "notes": "903019020901" },
+        { "loc": 112, "notes": "019030909209" }
+      ]
+    }
+  ],
+  "base": [
+    {
+      "basic": "4.....4.....0.44",
+      "final": "4.....4.....44.."
+    },
+    {
+      "basic": "2.3.4.3.2.3.4.3.",
+      "final": "2.3.4.3.2...4..."
+    },
+    {
+      "basic": "440...440...2...",
+      "final": "440...440...442."
+    },
+    {
+      "basic": "0.2.4.2.0.2.4.2.",
+      "final": "0.2.4.2.2.4.2.4."
+    },
+    {
+      "basic": "2.402.402.402.40",
+      "final": "2.402.402.40242."
+    },
+    {
+      "basic": "2034203420342034",
+      "final": "2034203420444440"
+    },
+    {
+      "basic": "2044204420442044",
+      "final": "2044204420442.4."
+    },
+    {
+      "basic": "4.444.444.444.44",
+      "final": "4.444.444.442.22"
+    }
+  ],
+  "drums": [
+    {
+      "basic": "1000000000001000",
+      "final": "1000000000001030"
+    },
+    {
+      "basic": "1000001000001000",
+      "final": "1000001000007750"
+    },
+    {
+      "basic": "3030003330300033",
+      "final": "3030003330303013"
+    },
+    {
+      "basic": "1000001000003330",
+      "final": "1000001000003310"
+    },
+    {
+      "basic": "1000301010003013",
+      "final": "1000301010003333"
+    },
+    {
+      "basic": "3033303330333033",
+      "final": "3033303330336655"
+    },
+    {
+      "basic": "3033203330332033",
+      "final": "3033203330332032"
+    },
+    {
+      "basic": "1033203310332033",
+      "final": "1033203310332220"
+    }
+  ],
+  "preset": [
+    {
+      "speed": 216,
+      "chord": 0,
+      "base": 4,
+      "base_quantize": 14,
+      "drums": 4,
+      "melo_tone": 0,
+      "sub_tone": 0,
+      "melo_lowest_note": 28,
+      "melo_density": 2,
+      "melo_use16": true,
+      "instrumentation": 3
+    },
+    {
+      "speed": 216,
+      "chord": 1,
+      "base": 6,
+      "base_quantize": 12,
+      "drums": 5,
+      "melo_tone": 3,
+      "sub_tone": 3,
+      "melo_lowest_note": 28,
+      "melo_density": 4,
+      "melo_use16": true,
+      "instrumentation": 3
+    },
+    {
+      "speed": 312,
+      "chord": 2,
+      "base": 1,
+      "base_quantize": 15,
+      "drums": 0,
+      "melo_tone": 5,
+      "sub_tone": 5,
+      "melo_lowest_note": 30,
+      "melo_density": 2,
+      "melo_use16": false,
+      "instrumentation": 0
+    },
+    {
+      "speed": 276,
+      "chord": 3,
+      "base": 2,
+      "base_quantize": 15,
+      "drums": 3,
+      "melo_tone": 4,
+      "sub_tone": 4,
+      "melo_lowest_note": 28,
+      "melo_density": 0,
+      "melo_use16": false,
+      "instrumentation": 3
+    },
+    {
+      "speed": 240,
+      "chord": 4,
+      "base": 0,
+      "base_quantize": 14,
+      "drums": 2,
+      "melo_tone": 0,
+      "sub_tone": 1,
+      "melo_lowest_note": 29,
+      "melo_density": 2,
+      "melo_use16": false,
+      "instrumentation": 3
+    },
+    {
+      "speed": 216,
+      "chord": 5,
+      "base_quantize": 14,
+      "base": 3,
+      "drums": 4,
+      "melo_tone": 1,
+      "sub_tone": 1,
+      "melo_lowest_note": 30,
+      "melo_density": 2,
+      "melo_use16": true,
+      "instrumentation": 2
+    },
+    {
+      "speed": 192,
+      "chord": 6,
+      "base": 5,
+      "base_quantize": 13,
+      "drums": 6,
+      "melo_tone": 0,
+      "sub_tone": 0,
+      "melo_lowest_note": 28,
+      "melo_density": 4,
+      "melo_use16": true,
+      "instrumentation": 1
+    },
+    {
+      "speed": 168,
+      "chord": 7,
+      "base": 7,
+      "base_quantize": 15,
+      "drums": 7,
+      "melo_tone": 3,
+      "sub_tone": 3,
+      "melo_lowest_note": 28,
+      "melo_density": 4,
+      "melo_use16": true,
+      "instrumentation": 3
+    }
+  ]
+}
