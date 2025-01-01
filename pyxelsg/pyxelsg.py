@@ -8,6 +8,7 @@
 import pyxel
 import os
 import json
+import random
 import copy
 from enum import Enum
 from board_generator import BoardGenerator
@@ -307,18 +308,26 @@ class SameGame:
 #                "speed": 312,
 #                "instrumentation": 3,
 #            }
-            custom_parm = {
+            custom_parm_options = {
                 "preset": 2,
                 "speed": 312,
-                "melo_density": 4,
+                "transpose": 0,
+                "instrumentation": 3,   # 忘れがちな追加
                 "chord": 6,
-                "base": 1,
+                "base": [0, 1, 2],
                 "base_quantize": 13,
                 "drums": 0,
                 "melo_tone": 5,
-                "melo_lowest_note": 30,  # 修正: パラメータ名は "melo_lowest_note"
+                "melo_lowest_note": 30,
+                "melo_density": [0, 2],
                 "melo_use16": False,
-                "instrumentation": 3,   # 忘れがちな追加
+            }
+#            # 各パラメータからランダムに選択しパラメータをセット
+#            custom_parm = {key: random.choice(values) for key, values in custom_parm_options.items()}
+            # 各パラメータからランダムに選択（リストの場合のみ）
+            custom_parm = {
+                key: random.choice(values) if isinstance(values, list) else values
+                for key, values in custom_parm_options.items()
             }
             self.bgm.set_parm(custom_parm)
             # 音楽を生成
