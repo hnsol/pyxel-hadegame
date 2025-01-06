@@ -12,7 +12,7 @@ import random
 import copy
 from enum import Enum
 from board_generator import BoardGenerator
-from bgm_generator import BGMGenerator
+from bgm import BGMGenerator
 
 # 定数の設定
 WINDOW_WIDTH = 256
@@ -239,8 +239,7 @@ class SameGame:
 
         # フォントの読み込み
         try:
-            self.font_small = self.load_font("assets/k8x12.bdf")
-#            self.font_large = self.load_font("assets/umplus_j12r.bdf")  # 必要であれば
+            self.font_small = self.load_font("assets/fonts/k8x12.bdf")
         except FileNotFoundError as e:
             print(f"Error loading font: {e}")
             exit(1)  # フォントがない場合はエラー終了
@@ -248,14 +247,14 @@ class SameGame:
         # BGM関連の初期化
         self.bgm = BGMGenerator()
         self.bgm_files = {
-            GameState.OPENING: "assets/opening_music.json",            # オープニング画面のBGM
-            GameState.DIFFICULTY_SELECTION: "assets/selection_music.json", # 難易度選択画面のBGM
-            GameState.GAME_START: "assets/gameplay_start_music.json", # ゲーム序盤のBGM
-            GameState.GAME_MID: "assets/gameplay_mid_music.json",     # ゲーム中盤のBGM
-            GameState.GAME_END: "assets/gameplay_end_music.json",     # ゲーム終盤のBGM
-            GameState.TIME_UP: "assets/time_up_music.json",           # タイムアップ時のBGM
-            GameState.NO_MOVES: "assets/no_moves_music.json",         # 動ける手がなくなった時のBGM
-            GameState.GAME_CLEARED: "assets/cleared_music.json",      # ゲームクリア時のBGM
+            GameState.OPENING: "assets/game_music/opening.json",            # オープニング画面のBGM
+            GameState.DIFFICULTY_SELECTION: "assets/game_music/selection.json", # 難易度選択画面のBGM
+            GameState.GAME_START: "assets/game_music/gameplay_start.json", # ゲーム序盤のBGM
+            GameState.GAME_MID: "assets/game_music/gameplay_mid.json",     # ゲーム中盤のBGM
+            GameState.GAME_END: "assets/game_music/gameplay_end.json",     # ゲーム終盤のBGM
+            GameState.TIME_UP: "assets/game_music/time_up.json",           # タイムアップ時のBGM
+            GameState.NO_MOVES: "assets/game_music/no_moves.json",         # 動ける手がなくなった時のBGM
+            GameState.GAME_CLEARED: "assets/game_music/cleared.json",      # ゲームクリア時のBGM
         }
         self.bgm_data = {}
         self.base_path = os.path.dirname(os.path.abspath(__file__))

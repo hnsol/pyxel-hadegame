@@ -7,8 +7,11 @@
 
 import pyxel as px
 import json
-import bgm_sounds
+from . import bgm_sounds
 import os
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 # パラメータ設定一覧
 # language: 0 (Japanese), 1 (English)
@@ -75,13 +78,35 @@ BARS_NUMBERS = 8
 
 # アプリ
 class BGMGenerator:
-    def __init__(self, tones_path="assets/bgm_tones.json", patterns_path="assets/bgm_patterns.json",
-                 generator_path="assets/bgm_generator.json", rhythm_path="assets/bgm_rhythm.json"):
+#    BASE_DIR = "assets/bgm_data"  # デフォルトのディレクトリを定義
+    BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../assets/bgm_data")
+
+#    def __init__(self, tones_path="assets/bgm_data/tones.json", patterns_path="assets/bgm_data/patterns.json",
+#                 generator_path="assets/bgm_data/generator.json", rhythm_path="assets/bgm_data/rhythm.json"):
+#        # JSONデータの読み込み
+#        self.tones = self._load_json(tones_path)
+#        self.patterns = self._load_json(patterns_path)
+#        self.generator = self._load_json(generator_path)
+#        self.melo_rhythm = self._load_json(rhythm_path)
+    def __init__(self, tones_path=None, patterns_path=None, generator_path=None, rhythm_path=None):
+        # デフォルトパスを適用
+        self.tones_path = tones_path or os.path.join(self.BASE_DIR, "tones.json")
+        self.patterns_path = patterns_path or os.path.join(self.BASE_DIR, "patterns.json")
+        self.generator_path = generator_path or os.path.join(self.BASE_DIR, "generator.json")
+        self.rhythm_path = rhythm_path or os.path.join(self.BASE_DIR, "rhythm.json")
+
+        # デバッグ用ログ
+        print(f"Base directory: {self.BASE_DIR}")
+        print(f"Tones path: {self.tones_path}")
+        print(f"Patterns path: {self.patterns_path}")
+        print(f"Generator path: {self.generator_path}")
+        print(f"Rhythm path: {self.rhythm_path}")
+
         # JSONデータの読み込み
-        self.tones = self._load_json(tones_path)
-        self.patterns = self._load_json(patterns_path)
-        self.generator = self._load_json(generator_path)
-        self.melo_rhythm = self._load_json(rhythm_path)
+        self.tones = self._load_json(self.tones_path)
+        self.patterns = self._load_json(self.patterns_path)
+        self.generator = self._load_json(self.generator_path)
+        self.melo_rhythm = self._load_json(self.rhythm_path)
 
         # デフォルトパラメータの設定 based on preset 2
         self.default_parm = {
@@ -137,12 +162,12 @@ class BGMGenerator:
             with open(full_path, "r", encoding="utf-8") as file:
                 return json.load(file)
         except FileNotFoundError:
-            print(f"Error: File not found: {full_path}")
+#            print(f"Error: File not found: {full_path}")
+            logging.error(f"Error: File not found: {full_path}")
             return {}  # デフォルト値として空の辞書を返す
         except json.JSONDecodeError as e:
             print(f"Error decoding JSON from {full_path}: {e}")
             return {}  # 不正なJSONデータの場合も空の辞書を返す
-
 
     def get_default_parm(self):
         """デフォルトのparmを取得"""
