@@ -182,6 +182,22 @@ class Button:
                 border_color=pyxel.COLOR_DARK_BLUE
             )
 
+class Block:
+    def __init__(self, row, col, color):
+        self.row = row
+        self.col = col
+        self.color = color
+        # 将来的にアニメーション用フラグやパーティクル情報などを持たせたい
+
+    def draw(self, x_offset, y_offset, cell_size):
+        """
+        実際に画面に描画するときの処理。
+        x_offset, y_offset はグリッドの表示開始座標
+        cell_size はセルのサイズ
+        """
+        x = x_offset + self.col * cell_size
+        y = y_offset + self.row * cell_size
+        pyxel.rect(x, y, cell_size, cell_size, COLORS[self.color])
 
 class SameGame:
 # 各ゲームステートごとのカスタムパラメータ
@@ -475,21 +491,49 @@ class SameGame:
         # BGM停止などが必要であればここに入れる
         self.stop_bgm()
 
+#    def generate_new_board(self, use_saved_initial_state=False):
+#        """
+#        新たに盤面を生成する。
+#        すでに self.initial_grid を持っているなら使う／使わないの制御もここで。
+#        """
+#        if use_saved_initial_state and hasattr(self, 'initial_grid'):
+#            self.grid = copy.deepcopy(self.initial_grid)
+#        else:
+#            self.grid = self.board_generator.generate_filled_solvable_board(
+#                rows=self.grid_rows,
+#                cols=self.grid_cols,
+#                colors=self.num_colors,
+#                timeout=3
+#            )
+#            self.initial_grid = copy.deepcopy(self.grid)
+
     def generate_new_board(self, use_saved_initial_state=False):
-        """
-        新たに盤面を生成する。
-        すでに self.initial_grid を持っているなら使う／使わないの制御もここで。
-        """
         if use_saved_initial_state and hasattr(self, 'initial_grid'):
+            # すでに保存済みの Block 配列があるなら、それを deepcopy で再現
             self.grid = copy.deepcopy(self.initial_grid)
         else:
-            self.grid = self.board_generator.generate_filled_solvable_board(
+            # まずは BoardGenerator で「色番号の2次元リスト」を取得
+            int_grid = self.board_generator.generate_filled_solvable_board(
                 rows=self.grid_rows,
                 cols=self.grid_cols,
                 colors=self.num_colors,
                 timeout=3
             )
-            self.initial_grid = copy.deepcopy(self.grid)
+    
+            # これを「Block (または None) の2次元リスト」に変換
+            block_grid = []
+            for row in range(self.grid_rows):
+                block_row = []
+                for col in range(self.grid_cols):
+                    color = int_grid[row][col]
+                    if color == -1:
+                        block_row.append(None)
+                    else:
+                        block_row.append(Block(row, col, color))
+                block_grid.append(block_row)
+    
+            self.grid = block_grid
+            self.initial_grid = copy.deepcopy(self.grid)  # 保存
 
     def update(self):
         """ゲームの状態を更新"""
@@ -696,32 +740,30 @@ class SameGame:
 
     def handle_click(self, mx, my):
         """盤面クリック時の処理"""
-#        game_area_y = BUTTON_AREA_HEIGHT
-#        game_area_height = WINDOW_HEIGHT - BUTTON_AREA_HEIGHT - STATUS_AREA_HEIGHT
-#        cell_size = min(WINDOW_WIDTH // self.grid_cols, game_area_height // self.grid_rows)
-#        grid_x_start = (WINDOW_WIDTH - (cell_size * self.grid_cols)) // 2
-#        grid_y_start = game_area_y + (game_area_height - (cell_size * self.grid_rows)) // 2
-
         cell_size, grid_x_start, grid_y_start = self.get_grid_layout()
     
         x = (mx - grid_x_start) // cell_size
         y = (my - grid_y_start) // cell_size
     
         if 0 <= x < self.grid_cols and 0 <= y < self.grid_rows:
-            color = self.grid[y][x]
-            if color == -1:
+#            color = self.grid[y][x]
+#            if color == -1:
+#                return
+            block = self.grid[y][x]
+            # ブロックが存在しないなら (= None) 何もしない
+            if block is None:
                 return
+    
+            # ブロックの色を取得
+            color = block.color
     
             # 消去処理
             blocks_to_remove = self.find_connected_blocks(x, y, color)
             if len(blocks_to_remove) > 1:
                 for bx, by in blocks_to_remove:
-                    self.grid[by][bx] = -1
+#                    self.grid[by][bx] = -1
+                    self.grid[by][bx] = None
     
-                # 効果音専用チャンネル（0番）で再生
-#                pyxel.play(0, color)
-                # 固定の効果音を再生
-#                pyxel.play(0, 0)  # サウンド番号 0 をチャンネル 0 で再生
                 self.play_effect(blocks_to_remove)
                 self.score += int(len(blocks_to_remove) * (len(blocks_to_remove) ** 2) * self.score_multiplier)
                 self.apply_gravity()
@@ -743,55 +785,130 @@ class SameGame:
         if bgm_state:
             self.play_bgm(bgm_state)
 
+#    def find_connected_blocks(self, x, y, color):
+#        stack = [(x, y)]
+#        visited = set()
+#        connected = []
+#
+#        while stack:
+#            cx, cy = stack.pop()
+#            if (cx, cy) in visited:
+#                continue
+#            visited.add((cx, cy))
+#            if self.grid[cy][cx] == color:
+#                connected.append((cx, cy))
+#                for nx, ny in [(cx - 1, cy), (cx + 1, cy), (cx, cy - 1), (cx, cy + 1)]:
+#                    if 0 <= nx < self.grid_cols and 0 <= ny < self.grid_rows:
+#                        stack.append((nx, ny))
+#        return connected
+
     def find_connected_blocks(self, x, y, color):
         stack = [(x, y)]
         visited = set()
         connected = []
-
+    
         while stack:
             cx, cy = stack.pop()
             if (cx, cy) in visited:
                 continue
             visited.add((cx, cy))
-            if self.grid[cy][cx] == color:
+    
+            block = self.grid[cy][cx]
+            if block is not None and block.color == color:
                 connected.append((cx, cy))
-                for nx, ny in [(cx - 1, cy), (cx + 1, cy), (cx, cy - 1), (cx, cy + 1)]:
+    
+                for nx, ny in [(cx-1, cy), (cx+1, cy), (cx, cy-1), (cx, cy+1)]:
                     if 0 <= nx < self.grid_cols and 0 <= ny < self.grid_rows:
                         stack.append((nx, ny))
+    
         return connected
 
+#    def apply_gravity(self):
+#        for x in range(self.grid_cols):
+#            column = [self.grid[y][x] for y in range(self.grid_rows) if self.grid[y][x] != -1]
+#            for y in range(self.grid_rows):
+#                self.grid[self.grid_rows - y - 1][x] = column[-(y + 1)] if y < len(column) else -1
+
     def apply_gravity(self):
-        for x in range(self.grid_cols):
-            column = [self.grid[y][x] for y in range(self.grid_rows) if self.grid[y][x] != -1]
-            for y in range(self.grid_rows):
-                self.grid[self.grid_rows - y - 1][x] = column[-(y + 1)] if y < len(column) else -1
+        for col in range(self.grid_cols):
+            # "None じゃないブロック" を上から順に集めたリストを作る
+            column_blocks = [self.grid[row][col] for row in range(self.grid_rows) if self.grid[row][col] is not None]
+            # 下から埋める形で再配置
+            for row in range(self.grid_rows):
+                # 下の行(y=grid_rows-1)ほど先に埋まる
+                target_row = self.grid_rows - 1 - row
+                if row < len(column_blocks):
+                    block = column_blocks[-(row+1)]
+                    block.row = target_row  # Block自体の row も更新しておく
+                    self.grid[target_row][col] = block
+                else:
+                    self.grid[target_row][col] = None
+
+#    def shift_columns_left(self):
+#        new_grid = []
+#        for x in range(self.grid_cols):
+#            # 列が全て -1 ではないときだけ新しいグリッドに追加
+#            if any(self.grid[y][x] != -1 for y in range(self.grid_rows)):
+#                new_grid.append([self.grid[y][x] for y in range(self.grid_rows)])
+#        # 空の列を追加してグリッドサイズを維持
+#        while len(new_grid) < self.grid_cols:
+#            new_grid.append([-1] * self.grid_rows)
+#        # グリッドを更新
+#        for x in range(self.grid_cols):
+#            for y in range(self.grid_rows):
+#                self.grid[y][x] = new_grid[x][y]
 
     def shift_columns_left(self):
-        new_grid = []
-        for x in range(self.grid_cols):
-            # 列が全て -1 ではないときだけ新しいグリッドに追加
-            if any(self.grid[y][x] != -1 for y in range(self.grid_rows)):
-                new_grid.append([self.grid[y][x] for y in range(self.grid_rows)])
-        # 空の列を追加してグリッドサイズを維持
-        while len(new_grid) < self.grid_cols:
-            new_grid.append([-1] * self.grid_rows)
-        # グリッドを更新
-        for x in range(self.grid_cols):
-            for y in range(self.grid_rows):
-                self.grid[y][x] = new_grid[x][y]
+        """
+        列が全て None なら、その列を左に詰める。
+        動かしたブロックは .col を更新しておく。
+        """
+        new_columns = []
+        
+        # 1. 空でない列 (少なくとも1つ Block がある列) だけ収集
+        for col in range(self.grid_cols):
+            # この列のブロック情報を縦にスキャン
+            column_data = [self.grid[row][col] for row in range(self.grid_rows)]
+            # ひとつでも None でないマスがあれば「有効な列」
+            if any(block is not None for block in column_data):
+                new_columns.append(column_data)
+        
+        # 2. 足りない列は全て None 列で埋める
+        while len(new_columns) < self.grid_cols:
+            new_columns.append([None] * self.grid_rows)
+        
+        # 3. new_columns を grid に書き戻し + 移動したブロックの col を更新
+        for new_col_index, column_data in enumerate(new_columns):
+            for row_index, block in enumerate(column_data):
+                self.grid[row_index][new_col_index] = block
+                if block is not None:
+                    block.col = new_col_index
+
+#    def has_valid_moves(self):
+#        for y in range(self.grid_rows):
+#            for x in range(self.grid_cols):
+#                color = self.grid[y][x]
+#                if color != -1 and len(self.find_connected_blocks(x, y, color)) > 1:
+#                    return True
+#        return False
 
     def has_valid_moves(self):
-        for y in range(self.grid_rows):
-            for x in range(self.grid_cols):
-                color = self.grid[y][x]
-                if color != -1 and len(self.find_connected_blocks(x, y, color)) > 1:
-                    return True
+        for row in range(self.grid_rows):
+            for col in range(self.grid_cols):
+                block = self.grid[row][col]
+                if block is not None:
+                    # 隣接チェック
+                    connected = self.find_connected_blocks(col, row, block.color)
+                    if len(connected) > 1:
+                        return True
         return False
 
     def is_grid_empty(self):
         for row in self.grid:
-            for cell in row:
-                if cell != -1:
+#            for cell in row:
+#                if cell != -1:
+            for block in row:
+                if block is not None:
                     return False
         return True
 
@@ -1063,36 +1180,33 @@ class SameGame:
                 border_color=pyxel.COLOR_DARK_BLUE
             )
 
+#    def draw_grid(self):
+#        """
+#        盤面を描画
+#        """
+#        cell_size, grid_x_start, grid_y_start = self.get_grid_layout()
+#
+#        for y in range(self.grid_rows):
+#            for x in range(self.grid_cols):
+#                color = self.grid[y][x]
+#                if color != -1:
+#                    pyxel.rect(
+#                        grid_x_start + x * cell_size,
+#                        grid_y_start + y * cell_size,
+#                        cell_size,
+#                        cell_size,
+#                        COLORS[color]
+#                    )
+
     def draw_grid(self):
-        """
-        盤面を描画
-        """
-#        left_margin = 4  # 左側の最小余白
-#        game_area_y = BUTTON_AREA_HEIGHT
-#        game_area_height = WINDOW_HEIGHT - BUTTON_AREA_HEIGHT - STATUS_AREA_HEIGHT
-#        
-#        # グリッドのセルサイズを計算（左右余白を考慮）
-#        cell_size = min((WINDOW_WIDTH - 2 * left_margin) // self.grid_cols, game_area_height // self.grid_rows)
-#        
-#        # グリッドのX座標の開始位置を計算
-#        grid_x_start = left_margin + ((WINDOW_WIDTH - 2 * left_margin) - (cell_size * self.grid_cols)) // 2
-#        
-#        # グリッドのY座標の開始位置を計算
-#        grid_y_start = game_area_y + (game_area_height - (cell_size * self.grid_rows)) // 2
-
         cell_size, grid_x_start, grid_y_start = self.get_grid_layout()
-
-        for y in range(self.grid_rows):
-            for x in range(self.grid_cols):
-                color = self.grid[y][x]
-                if color != -1:
-                    pyxel.rect(
-                        grid_x_start + x * cell_size,
-                        grid_y_start + y * cell_size,
-                        cell_size,
-                        cell_size,
-                        COLORS[color]
-                    )
+    
+        for row in range(self.grid_rows):
+            for col in range(self.grid_cols):
+                block = self.grid[row][col]
+                if block is not None:
+                    # block.draw(...) メソッドを呼ぶ形に変更
+                    block.draw(grid_x_start, grid_y_start, cell_size)
 
     def draw_score_and_time(self):
         """
