@@ -287,73 +287,156 @@ class SameGame:
     }
 
     def __init__(self):
+#        self.current_language = "ja"
+#
+#        # ベースパスを取得
+#        self.base_path = os.path.dirname(os.path.abspath(__file__))
+#
+#        # フォントの読み込み
+#        try:
+#            self.font_small = self.load_font("assets/fonts/k8x12.bdf")
+#        except FileNotFoundError as e:
+#            print(f"Error loading font: {e}")
+#            exit(1)  # フォントがない場合はエラー終了
+#
+#        # BGM関連の初期化
+#        self.bgm = BGMGenerator()
+#        self.bgm_files = {
+#            GameState.OPENING: "assets/game_music/opening.json",            # オープニング画面のBGM
+#            GameState.DIFFICULTY_SELECTION: "assets/game_music/selection.json", # 難易度選択画面のBGM
+#            GameState.GAME_START: "assets/game_music/gameplay_start.json", # ゲーム序盤のBGM
+#            GameState.GAME_MID: "assets/game_music/gameplay_mid.json",     # ゲーム中盤のBGM
+#            GameState.GAME_END: "assets/game_music/gameplay_end.json",     # ゲーム終盤のBGM
+#            GameState.TIME_UP: "assets/game_music/time_up.json",           # タイムアップ時のBGM
+#            GameState.NO_MOVES: "assets/game_music/no_moves.json",         # 動ける手がなくなった時のBGM
+#            GameState.GAME_CLEARED: "assets/game_music/cleared.json",      # ゲームクリア時のBGM
+#        }
+#        self.bgm_data = {}
+#        self.base_path = os.path.dirname(os.path.abspath(__file__))
+#        self.current_bgm = None
+#
+#        self.load_bgms()
+#
+#        self.difficulty_levels = {
+#            "easy":      {"grid_rows":  5, "grid_cols":  5, "colors": 3, "time_limit": None, "score_multiplier": 1.0},
+#            "normal":    {"grid_rows":  6, "grid_cols":  8, "colors": 4, "time_limit": None, "score_multiplier": 1.2},
+#            "hard":      {"grid_rows":  9, "grid_cols": 12, "colors": 5, "time_limit":  108, "score_multiplier": 1.5},
+#            "very_hard": {"grid_rows": 10, "grid_cols": 15, "colors": 5, "time_limit":   81, "score_multiplier": 2.0},
+#            "expert":    {"grid_rows": 12, "grid_cols": 18, "colors": 5, "time_limit":   54, "score_multiplier": 3.0},
+#        }
+#        self.current_difficulty = "easy"
+#        self.grid_rows = self.difficulty_levels[self.current_difficulty]["grid_rows"]
+#        self.grid_cols = self.difficulty_levels[self.current_difficulty]["grid_cols"]
+#        self.num_colors = self.difficulty_levels[self.current_difficulty]["colors"]
+#        self.time_limit = self.difficulty_levels[self.current_difficulty]["time_limit"]
+#        self.score_multiplier = self.difficulty_levels[self.current_difficulty]["score_multiplier"]
+#        self.bonus_added = False  # ボーナススコア加算済みかを判定するフラグ
+#
+#        pyxel.init(WINDOW_WIDTH, WINDOW_HEIGHT)
+#        pyxel.mouse(True)
+#        pyxel.title = "SameGame"
+#        self.state = GameState.OPENING
+#        self.high_scores = DEFAULT_TOP_SCORES[:]
+#        self.current_score_rank = None
+#        self.start_time = None
+#        self.initial_grid = []
+#        self.current_bgm = None
+#
+#        # BoardGenerator のインスタンスを作成
+#        self.board_generator = BoardGenerator()
+#        # パーティクルを格納するリスト
+#        self.particles = []
+#
+#        self.difficulty_buttons = []
+#        self.create_difficulty_buttons()
+#        self.create_language_button()  # 言語切り替えボタンを作成
+#        self.create_game_buttons()
+#        
+#        self.current_bgm = None  # 現在再生中のBGMを記録
+#        pyxel.run(self.update, self.draw)
+
+        """ゲーム全体の初期化"""
+
+        # 言語設定
         self.current_language = "ja"
 
-        # ベースパスを取得
+        # ベースパス設定
         self.base_path = os.path.dirname(os.path.abspath(__file__))
 
-        # フォントの読み込み
+        # Pyxel初期化
+        pyxel.init(WINDOW_WIDTH, WINDOW_HEIGHT)
+        pyxel.mouse(True)
+        pyxel.title = "SameGame"
+
+        # ゲームステート
+        self.state = GameState.OPENING
+
+        # フォント読み込み
         try:
             self.font_small = self.load_font("assets/fonts/k8x12.bdf")
         except FileNotFoundError as e:
             print(f"Error loading font: {e}")
-            exit(1)  # フォントがない場合はエラー終了
+            exit(1)
 
-        # BGM関連の初期化
+        # BGM設定
         self.bgm = BGMGenerator()
         self.bgm_files = {
-            GameState.OPENING: "assets/game_music/opening.json",            # オープニング画面のBGM
-            GameState.DIFFICULTY_SELECTION: "assets/game_music/selection.json", # 難易度選択画面のBGM
-            GameState.GAME_START: "assets/game_music/gameplay_start.json", # ゲーム序盤のBGM
-            GameState.GAME_MID: "assets/game_music/gameplay_mid.json",     # ゲーム中盤のBGM
-            GameState.GAME_END: "assets/game_music/gameplay_end.json",     # ゲーム終盤のBGM
-            GameState.TIME_UP: "assets/game_music/time_up.json",           # タイムアップ時のBGM
-            GameState.NO_MOVES: "assets/game_music/no_moves.json",         # 動ける手がなくなった時のBGM
-            GameState.GAME_CLEARED: "assets/game_music/cleared.json",      # ゲームクリア時のBGM
+            GameState.OPENING: "assets/game_music/opening.json",
+            GameState.DIFFICULTY_SELECTION: "assets/game_music/selection.json",
+            GameState.GAME_START: "assets/game_music/gameplay_start.json",
+            GameState.GAME_MID: "assets/game_music/gameplay_mid.json",
+            GameState.GAME_END: "assets/game_music/gameplay_end.json",
+            GameState.TIME_UP: "assets/game_music/time_up.json",
+            GameState.NO_MOVES: "assets/game_music/no_moves.json",
+            GameState.GAME_CLEARED: "assets/game_music/cleared.json",
         }
         self.bgm_data = {}
-        self.base_path = os.path.dirname(os.path.abspath(__file__))
         self.current_bgm = None
-
         self.load_bgms()
 
+        # 難易度設定
         self.difficulty_levels = {
-            "easy":      {"grid_rows":  5, "grid_cols":  5, "colors": 3, "time_limit": None, "score_multiplier": 1.0},
-            "normal":    {"grid_rows":  6, "grid_cols":  8, "colors": 4, "time_limit": None, "score_multiplier": 1.2},
-            "hard":      {"grid_rows":  9, "grid_cols": 12, "colors": 5, "time_limit":  108, "score_multiplier": 1.5},
-            "very_hard": {"grid_rows": 10, "grid_cols": 15, "colors": 5, "time_limit":   81, "score_multiplier": 2.0},
-            "expert":    {"grid_rows": 12, "grid_cols": 18, "colors": 5, "time_limit":   54, "score_multiplier": 3.0},
+            "easy": {"grid_rows": 5, "grid_cols": 5, "colors": 3, "time_limit": None, "score_multiplier": 1.0},
+            "normal": {"grid_rows": 6, "grid_cols": 8, "colors": 4, "time_limit": None, "score_multiplier": 1.2},
+            "hard": {"grid_rows": 9, "grid_cols": 12, "colors": 5, "time_limit": 108, "score_multiplier": 1.5},
+            "very_hard": {"grid_rows": 10, "grid_cols": 15, "colors": 5, "time_limit": 81, "score_multiplier": 2.0},
+            "expert": {"grid_rows": 12, "grid_cols": 18, "colors": 5, "time_limit": 54, "score_multiplier": 3.0},
         }
         self.current_difficulty = "easy"
-        self.grid_rows = self.difficulty_levels[self.current_difficulty]["grid_rows"]
-        self.grid_cols = self.difficulty_levels[self.current_difficulty]["grid_cols"]
-        self.num_colors = self.difficulty_levels[self.current_difficulty]["colors"]
-        self.time_limit = self.difficulty_levels[self.current_difficulty]["time_limit"]
-        self.score_multiplier = self.difficulty_levels[self.current_difficulty]["score_multiplier"]
-        self.bonus_added = False  # ボーナススコア加算済みかを判定するフラグ
+        self.update_difficulty_settings()
 
-        pyxel.init(WINDOW_WIDTH, WINDOW_HEIGHT)
-        pyxel.mouse(True)
-        pyxel.title = "SameGame"
-        self.state = GameState.OPENING
+        # スコア関連
         self.high_scores = DEFAULT_TOP_SCORES[:]
         self.current_score_rank = None
         self.start_time = None
-        self.initial_grid = []
-        self.current_bgm = None
+        self.score = 0
+        self.bonus_added = False
 
-        # BoardGenerator のインスタンスを作成
+        # 盤面設定
         self.board_generator = BoardGenerator()
-        # パーティクルを格納するリスト
-        self.particles = []
+        self.initial_grid = []
+        self.grid = []
 
+        # ボタン設定
         self.difficulty_buttons = []
         self.create_difficulty_buttons()
-        self.create_language_button()  # 言語切り替えボタンを作成
+        self.create_language_button()
         self.create_game_buttons()
-        
-        self.current_bgm = None  # 現在再生中のBGMを記録
+
+        # パーティクル設定
+        self.particles = []
+
+        # ゲームループ開始
         pyxel.run(self.update, self.draw)
+
+    def update_difficulty_settings(self):
+        """現在の難易度設定を反映"""
+        settings = self.difficulty_levels[self.current_difficulty]
+        self.grid_rows = settings["grid_rows"]
+        self.grid_cols = settings["grid_cols"]
+        self.num_colors = settings["colors"]
+        self.time_limit = settings["time_limit"]
+        self.score_multiplier = settings["score_multiplier"]
 
     def load_font(self, relative_path):
         """BDFフォントを絶対パスで読み込む"""
