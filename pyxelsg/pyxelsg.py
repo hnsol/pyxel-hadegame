@@ -1062,6 +1062,42 @@ class SameGame:
                     return False
         return True
 
+#    def play_effect(self, blocks_to_remove):
+#        """ポップで壊れる明るい効果音を再生"""
+#        num_blocks = len(blocks_to_remove)
+#    
+#        # 高音域で明るい音階を定義
+#        base_notes = ["c3", "d3", "e3", "g3", "a3", "c4", "d4", "e4", "g4", "a4"]
+#        max_notes = min(len(base_notes), num_blocks)
+#        notes = base_notes[:max_notes]
+#    
+#        # ノイズ効果の混入割合を調整（ブロック数に応じて増加）
+#        noise_ratio = min(0.5, 0.2 + num_blocks * 0.02)  # 最大50%までノイズを混入
+#        tones = "".join(
+#            ["n" if random.random() < noise_ratio else "p" for _ in range(len(notes))]
+#        )
+#    
+#        # 音量をランダム化して変化をつける
+#        volumes = "".join([str(random.randint(4, 6)) for _ in range(len(notes))])
+#    
+#        # 効果をランダム化し、フェード効果を時折追加
+#        effects = "".join(["n" if i % 3 == 0 else "f" for i in range(len(notes))])
+#    
+#        # 再生速度をブロック数に応じて速くする（多いほど速く）
+#        speed = max(4, 8 - (num_blocks // 5))  # 最小速度4、ブロック数で短縮
+#    
+#        # 効果音の設定
+#        pyxel.sounds[0].set(
+#            notes="".join(notes),  # 音階のみを指定
+#            tones=tones,          # パルスとノイズの切り替えを指定
+#            volumes=volumes,      # ボリューム
+#            effects=effects,      # 効果
+#            speed=speed,          # 再生速度
+#        )
+#    
+#        # 効果音を再生
+#        pyxel.play(3, 0)
+
     def play_effect(self, blocks_to_remove):
         """ポップで壊れる明るい効果音を再生"""
         num_blocks = len(blocks_to_remove)
@@ -1077,8 +1113,13 @@ class SameGame:
             ["n" if random.random() < noise_ratio else "p" for _ in range(len(notes))]
         )
     
-        # 音量をランダム化して変化をつける
-        volumes = "".join([str(random.randint(4, 6)) for _ in range(len(notes))])
+        # ボリューム設定：末尾に向けて大きくする
+        base_volume = 4 + min(3, num_blocks // 10)  # ブロック数が多いと全体的にボリュームを増加
+        volumes = [
+            base_volume + (i / len(notes)) * 2 if tones[i] == "n" else base_volume
+            for i in range(len(notes))
+        ]
+        volumes = "".join([str(min(7, int(v))) for v in volumes])  # 最大ボリュームは7
     
         # 効果をランダム化し、フェード効果を時折追加
         effects = "".join(["n" if i % 3 == 0 else "f" for i in range(len(notes))])
