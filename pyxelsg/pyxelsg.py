@@ -290,24 +290,32 @@ class ScorePopup:
         self.lifetime = 15
         self.age = 0
 #        self.size = max(10, min(20, int(score / 50)))  # スコアに応じて文字サイズを調整
-        self.size = max(20, int(20 * (score / 100) ** 0.5)) # スコアに応じて文字サイズを調整
+#        self.size = max(20, int(20 * (score / 100) ** 0.5)) # スコアに応じて文字サイズを調整
 #        self.vy = -0.5  # 上昇速度
 #        self.vy = -1.5  # 上昇速度
 
-        # スコアに応じた色と上昇速度を設定
+        # スコアに応じた色、スケール、上昇速度を設定
         if score <= 99:
 #            self.color = pyxel.COLOR_GRAY
             self.color = pyxel.COLOR_LIGHT_BLUE
+            self.scale = 1
             self.vy = -1.0
         elif score <= 999:
             self.color = pyxel.COLOR_WHITE
+            self.scale = 2
             self.vy = -2.0
         elif score <= 4999:
             self.color = pyxel.COLOR_YELLOW
+            self.scale = 3
             self.vy = -4.0
         else:
             self.color = pyxel.COLOR_RED
+            self.scale = 4
             self.vy = -4.0
+
+        # デバッグ出力: 初期設定確認
+        print(f"[DEBUG] ScorePopup initialized: score={self.score}, color={self.color}, scale={self.scale}, vy={self.vy}")
+
 
     def update(self):
         self.y += self.vy
@@ -326,11 +334,12 @@ class ScorePopup:
             color=self.color,
             align="left",
             x_offset=x,
-            border_color=pyxel.COLOR_BLACK  # 袋文字の色
+            border_color=pyxel.COLOR_BLACK,  # 袋文字の色
         )
 
     def is_alive(self):
         return self.age < self.lifetime
+
 
 
 class SameGame:
@@ -426,8 +435,8 @@ class SameGame:
             "easy": {"grid_rows": 5, "grid_cols": 5, "colors": 3, "time_limit": None, "score_multiplier": 1.0},
             "normal": {"grid_rows": 6, "grid_cols": 8, "colors": 4, "time_limit": None, "score_multiplier": 1.2},
             "hard": {"grid_rows": 9, "grid_cols": 12, "colors": 5, "time_limit": 108, "score_multiplier": 1.5},
-            "very_hard": {"grid_rows": 10, "grid_cols": 15, "colors": 5, "time_limit": 81, "score_multiplier": 2.0},
-            "expert": {"grid_rows": 12, "grid_cols": 18, "colors": 5, "time_limit": 54, "score_multiplier": 3.0},
+            "very_hard": {"grid_rows": 10, "grid_cols": 15, "colors": 5, "time_limit": 54, "score_multiplier": 2.0},
+            "expert": {"grid_rows": 12, "grid_cols": 18, "colors": 5, "time_limit": 27, "score_multiplier": 3.0},
         }
         self.current_difficulty = "easy"
         self.update_difficulty_settings()
@@ -722,13 +731,13 @@ class SameGame:
         speed = min(8, 2 + int(num_blocks ** 0.8))
     
         # デバッグ情報
-        print(f"[DEBUG] base_notes: {base_notes}")
-        print(f"[DEBUG] max_notes: {max_notes}")
-        print(f"[DEBUG] Notes: {' '.join(notes)}")
-        print(f"[DEBUG] Tones: {tones}")
-        print(f"[DEBUG] Volumes: {volumes}")
-        print(f"[DEBUG] Effects: {effects}")
-        print(f"[DEBUG] Speed: {speed}")
+#        print(f"[DEBUG] base_notes: {base_notes}")
+#        print(f"[DEBUG] max_notes: {max_notes}")
+#        print(f"[DEBUG] Notes: {' '.join(notes)}")
+#        print(f"[DEBUG] Tones: {tones}")
+#        print(f"[DEBUG] Volumes: {volumes}")
+#        print(f"[DEBUG] Effects: {effects}")
+#        print(f"[DEBUG] Speed: {speed}")
     
         # Pyxel サウンド設定
         try:
@@ -862,7 +871,7 @@ class SameGame:
                     self.play_bgm(GameState.GAME_MID)
                 is_low_time = (
                     self.time_limit
-                    and (self.time_limit - (pyxel.frame_count - self.start_time) // 30) <= 10
+                    and (self.time_limit - (pyxel.frame_count - self.start_time) // 30) <= 15
                 )
                 if remaining_cells / (self.grid_rows * self.grid_cols) <= 0.25 or is_low_time:
                     self.state = GameState.GAME_END
