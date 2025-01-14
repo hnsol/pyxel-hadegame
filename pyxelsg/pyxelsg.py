@@ -199,6 +199,34 @@ class Block:
         y = y_offset + self.row * cell_size
         pyxel.rect(x, y, cell_size, cell_size, COLORS[self.color])
 
+class Particle:
+    def __init__(self, x, y, color):
+        self.x = x
+        self.y = y
+        self.vx = random.uniform(-1.5, 1.5)  # X方向のランダム速度
+        self.vy = random.uniform(-2.0, -0.5) # Y方向のランダム速度 (ちょっと上向き)
+        self.color = color
+        self.life = 20  # パーティクルの最大寿命(フレーム数)
+        self.age = 0    # 生存経過フレーム
+
+    def update(self):
+        """毎フレーム呼ばれる。位置更新と寿命管理を行う"""
+        self.x += self.vx
+        self.y += self.vy
+
+        # 重力っぽい効果を加える(任意)
+        self.vy += 0.1
+
+        self.age += 1
+
+    def draw(self):
+        """描画。Pyxelの画面座標に合わせてドットを打つ"""
+        pyxel.pset(int(self.x), int(self.y), self.color)
+
+    def is_alive(self):
+        """寿命を超えていないかどうか"""
+        return self.age < self.life
+
 class SameGame:
 # 各ゲームステートごとのカスタムパラメータ
     GAME_STATE_BGM_PARAMS = {
@@ -301,18 +329,18 @@ class SameGame:
         self.current_score_rank = None
         self.start_time = None
         self.initial_grid = []
-#        self.bgm_tracks = self.setup_bgm()
         self.current_bgm = None
 
         # BoardGenerator のインスタンスを作成
         self.board_generator = BoardGenerator()
-
-#        self.reset_game(use_saved_initial_state=False)
+        # パーティクルを格納するリスト
+        self.particles = []
 
         self.difficulty_buttons = []
         self.create_difficulty_buttons()
         self.create_language_button()  # 言語切り替えボタンを作成
         self.create_game_buttons()
+        
         self.current_bgm = None  # 現在再生中のBGMを記録
         pyxel.run(self.update, self.draw)
 
@@ -541,7 +569,8 @@ class SameGame:
         previous_state = self.state  # ステータスの変更を追跡
 
         # RetryボタンとQuitボタンの処理を特定の状態に限定
-        if self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
+#        if self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
+        if self.state in [GameState.GAME_START, GameState.GAME_MID]:
             # Retryボタンの処理
             retry_x = BUTTON_SPACING
             retry_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
@@ -707,6 +736,9 @@ class SameGame:
         if self.state != previous_state:
             self.handle_state_change()
 
+        # === パーティクルの更新 ===
+        self.update_particles()
+
     def apply_difficulty_settings(self, difficulty_key):
         print(f"Applying difficulty: {self.current_difficulty}")  # デバッグ出力
         # ここで現在のdifficultyを更新する
@@ -719,8 +751,6 @@ class SameGame:
         self.time_limit = settings["time_limit"]
         self.score_multiplier = settings["score_multiplier"]
         print(f"Settings applied: {settings}")
-#        # 難易度変更時に盤面をリセット
-#        self.reset_game(use_saved_initial_state=False)
 
     def get_grid_layout(self):
         """
@@ -760,12 +790,18 @@ class SameGame:
             # 消去処理
             blocks_to_remove = self.find_connected_blocks(x, y, color)
             if len(blocks_to_remove) > 1:
+                # 1) パーティクルの発生
+                self.spawn_particles(blocks_to_remove, cell_size, grid_x_start, grid_y_start)
+
+                # 2) ブロック消去
                 for bx, by in blocks_to_remove:
-#                    self.grid[by][bx] = -1
                     self.grid[by][bx] = None
-    
+
+                # 3) 効果音・スコア等
                 self.play_effect(blocks_to_remove)
                 self.score += int(len(blocks_to_remove) * (len(blocks_to_remove) ** 2) * self.score_multiplier)
+
+                # 4) 重力 & 列詰め
                 self.apply_gravity()
                 self.shift_columns_left()
 
@@ -922,6 +958,36 @@ class SameGame:
         except ValueError:
             self.current_score_rank = None
 
+    def spawn_particles(self, blocks_to_remove, cell_size, grid_x_start, grid_y_start):
+        """
+        消えるブロックの画面上の位置あたりにパーティクルを出す。
+        """
+        for (bx, by) in blocks_to_remove:
+            block = self.grid[by][bx]
+            if block is None:
+                # すでに消されている場合はスキップ（2回呼ばれても大丈夫なように）
+                continue
+    
+            # ブロックの左上座標
+            x = grid_x_start + block.col * cell_size + cell_size / 2
+            y = grid_y_start + block.row * cell_size + cell_size / 2
+            # ブロックの色に対応するPyxel上のカラー
+            pyxel_color = COLORS[block.color]
+    
+            # ここで例として 6 個くらいパーティクルを出す
+            for _ in range(6):
+                p = Particle(x, y, pyxel_color)
+                self.particles.append(p)
+
+    def update_particles(self):
+        """self.particles 内のパーティクルを更新し、寿命が切れたものを除去"""
+        alive_particles = []
+        for p in self.particles:
+            p.update()
+            if p.is_alive():
+                alive_particles.append(p)
+        self.particles = alive_particles
+
 #    def draw_text(self, y, text, color, align="center", x_offset=0, font=None):
     def draw_text(self, y, text, color, align="center", x_offset=0, font=None, border_color=None):
         """BDFフォントを使用してテキストを描画"""
@@ -1023,15 +1089,6 @@ class SameGame:
                     border_color=pyxel.COLOR_DARK_BLUE
                 )
 
-#        elif self.state == GameState.BOARD_GENERATION:
-#            self.draw_text(
-#                WINDOW_HEIGHT // 2,
-#                "Generating Board...",
-#                pyxel.COLOR_YELLOW,
-#                align="center",
-#                border_color=pyxel.COLOR_DARK_BLUE,
-#            )
-
         elif self.state == GameState.BOARD_GENERATION:
             board_gen_msg = translations["game_state_messages"]["board_generation"]
             text = board_gen_msg["message"][self.current_language]
@@ -1054,7 +1111,7 @@ class SameGame:
     
         elif self.state in [GameState.TIME_UP, GameState.NO_MOVES, GameState.GAME_CLEARED]:
 #            self.draw_buttons()
-            self.draw_game_buttons()
+#            self.draw_game_buttons()
             self.draw_difficulty_label()
             self.draw_grid()
             self.draw_score_and_time()
@@ -1098,6 +1155,9 @@ class SameGame:
                 color = pyxel.COLOR_YELLOW if i == self.current_score_rank else pyxel.COLOR_WHITE
                 self.draw_text(60 + i * 12, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
             self.draw_text(200, high_score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+
+        # === パーティクル描画 ===
+        self.draw_particles()
 
     def create_game_buttons(self):
         """
@@ -1207,6 +1267,10 @@ class SameGame:
                 if block is not None:
                     # block.draw(...) メソッドを呼ぶ形に変更
                     block.draw(grid_x_start, grid_y_start, cell_size)
+
+    def draw_particles(self):
+        for p in self.particles:
+            p.draw()
 
     def draw_score_and_time(self):
         """
