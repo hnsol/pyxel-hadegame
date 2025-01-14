@@ -244,15 +244,15 @@ class Particle:
         self.vx = random.uniform(-1.5, 1.5)  # ランダムなX方向速度
         self.vy = random.uniform(-2.0, 1.5)  # ランダムなY方向速度
         self.gravity = 0.25  # 重力
-        self.is_special = random.random() < 0.1  # 10%で赤またはダークグレー
+        self.is_special = random.random() < 0.15  # 10%で他の色を混ぜる（赤黄色黒）
 
         # 5%の確率で赤またはダークグレー
         if self.is_special:
-            self.color = random.choice([pyxel.COLOR_RED, pyxel.COLOR_YELLOW, pyxel.COLOR_BLACK])
+            self.color = random.choice([pyxel.COLOR_RED, pyxel.COLOR_PINK, pyxel.COLOR_YELLOW, pyxel.COLOR_BLACK])
             self.size = size * random.uniform(0.5, 0.75)  # サイズを半分程度に縮小
         else:
             self.color = color
-            self.size = size * random.uniform(1.5, 2.0)  # 通常サイズのランダム化
+            self.size = size * random.uniform(1.5, 2.5)  # 通常サイズのランダム化
 
         self.life = 20  # 最大寿命
         self.age = 0    # 経過フレーム
@@ -262,7 +262,8 @@ class Particle:
         self.x += self.vx
         self.y += self.vy
         self.vy += self.gravity  # 重力を適用
-        self.size *= 0.98  # 寿命に応じて縮小
+#        self.size *= 0.98  # 寿命に応じて縮小
+        self.size *= 0.97  # 寿命に応じて縮小
         self.age += 1
 
     def draw(self):
@@ -1196,7 +1197,9 @@ class SameGame:
 #                    self.state = GameState.GAME_CLEARED
 #                elif not self.has_valid_moves():
 #                    self.state = GameState.NO_MOVES
-            if self.all_blocks_stopped():  # 全てのブロックが停止した状態
+
+#            if self.all_blocks_stopped():  # 全てのブロックが停止した状態
+            if not self.is_falling and not self.is_shifting:
                 if self.is_grid_empty():
                     self.state = GameState.GAME_CLEARED
                 elif self.has_valid_moves():  # このタイミングで判定
@@ -1275,7 +1278,7 @@ class SameGame:
                     self.is_shifting = False
                     # 全アニメが終わったのでアニメフラグオフ
 #                    print("Falling + shifting finished!")
-                    self.is_animating = False
+#                    self.is_animating = False
     
             # 3. 上記以外のタイミングでアニメを始めた場合は、まとめて is_animating = True など
             #   (「ブロックを消去したタイミング」で is_animating = True にするなど)
@@ -1345,13 +1348,6 @@ class SameGame:
                 self.score += points_gained
 
                 # 4) 重力 & 列詰め
-#                self.apply_gravity()
-#                self.shift_columns_left()
-
-                # 重力＆シフト（アニメーション版）
-#                self.apply_gravity_animated()
-#                self.shift_columns_left_animated()
-#                self.is_animating = True # ここでアニメ開始フラグをTrue
 
                 # まず落下アニメだけを始める
                 self.apply_gravity_animated()
