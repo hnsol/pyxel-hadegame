@@ -181,21 +181,66 @@ class Button:
             )
 
 class Block:
-    def __init__(self, row, col, color):
+#    def __init__(self, row, col, color):
+#        self.row = row
+#        self.col = col
+#        self.color = color
+#        # 将来的にアニメーション用フラグやパーティクル情報などを持たせたい
+
+    def __init__(self, row, col, color, cell_size, x_offset, y_offset):
         self.row = row
         self.col = col
         self.color = color
-        # 将来的にアニメーション用フラグやパーティクル情報などを持たせたい
 
-    def draw(self, x_offset, y_offset, cell_size):
+        # ここでセルサイズをインスタンス変数として保持
+        self.cell_size = cell_size
+
+        # 画面上の描画用座標（浮動小数）
+        self.x = x_offset + col * cell_size
+        self.y = y_offset + row * cell_size
+        
+        # 目標座標（落下やシフト後の座標）
+        self.target_x = self.x
+        self.target_y = self.y
+        
+        # 移動速度やアニメーション速度係数
+        self.move_speed = 3.0  # 1フレームあたりに何ピクセル移動するか
+
+    def update(self):
+        """
+        毎フレーム呼ばれて、self.x, self.y が target_x, target_y に近づくようにする
+        """
+        dx = self.target_x - self.x
+        dy = self.target_y - self.y
+        
+        # 距離が move_speed 以下なら一気に到達、それ以上なら少しずつ近づく
+        dist_sq = dx*dx + dy*dy
+        if dist_sq < self.move_speed * self.move_speed:
+            # 到達とみなす
+            self.x = self.target_x
+            self.y = self.target_y
+        else:
+            # normalizeして move_speed だけ動く
+            dist = dist_sq**0.5
+            self.x += (dx / dist) * self.move_speed
+            self.y += (dy / dist) * self.move_speed
+
+#    def draw(self, x_offset, y_offset, cell_size):
+#        """
+#        実際に画面に描画するときの処理。
+#        x_offset, y_offset はグリッドの表示開始座標
+#        cell_size はセルのサイズ
+#        """
+#        x = x_offset + self.col * cell_size
+#        y = y_offset + self.row * cell_size
+#        pyxel.rect(x, y, cell_size, cell_size, COLORS[self.color])
+    def draw(self):
         """
         実際に画面に描画するときの処理。
-        x_offset, y_offset はグリッドの表示開始座標
-        cell_size はセルのサイズ
         """
-        x = x_offset + self.col * cell_size
-        y = y_offset + self.row * cell_size
-        pyxel.rect(x, y, cell_size, cell_size, COLORS[self.color])
+#        pyxel.rect(int(self.x), int(self.y), CELL_SIZE, CELL_SIZE, COLORS[self.color])
+        pyxel.rect(int(self.x), int(self.y), self.cell_size, self.cell_size, COLORS[self.color])
+
 
 class Particle:
     def __init__(self, x, y, color, size):
@@ -364,6 +409,9 @@ class SameGame:
         # 画面シェイク関連の変数
         self.shake_timer = 0      # シェイクが発生しているフレーム数
         self.shake_magnitude = 0  # シェイクの強さ（ピクセル単位）
+
+        # **アニメーション中フラグを追加**
+        self.is_animating = False
 
         # ゲームループ開始
         pyxel.run(self.update, self.draw)
@@ -746,9 +794,53 @@ class SameGame:
         if self.shake_timer > 0:
             self.shake_timer -= 1
 
-        # === パーティクルの更新 ===
-        self.update_particles()
+        # もし is_animating が True なら、ブロックがすべてアニメ完了しているかチェック
+        if self.is_animating:
+            all_done = True
+            for row in range(self.grid_rows):
+                for col in range(self.grid_cols):
+                    block = self.grid[row][col]
+                    if block is not None:
+                        # まだ動いているブロックがあるか？
+                        if abs(block.x - block.target_x) > 0.1 or abs(block.y - block.target_y) > 0.1:
+                            all_done = False
+                            break
+                if not all_done:
+                    break
+            
+            if all_done:
+                print("Animation finished.")
+                self.is_animating = False
+    
+#        # パーティクルやブロックアニメの更新
+#        self.update_particles()
+#        
+#        # 二重ループの直前にサイズを出してみる
+#        print(f"DEBUG: grid_rows={self.grid_rows}, grid_cols={self.grid_cols}")
+#        print(f"DEBUG: actual grid size = {len(self.grid)} x {len(self.grid[0]) if self.grid else '??'}")
+#
+#        for row in range(self.grid_rows):
+#            for col in range(self.grid_cols):
+#                block = self.grid[row][col]
+#                if block:
+#                    block.update()
 
+        if self.state in [GameState.GAME_START,
+                          GameState.GAME_MID,
+                          GameState.GAME_END,
+                          GameState.TIME_UP,
+                          GameState.NO_MOVES,
+                          GameState.GAME_CLEARED]:
+            # ブロックやパーティクル等のアニメーション更新
+            self.update_particles()
+            # 二重ループの直前にサイズを出してみる
+#            print(f"DEBUG: grid_rows={self.grid_rows}, grid_cols={self.grid_cols}")
+#            print(f"DEBUG: actual grid size = {len(self.grid)} x {len(self.grid[0]) if self.grid else '??'}")
+            for row in range(self.grid_rows):
+                for col in range(self.grid_cols):
+                    block = self.grid[row][col]
+                    if block is not None:
+                        block.update()
 
     def apply_difficulty_settings(self, difficulty_key):
         print(f"Applying difficulty: {self.current_difficulty}")  # デバッグ出力
@@ -764,6 +856,10 @@ class SameGame:
         print(f"Settings applied: {settings}")
 
     def handle_click(self, mx, my):
+        # アニメ中はクリック無視
+        if self.is_animating:
+            return
+
         """盤面クリック時の処理"""
         cell_size, grid_x_start, grid_y_start = self.get_grid_layout()
     
@@ -802,8 +898,13 @@ class SameGame:
                 self.score += points_gained
 
                 # 4) 重力 & 列詰め
-                self.apply_gravity()
-                self.shift_columns_left()
+#                self.apply_gravity()
+#                self.shift_columns_left()
+
+                # 重力＆シフト（アニメーション版）
+                self.apply_gravity_animated()
+                self.shift_columns_left_animated()
+                self.is_animating = True # ここでアニメ開始フラグをTrue
 
                 # 画面を揺らすフラグをセット
                 # シェイクレベルをポイントに応じて増やす
@@ -860,6 +961,9 @@ class SameGame:
         self.stop_bgm()
 
     def generate_new_board(self, use_saved_initial_state=False):
+        # ここで先にセルサイズ等を更新
+        self.cell_size, self.grid_x_start, self.grid_y_start = self.get_grid_layout()
+
         if use_saved_initial_state and hasattr(self, 'initial_grid'):
             # すでに保存済みの Block 配列があるなら、それを deepcopy で再現
             self.grid = copy.deepcopy(self.initial_grid)
@@ -881,7 +985,12 @@ class SameGame:
                     if color == -1:
                         block_row.append(None)
                     else:
-                        block_row.append(Block(row, col, color))
+                        block_row.append(Block(
+                            row, col, color,
+                            self.cell_size,
+                            self.grid_x_start,
+                            self.grid_y_start
+                        ))
                 block_grid.append(block_row)
     
             self.grid = block_grid
@@ -908,46 +1017,89 @@ class SameGame:
     
         return connected
 
-    def apply_gravity(self):
-        for col in range(self.grid_cols):
-            # "None じゃないブロック" を上から順に集めたリストを作る
-            column_blocks = [self.grid[row][col] for row in range(self.grid_rows) if self.grid[row][col] is not None]
-            # 下から埋める形で再配置
-            for row in range(self.grid_rows):
-                # 下の行(y=grid_rows-1)ほど先に埋まる
-                target_row = self.grid_rows - 1 - row
-                if row < len(column_blocks):
-                    block = column_blocks[-(row+1)]
-                    block.row = target_row  # Block自体の row も更新しておく
-                    self.grid[target_row][col] = block
-                else:
-                    self.grid[target_row][col] = None
+#    def apply_gravity(self):
+#        for col in range(self.grid_cols):
+#            # "None じゃないブロック" を上から順に集めたリストを作る
+#            column_blocks = [self.grid[row][col] for row in range(self.grid_rows) if self.grid[row][col] is not None]
+#            # 下から埋める形で再配置
+#            for row in range(self.grid_rows):
+#                # 下の行(y=grid_rows-1)ほど先に埋まる
+#                target_row = self.grid_rows - 1 - row
+#                if row < len(column_blocks):
+#                    block = column_blocks[-(row+1)]
+#                    block.row = target_row  # Block自体の row も更新しておく
+#                    self.grid[target_row][col] = block
+#                else:
+#                    self.grid[target_row][col] = None
 
-    def shift_columns_left(self):
+    def apply_gravity_animated(self):
         """
-        列が全て None なら、その列を左に詰める。
-        動かしたブロックは .col を更新しておく。
+        従来の apply_gravity() と同じように「最終 row」を計算しつつ、
+        実際に block.row を書き換え、block.target_y を更新してあげる。
         """
-        new_columns = []
-        
-        # 1. 空でない列 (少なくとも1つ Block がある列) だけ収集
         for col in range(self.grid_cols):
-            # この列のブロック情報を縦にスキャン
+            # この列にあるブロックを抽出
+            column_blocks = []
+            for row in range(self.grid_rows):
+                if self.grid[row][col] is not None:
+                    column_blocks.append(self.grid[row][col])
+            
+            # 下から詰めるように最終 row を割り当て
+            # 例：最後の行 (grid_rows-1) から順番に
+            curr_row = self.grid_rows - 1
+            for block in reversed(column_blocks):
+                block.row = curr_row  # ここで row を更新
+                # block.target_y = y_offset + curr_row * cell_size
+                block.target_y = self.grid_y_start + curr_row * self.cell_size  
+                self.grid[curr_row][col] = block
+                curr_row -= 1
+            
+            # 残りは None 埋め
+            for r in range(curr_row, -1, -1):
+                self.grid[r][col] = None
+
+#    def shift_columns_left(self):
+#        """
+#        列が全て None なら、その列を左に詰める。
+#        動かしたブロックは .col を更新しておく。
+#        """
+#        new_columns = []
+#        
+#        # 1. 空でない列 (少なくとも1つ Block がある列) だけ収集
+#        for col in range(self.grid_cols):
+#            # この列のブロック情報を縦にスキャン
+#            column_data = [self.grid[row][col] for row in range(self.grid_rows)]
+#            # ひとつでも None でないマスがあれば「有効な列」
+#            if any(block is not None for block in column_data):
+#                new_columns.append(column_data)
+#        
+#        # 2. 足りない列は全て None 列で埋める
+#        while len(new_columns) < self.grid_cols:
+#            new_columns.append([None] * self.grid_rows)
+#        
+#        # 3. new_columns を grid に書き戻し + 移動したブロックの col を更新
+#        for new_col_index, column_data in enumerate(new_columns):
+#            for row_index, block in enumerate(column_data):
+#                self.grid[row_index][new_col_index] = block
+#                if block is not None:
+#                    block.col = new_col_index
+
+    def shift_columns_left_animated(self):
+        new_columns = []
+        for col in range(self.grid_cols):
             column_data = [self.grid[row][col] for row in range(self.grid_rows)]
-            # ひとつでも None でないマスがあれば「有効な列」
             if any(block is not None for block in column_data):
                 new_columns.append(column_data)
         
-        # 2. 足りない列は全て None 列で埋める
         while len(new_columns) < self.grid_cols:
-            new_columns.append([None] * self.grid_rows)
+            new_columns.append([None]*self.grid_rows)
         
-        # 3. new_columns を grid に書き戻し + 移動したブロックの col を更新
         for new_col_index, column_data in enumerate(new_columns):
             for row_index, block in enumerate(column_data):
                 self.grid[row_index][new_col_index] = block
                 if block is not None:
                     block.col = new_col_index
+                    block.target_x = self.grid_x_start + new_col_index * self.cell_size
 
     def has_valid_moves(self):
         for row in range(self.grid_rows):
@@ -1339,7 +1491,8 @@ class SameGame:
                 block = self.grid[row][col]
                 if block is not None:
                     # block.draw(...) メソッドを呼ぶ形に変更
-                    block.draw(grid_x_start, grid_y_start, cell_size)
+#                    block.draw(grid_x_start, grid_y_start, cell_size)
+                    block.draw()
 
     def get_grid_layout(self):
         """
