@@ -199,46 +199,163 @@ class Block:
         y = y_offset + self.row * cell_size
         pyxel.rect(x, y, cell_size, cell_size, COLORS[self.color])
 
+#class Particle:
+#    def __init__(self, x, y, color, size):
+#        self.x = x
+#        self.y = y
+#        self.vx = random.uniform(-1.5, 1.5)  # X方向のランダム速度
+##        self.vy = random.uniform(-2.0, -0.5) # Y方向のランダム速度 (ちょっと上向き)
+#        self.vy = random.uniform(-1.0, 1.5) # Y方向のランダム速度 (ちょっと下向き)
+#        self.color = color
+#        self.life = 20  # パーティクルの最大寿命(フレーム数)
+#        self.age = 0    # 生存経過フレーム
+#        self.size = size  # コマに対しての相対的な大きさを設定
+#
+#    def update(self):
+#        """毎フレーム呼ばれる。位置更新と寿命管理を行う"""
+#        self.x += self.vx
+#        self.y += self.vy
+#
+#        # 重力っぽい効果を加える(任意)
+##        self.vy += 0.1
+#        self.vy += 0.3
+#
+#        self.age += 1
+#
+#    def draw(self):
+#        """描画。Pyxelの画面座標に合わせてドットを打つ"""
+#        pyxel.rect(
+#            int(self.x - self.size / 2),  # 左上X座標
+#            int(self.y - self.size / 2),  # 左上Y座標
+#            int(self.size),  # 幅
+#            int(self.size),  # 高さ
+#            self.color       # 色
+#        )
+#
+#    def is_alive(self):
+#        """寿命を超えていないかどうか"""
+#        return self.age < self.life
+
+#class Particle:
+#    def __init__(self, x, y, color, size):
+#        self.x = x
+#        self.y = y
+#        self.vx = random.uniform(-1.5, 1.5)  # ランダムなX方向速度
+#        self.vy = random.uniform(-2.0, 1.5)  # ランダムなY方向速度
+##        self.color = color if random.random() > 0.1 else random.choice([8, 0])  # 20%で赤や黒
+#        self.color = color if random.random() > 0.1 else random.choice([pyxel.COLOR_RED, pyxel.COLOR_BLACK])  # 10%で赤や黒
+#        self.life = 20  # 最大寿命
+#        self.age = 0    # 経過フレーム
+#        self.size = size * random.uniform(0.5, 1.5)  # サイズをランダム化
+#
+#    def update(self):
+#        """位置と速度を更新"""
+#        self.x += self.vx
+#        self.y += self.vy
+#        self.vy += 0.2  # 重力効果
+#        self.size *= 0.98  # 寿命に応じて縮小
+#        self.age += 1
+#
+#    def draw(self):
+#        """パーティクルの描画"""
+#        if self.size > 0:
+#            pyxel.rect(
+#                int(self.x - self.size / 2),
+#                int(self.y - self.size / 2),
+#                int(self.size),
+#                int(self.size),
+#                self.color
+#            )
+#
+#    def is_alive(self):
+#        """寿命チェック"""
+#        return self.age < self.life
+
+#class Particle:
+#    def __init__(self, x, y, color, size, is_center_effect=False):
+#        self.x = x
+#        self.y = y
+#        self.vx = random.uniform(-1.5, 1.5)  # ランダムなX方向速度
+#        self.vy = random.uniform(-2.0, 1.5)  # ランダムなY方向速度
+#        self.gravity = 0.2 if not is_center_effect else 0.0  # 重力（中心エフェクトは重力なし）
+#        self.color = color if random.random() > 0.1 else random.choice([pyxel.COLOR_RED, pyxel.COLOR_BLACK])  # 10%で赤や黒
+#        self.life = 20  # 最大寿命
+#        self.age = 0    # 経過フレーム
+#        self.size = size * random.uniform(0.5, 1.5)  # サイズをランダム化
+#        self.is_center_effect = is_center_effect  # 中心エフェクトフラグ
+#
+#        # 中心エフェクト用の速度調整
+#        if self.is_center_effect:
+#            slow_factor = random.uniform(0.02, 0.1)  # 低速係数
+#            self.vx *= slow_factor
+#            self.vy *= slow_factor  # 重力が0なので、vyが固定でも問題なし
+#
+#    def update(self):
+#        """位置と速度を更新"""
+#        self.x += self.vx
+#        self.y += self.vy
+#        self.vy += self.gravity  # 重力を適用（中心エフェクトは重力なし）
+#        self.size *= 0.98  # 寿命に応じて縮小
+#        self.age += 1
+#
+#    def draw(self):
+#        """パーティクルの描画"""
+#        if self.size > 0:
+#            pyxel.rect(
+#                int(self.x - self.size / 2),
+#                int(self.y - self.size / 2),
+#                int(self.size),
+#                int(self.size),
+#                self.color
+#            )
+#
+#    def is_alive(self):
+#        """寿命チェック"""
+#        return self.age < self.life
+
 class Particle:
     def __init__(self, x, y, color, size):
         self.x = x
         self.y = y
-        self.vx = random.uniform(-1.5, 1.5)  # X方向のランダム速度
-#        self.vy = random.uniform(-2.0, -0.5) # Y方向のランダム速度 (ちょっと上向き)
-        self.vy = random.uniform(-1.0, 1.5) # Y方向のランダム速度 (ちょっと下向き)
-        self.color = color
-        self.life = 20  # パーティクルの最大寿命(フレーム数)
-        self.age = 0    # 生存経過フレーム
-        self.size = size  # コマに対しての相対的な大きさを設定
+        self.vx = random.uniform(-1.5, 1.5)  # ランダムなX方向速度
+        self.vy = random.uniform(-2.0, 1.5)  # ランダムなY方向速度
+        self.gravity = 0.25  # 重力
+        self.is_special = random.random() < 0.1  # 10%で赤またはダークグレー
+
+        # 5%の確率で赤またはダークグレー
+        if self.is_special:
+            self.color = random.choice([pyxel.COLOR_RED, pyxel.COLOR_YELLOW, pyxel.COLOR_BLACK])
+            self.size = size * random.uniform(0.5, 0.75)  # サイズを半分程度に縮小
+        else:
+            self.color = color
+            self.size = size * random.uniform(1.5, 2.0)  # 通常サイズのランダム化
+
+        self.life = 20  # 最大寿命
+        self.age = 0    # 経過フレーム
 
     def update(self):
-        """毎フレーム呼ばれる。位置更新と寿命管理を行う"""
+        """位置と速度を更新"""
         self.x += self.vx
         self.y += self.vy
-
-        # 重力っぽい効果を加える(任意)
-#        self.vy += 0.1
-        self.vy += 0.3
-
+        self.vy += self.gravity  # 重力を適用
+        self.size *= 0.98  # 寿命に応じて縮小
         self.age += 1
 
     def draw(self):
-        """描画。Pyxelの画面座標に合わせてドットを打つ"""
-#        pyxel.pset(int(self.x), int(self.y), self.color)
-        # ここでは円形パーティクルの例
-        # size が大きいほど目立つパーティクルになる
-#        pyxel.circ(self.x, self.y, self.size, self.color)
-        pyxel.rect(
-            int(self.x - self.size / 2),  # 左上X座標
-            int(self.y - self.size / 2),  # 左上Y座標
-            int(self.size),  # 幅
-            int(self.size),  # 高さ
-            self.color       # 色
-        )
+        """パーティクルの描画"""
+        if self.size > 0:
+            pyxel.rect(
+                int(self.x - self.size / 2),
+                int(self.y - self.size / 2),
+                int(self.size),
+                int(self.size),
+                self.color
+            )
 
     def is_alive(self):
-        """寿命を超えていないかどうか"""
+        """寿命チェック"""
         return self.age < self.life
+
 
 class SameGame:
 # 各ゲームステートごとのカスタムパラメータ
@@ -945,92 +1062,6 @@ class SameGame:
                     return False
         return True
 
-#    def play_effect(self, blocks_to_remove):
-#        """消したマスの数に応じて上昇音階の効果音を再生"""
-#        num_blocks = len(blocks_to_remove)
-#    
-#        # 基本となる上昇音階の定義
-##        base_notes = ["c2", "d2", "e2", "g2", "a2", "c3"]
-#        base_notes = ["c2", "d2", "e2", "g2", "a2", "c3", "d3", "e3", "g3", "a3"]
-#        max_notes = min(len(base_notes), num_blocks)  # 消したマス数に応じて音階を制限
-#        notes = base_notes[:max_notes]  # 必要な音階だけを取得
-#    
-#        # 再生速度を調整（少ない場合は速く、多い場合は少しゆっくり）
-#        speed = max(5, 15 - (num_blocks // 2))
-#    
-#        # 効果音を設定
-#        pyxel.sounds[0].set(
-#            notes="".join(notes),  # 上昇音階を生成
-#            tones="p",            # パルス音（爽やかな音）
-#            volumes="5" * max_notes,  # 音量を一定に
-#            effects="n" * max_notes,  # 効果なし（シンプルに）
-#            speed=speed,          # スピード設定
-#        )
-#    
-#        # 効果音を再生
-#        pyxel.play(3, 0)
-
-#    def play_effect(self, blocks_to_remove):
-#        """消したマスの数に応じて壊れた実感のある効果音を再生"""
-#        num_blocks = len(blocks_to_remove)
-#    
-#        # 使用可能なノートを限定
-#        base_notes = ["c1", "d1", "e1", "f1", "g1", "a1", "b1", "c2", "d2", "e2"]
-#        max_notes = min(len(base_notes), num_blocks)
-#        notes = base_notes[:max_notes]  # 必要な音階だけを取得
-#    
-#        # ノイズ部分の音符を明確にする（ノイズ 'n' を混ぜる場合も検証済みのデータにする）
-#        noise_notes = "".join(["c1" for _ in range(max_notes)])  # ノイズを置き換える場合の例
-#    
-#        # 効果音を生成する設定
-#        tones = "".join(["p" if i % 2 == 0 else "n" for i in range(max_notes)])  # パルスとノイズを交互に
-#        volumes = "".join(["5" for _ in range(max_notes)])  # 一定音量
-#        effects = "".join(["f" if i % 2 == 0 else "n" for i in range(max_notes)])  # フェードと通常を交互
-#    
-#        # 再生速度をブロック数に応じて変化させる
-#        speed = max(5, 15 - (num_blocks // 2))
-#    
-#        # 効果音設定
-#        pyxel.sounds[0].set(
-#            notes="".join(notes) + noise_notes,  # ノイズ音を後半に追加
-#            tones=tones,
-#            volumes=volumes,
-#            effects=effects,
-#            speed=speed,
-#        )
-#    
-#        # 効果音を再生
-#        pyxel.play(3, 0)
-
-#    def play_effect(self, blocks_to_remove):
-#        """ポップで明るく壊れる効果音を再生"""
-#        num_blocks = len(blocks_to_remove)
-#    
-#        # 高音域で明るい音階を定義
-#        base_notes = ["c3", "d3", "e3", "g3", "a3", "c4", "d4", "e4", "g4", "a4"]
-#        max_notes = min(len(base_notes), num_blocks)
-#        notes = base_notes[:max_notes]
-#    
-#        # ノイズ効果は「tones」で指定
-#        tones = "".join(["p" if i % 2 == 0 else "n" for i in range(len(notes))])  # パルスとノイズ交互
-#        volumes = "".join([str(random.randint(4, 6)) for _ in range(len(notes))])  # 音量をランダム化
-#        effects = "".join(["n" if i % 3 == 0 else "f" for i in range(len(notes))])  # ノイズとフェードをミックス
-#    
-#        # 再生速度をブロック数に応じて調整
-#        speed = max(4, 12 - (num_blocks // 3))
-#    
-#        # 効果音の設定
-#        pyxel.sounds[0].set(
-#            notes="".join(notes),  # 音階のみを指定
-#            tones=tones,          # パルスとノイズの切り替えを指定
-#            volumes=volumes,      # ボリューム
-#            effects=effects,      # 効果
-#            speed=speed,          # 再生速度
-#        )
-#    
-#        # 効果音を再生
-#        pyxel.play(3, 0)
-
     def play_effect(self, blocks_to_remove):
         """ポップで壊れる明るい効果音を再生"""
         num_blocks = len(blocks_to_remove)
@@ -1068,20 +1099,62 @@ class SameGame:
         pyxel.play(3, 0)
 
 
+#    def spawn_particles(self, blocks_to_remove, points_gained, cell_size, grid_x_start, grid_y_start):
+#        """
+#        今回の消去で獲得した points_gained を受け取り、
+#        それに応じてパーティクルの数や速さ・サイズを変えてみる。
+#        """
+#        # 「派手さ係数」をスコアに応じて計算
+#        particle_factor = min(5.0, 1.0 + (points_gained / 500.0))  
+#        # → 500点につき +1、ただし最大5倍に制限
+##        print(f"particle factore(max 5.0): {particle_factor}")
+#
+#        # cell_size にもとづくパーティクルの大きさ
+#        base_particle_size = max(1, int(cell_size * 0.4))
+#    
+#        for (bx, by) in blocks_to_remove:
+#            block = self.grid[by][bx]
+#            # クリックで消し終わった後だと None になっているかもしれないので要チェック
+#            if block is None:
+#                continue
+#    
+#            # 画面上の座標
+#            x = grid_x_start + block.col * cell_size + cell_size / 2
+#            y = grid_y_start + block.row * cell_size + cell_size / 2
+#            color = COLORS[block.color]
+#    
+#            # パーティクル個数をスコアに応じて増やす例
+##            base_count = int(5 * particle_factor)
+##            for _ in range(base_count):
+##                # スピードも派手さに応じて変化させる例
+##                vx = random.uniform(-1.0 * particle_factor, 1.0 * particle_factor)
+##                vy = random.uniform(-2.0 * particle_factor, -0.5 * particle_factor)
+##    
+##                # 例: Particle のコンストラクタに size を追加している
+##                p = Particle(x, y, color, base_particle_size)
+##                p.vx = vx
+##                p.vy = vy
+##    
+##                self.particles.append(p)
+#
+#            # パーティクル生成
+#            for _ in range(int(10 * particle_factor)):
+#                p = Particle(x, y, color, base_particle_size)
+#                self.particles.append(p)
+#    
+#            # 中心エフェクト
+#            self.particles.append(Particle(x, y, pyxel.COLOR_YELLOW, base_particle_size * 1.5))
+
     def spawn_particles(self, blocks_to_remove, points_gained, cell_size, grid_x_start, grid_y_start):
         """
         今回の消去で獲得した points_gained を受け取り、
         それに応じてパーティクルの数や速さ・サイズを変えてみる。
         """
-        # たとえば「派手さ係数」をスコアに応じて計算する
-        # 例:  スコアの大きさに比例 or 指数 or ステップでもOK
+        # 「派手さ係数」をスコアに応じて計算
         particle_factor = min(5.0, 1.0 + (points_gained / 500.0))  
-        # → 1000点につき +1、ただし最大5倍に制限
-#        print(f"particle factore(max 5.0): {particle_factor}")
-
+        # → 500点につき +1、ただし最大5倍に制限
     
         # cell_size にもとづくパーティクルの大きさ
-#        base_particle_size = max(1, int(cell_size * 0.2))
         base_particle_size = max(1, int(cell_size * 0.4))
     
         for (bx, by) in blocks_to_remove:
@@ -1095,19 +1168,23 @@ class SameGame:
             y = grid_y_start + block.row * cell_size + cell_size / 2
             color = COLORS[block.color]
     
-            # パーティクル個数をスコアに応じて増やす例
+            # 普通のパーティクル生成（ランダムな速度と派手さ調整を復元）
             base_count = int(5 * particle_factor)
             for _ in range(base_count):
-                # スピードも派手さに応じて変化させる例
-                vx = random.uniform(-1.0 * particle_factor, 1.0 * particle_factor)
-                vy = random.uniform(-2.0 * particle_factor, -0.5 * particle_factor)
-    
-                # 例: Particle のコンストラクタに size を追加している
                 p = Particle(x, y, color, base_particle_size)
-                p.vx = vx
-                p.vy = vy
-    
+                p.vx = random.uniform(-1.0 * particle_factor, 1.0 * particle_factor)  # ランダムな速度 (X)
+                p.vy = random.uniform(-2.0 * particle_factor, -0.5 * particle_factor)  # ランダムな速度 (Y)
                 self.particles.append(p)
+    
+#            # 中心エフェクト（速度を極端に遅くする）
+#            slow_particle = Particle(x, y, pyxel.COLOR_YELLOW, base_particle_size * 1.5)
+#            slow_particle.vx = random.uniform(-0.05, 0.05)  # 非常に遅い速度 (X)
+#            slow_particle.vy = random.uniform(-0.05, 0.05)  # 非常に遅い速度 (Y)
+#            self.particles.append(slow_particle)
+
+            # 中心エフェクト生成（重力なし）
+#            slow_particle = Particle(x, y, pyxel.COLOR_YELLOW, base_particle_size * 1.5, is_center_effect=True)
+#            self.particles.append(slow_particle)
 
     def update_particles(self):
         """self.particles 内のパーティクルを更新し、寿命が切れたものを除去"""
