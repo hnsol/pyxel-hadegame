@@ -52,34 +52,34 @@ translations = {
     "instructions": {
         "intro": {
             "ja": {
-                "base_y": 70,
-                "line_spacing": 15,
+                "base_y": 80,
+                "line_spacing": 20,
                 "lines": [
                     {"line": "あそびかた:", "color": pyxel.COLOR_YELLOW},
                     {"line": "1. つながっているブロックを消せます", "color": pyxel.COLOR_WHITE},
                     {"line": "2. 多くのブロックを消すと高得点", "color": pyxel.COLOR_WHITE},
-                    {"line": "3. 全てのブロックを消すとボーナス！", "color": pyxel.COLOR_WHITE},
-                    {"line": "4. むずかしいほど高得点！", "color": pyxel.COLOR_WHITE},
-                    {"line": "5. 消せるブロックがなくなったらおわり", "color": pyxel.COLOR_WHITE}
+                    {"line": "3. 全てのブロックを消せるかな？", "color": pyxel.COLOR_WHITE},
+#                    {"line": "4. むずかしいほど高得点！", "color": pyxel.COLOR_WHITE},
+#                    {"line": "5. 消せるブロックがなくなったらおわり", "color": pyxel.COLOR_WHITE}
                 ]
             },
             "en": {
-                "base_y": 70,
-                "line_spacing": 15,
+                "base_y": 80,
+                "line_spacing": 20,
                 "lines": [
                     {"line": "How to Play:", "color": pyxel.COLOR_YELLOW},
-                    {"line": "1. Click connected blocks to remove them.", "color": pyxel.COLOR_WHITE},
-                    {"line": "2. Remove more blocks at once for higher scores.", "color": pyxel.COLOR_WHITE},
-                    {"line": "3. Clear all blocks for a bonus!", "color": pyxel.COLOR_WHITE},
-                    {"line": "4. Higher difficulty means higher scores!", "color": pyxel.COLOR_WHITE},
-                    {"line": "5. No moves left? Game over.", "color": pyxel.COLOR_WHITE}
+                    {"line": "1. Click blocks to remove them.", "color": pyxel.COLOR_WHITE},
+                    {"line": "2. Remove more blocks for higher scores.", "color": pyxel.COLOR_WHITE},
+                    {"line": "3. Try to clear all blocks!", "color": pyxel.COLOR_WHITE},
+#                    {"line": "4. Higher difficulty means higher scores!", "color": pyxel.COLOR_WHITE},
+#                    {"line": "5. No moves left? Game over.", "color": pyxel.COLOR_WHITE}
                 ]
             }
         }
     },
     "difficulty_options": [
         {"key": "easy", "label": {"ja": "かんたん", "en": "Easy"}, "description": {"ja": "小さいばんめん、少ない色", "en": "Small grid, few colors"}},
-        {"key": "normal", "label": {"ja": "ふつう", "en": "Normal"}, "description": {"ja": "中ぐらいのばんめん、やや多い色", "en": "Medium-sized grid, slightly more colors"}},
+        {"key": "normal", "label": {"ja": "ふつう", "en": "Normal"}, "description": {"ja": "中ぐらいのばんめん、やや多い色", "en": "Medium-sized grid, more colors"}},
         {"key": "hard", "label": {"ja": "むずかしい", "en": "Hard"}, "description": {"ja": "制限時間あり、多い色", "en": "Timed play, many colors"}},
         {"key": "very_hard", "label": {"ja": "めちゃむず", "en": "Very Hard"}, "description": {"ja": "短い制限時間、大きなばんめん", "en": "Short time limit, large grid"}},
         {"key": "expert", "label": {"ja": "たつじん", "en": "Expert"}, "description": {"ja": "とても短い時間、最大ばんめん", "en": "Largest grid, shortest time limit"}}
