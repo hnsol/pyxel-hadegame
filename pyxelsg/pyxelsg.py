@@ -135,8 +135,6 @@ translations = {
     }
 }
 
-
-
 class GameState(Enum):
     OPENING = "opening"
     DIFFICULTY_SELECTION = "difficulty_selection"
@@ -198,120 +196,6 @@ class Block:
         x = x_offset + self.col * cell_size
         y = y_offset + self.row * cell_size
         pyxel.rect(x, y, cell_size, cell_size, COLORS[self.color])
-
-#class Particle:
-#    def __init__(self, x, y, color, size):
-#        self.x = x
-#        self.y = y
-#        self.vx = random.uniform(-1.5, 1.5)  # X方向のランダム速度
-##        self.vy = random.uniform(-2.0, -0.5) # Y方向のランダム速度 (ちょっと上向き)
-#        self.vy = random.uniform(-1.0, 1.5) # Y方向のランダム速度 (ちょっと下向き)
-#        self.color = color
-#        self.life = 20  # パーティクルの最大寿命(フレーム数)
-#        self.age = 0    # 生存経過フレーム
-#        self.size = size  # コマに対しての相対的な大きさを設定
-#
-#    def update(self):
-#        """毎フレーム呼ばれる。位置更新と寿命管理を行う"""
-#        self.x += self.vx
-#        self.y += self.vy
-#
-#        # 重力っぽい効果を加える(任意)
-##        self.vy += 0.1
-#        self.vy += 0.3
-#
-#        self.age += 1
-#
-#    def draw(self):
-#        """描画。Pyxelの画面座標に合わせてドットを打つ"""
-#        pyxel.rect(
-#            int(self.x - self.size / 2),  # 左上X座標
-#            int(self.y - self.size / 2),  # 左上Y座標
-#            int(self.size),  # 幅
-#            int(self.size),  # 高さ
-#            self.color       # 色
-#        )
-#
-#    def is_alive(self):
-#        """寿命を超えていないかどうか"""
-#        return self.age < self.life
-
-#class Particle:
-#    def __init__(self, x, y, color, size):
-#        self.x = x
-#        self.y = y
-#        self.vx = random.uniform(-1.5, 1.5)  # ランダムなX方向速度
-#        self.vy = random.uniform(-2.0, 1.5)  # ランダムなY方向速度
-##        self.color = color if random.random() > 0.1 else random.choice([8, 0])  # 20%で赤や黒
-#        self.color = color if random.random() > 0.1 else random.choice([pyxel.COLOR_RED, pyxel.COLOR_BLACK])  # 10%で赤や黒
-#        self.life = 20  # 最大寿命
-#        self.age = 0    # 経過フレーム
-#        self.size = size * random.uniform(0.5, 1.5)  # サイズをランダム化
-#
-#    def update(self):
-#        """位置と速度を更新"""
-#        self.x += self.vx
-#        self.y += self.vy
-#        self.vy += 0.2  # 重力効果
-#        self.size *= 0.98  # 寿命に応じて縮小
-#        self.age += 1
-#
-#    def draw(self):
-#        """パーティクルの描画"""
-#        if self.size > 0:
-#            pyxel.rect(
-#                int(self.x - self.size / 2),
-#                int(self.y - self.size / 2),
-#                int(self.size),
-#                int(self.size),
-#                self.color
-#            )
-#
-#    def is_alive(self):
-#        """寿命チェック"""
-#        return self.age < self.life
-
-#class Particle:
-#    def __init__(self, x, y, color, size, is_center_effect=False):
-#        self.x = x
-#        self.y = y
-#        self.vx = random.uniform(-1.5, 1.5)  # ランダムなX方向速度
-#        self.vy = random.uniform(-2.0, 1.5)  # ランダムなY方向速度
-#        self.gravity = 0.2 if not is_center_effect else 0.0  # 重力（中心エフェクトは重力なし）
-#        self.color = color if random.random() > 0.1 else random.choice([pyxel.COLOR_RED, pyxel.COLOR_BLACK])  # 10%で赤や黒
-#        self.life = 20  # 最大寿命
-#        self.age = 0    # 経過フレーム
-#        self.size = size * random.uniform(0.5, 1.5)  # サイズをランダム化
-#        self.is_center_effect = is_center_effect  # 中心エフェクトフラグ
-#
-#        # 中心エフェクト用の速度調整
-#        if self.is_center_effect:
-#            slow_factor = random.uniform(0.02, 0.1)  # 低速係数
-#            self.vx *= slow_factor
-#            self.vy *= slow_factor  # 重力が0なので、vyが固定でも問題なし
-#
-#    def update(self):
-#        """位置と速度を更新"""
-#        self.x += self.vx
-#        self.y += self.vy
-#        self.vy += self.gravity  # 重力を適用（中心エフェクトは重力なし）
-#        self.size *= 0.98  # 寿命に応じて縮小
-#        self.age += 1
-#
-#    def draw(self):
-#        """パーティクルの描画"""
-#        if self.size > 0:
-#            pyxel.rect(
-#                int(self.x - self.size / 2),
-#                int(self.y - self.size / 2),
-#                int(self.size),
-#                int(self.size),
-#                self.color
-#            )
-#
-#    def is_alive(self):
-#        """寿命チェック"""
-#        return self.age < self.life
 
 class Particle:
     def __init__(self, x, y, color, size):
@@ -477,6 +361,10 @@ class SameGame:
         # パーティクル設定
         self.particles = []
 
+        # 画面シェイク関連の変数
+        self.shake_timer = 0      # シェイクが発生しているフレーム数
+        self.shake_magnitude = 0  # シェイクの強さ（ピクセル単位）
+
         # ゲームループ開始
         pyxel.run(self.update, self.draw)
 
@@ -634,6 +522,13 @@ class SameGame:
         """
         Retry, Quit ボタンを描画
         """
+        # 毎フレーム、最新言語のラベルを代入
+        retry_label = translations["button_labels"]["retry"][self.current_language]
+        quit_label  = translations["button_labels"]["quit"][self.current_language]
+    
+        self.retry_button.label = retry_label
+        self.quit_button.label  = quit_label
+
         mx, my = pyxel.mouse_x, pyxel.mouse_y
         # Retry
         self.retry_button.draw(
@@ -847,8 +742,13 @@ class SameGame:
         if self.state != previous_state:
             self.handle_state_change()
 
+        # シェイクタイマーの更新
+        if self.shake_timer > 0:
+            self.shake_timer -= 1
+
         # === パーティクルの更新 ===
         self.update_particles()
+
 
     def apply_difficulty_settings(self, difficulty_key):
         print(f"Applying difficulty: {self.current_difficulty}")  # デバッグ出力
@@ -904,6 +804,13 @@ class SameGame:
                 # 4) 重力 & 列詰め
                 self.apply_gravity()
                 self.shift_columns_left()
+
+                # 画面を揺らすフラグをセット
+                # シェイクレベルをポイントに応じて増やす
+                # 点数ごとに+1, 最長20フレーム
+                self.shake_magnitude = min(5, 1 + points_gained // 500)
+                self.shake_timer = min(20, 2 + points_gained // 100)
+                print(f"Debug: shake_magnitude={self.shake_magnitude}, shake_timer={self.shake_timer}, points_gained={points_gained}")
 
     def handle_state_change(self):
         """ステータス変更時のBGMを再生"""
@@ -1238,6 +1145,23 @@ class SameGame:
 
 
     def draw(self):
+        # まずシェイクのオフセットを決定
+        # シェイクタイマーが残っていればランダムにオフセット
+        if self.shake_timer > 0:
+#            shake_x = random.uniform(-self.shake_magnitude, self.shake_magnitude)
+#            shake_y = random.uniform(-self.shake_magnitude, self.shake_magnitude)
+            # 残りタイマーに基づいて非線形減衰を計算
+            normalized_timer = self.shake_timer / 20  # 0〜1に正規化
+            current_magnitude = max(1, self.shake_magnitude * (normalized_timer ** 2))  # 平方減衰
+            shake_x = random.uniform(-current_magnitude, current_magnitude)
+            shake_y = random.uniform(-current_magnitude, current_magnitude)
+        else:
+            shake_x = 0
+            shake_y = 0
+    
+        # Pyxel のカメラをセット
+        pyxel.camera(shake_x, shake_y)
+
         # 画面をクリア
         pyxel.cls(0)
 
