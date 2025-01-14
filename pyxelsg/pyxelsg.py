@@ -8,6 +8,7 @@
 import pyxel
 import os
 import json
+import math
 import random
 import copy
 from enum import Enum
@@ -1036,8 +1037,10 @@ class SameGame:
                 # シェイクレベルをポイントに応じて増やす
                 # 点数ごとに+1, 最長20フレーム
 #                self.shake_magnitude = min(5, 1 + points_gained // 500)
-                self.shake_magnitude = min(8, 1 + points_gained // 500)
-                self.shake_timer = min(20, 2 + points_gained // 100)
+#                self.shake_magnitude = min(8, 1 + points_gained // 500)
+#                self.shake_timer = min(20, 2 + points_gained // 100)
+                self.shake_magnitude = min(15, 2 + points_gained // 100)
+                self.shake_timer = min(30, 4 + points_gained // 100)
 #                print(f"Debug: shake_magnitude={self.shake_magnitude}, shake_timer={self.shake_timer}, points_gained={points_gained}")
 
     def handle_state_change(self):
@@ -1282,9 +1285,15 @@ class SameGame:
         if self.shake_timer > 0:
             # 残りタイマーに基づいて非線形減衰を計算
             normalized_timer = self.shake_timer / 20  # 0〜1に正規化
-            current_magnitude = max(1, self.shake_magnitude * (normalized_timer ** 2))  # 平方減衰
-            shake_x = random.uniform(-current_magnitude, current_magnitude)
-            shake_y = random.uniform(-current_magnitude, current_magnitude)
+#            current_magnitude = max(1, self.shake_magnitude * (normalized_timer ** 2))  # 平方減衰
+#            shake_x = random.uniform(-current_magnitude, current_magnitude)
+#            shake_y = random.uniform(-current_magnitude, current_magnitude)
+
+            # 減衰を緩やかに（直線減衰や平方根を使用）
+            current_magnitude = self.shake_magnitude * (normalized_timer ** 0.5)  # 緩やかな減衰
+            # ランダム性を強化（ノイズのような動きを追加）
+            shake_x = random.uniform(-current_magnitude, current_magnitude) + math.sin(pyxel.frame_count * 0.1) * current_magnitude * 0.2
+            shake_y = random.uniform(-current_magnitude, current_magnitude) + math.cos(pyxel.frame_count * 0.1) * current_magnitude * 0.2
         else:
             shake_x = 0
             shake_y = 0
