@@ -3,7 +3,7 @@
 # desc: A simple SameGame puzzle game built with Pyxel. Clear the board by removing groups of blocks with the same color!
 # site: https://github.com/hnsol/pyxel-samegame
 # license: MIT
-# version: 0.5
+# version: 0.9
 
 import pyxel
 import os
@@ -25,7 +25,6 @@ BUTTON_AREA_HEIGHT = 40  # ボタンエリアの高さ（縦にボタンを並�
 STATUS_AREA_HEIGHT = 30   # 表示エリアの高さ
 
 COLORS = [1, 4, 3, 6, 2]  # 色覚多様性対応 rev02
-#DEFAULT_TOP_SCORES = [10000, 5000, 2500, 1000, 500, 250, 100, 50, 25, 10]  # デフォルトのトップ10スコア
 DEFAULT_TOP_SCORES = [50000, 25000, 7500, 5000, 2500, 750, 500, 250, 75, 50]  # デフォルトのトップ10スコア
 
 translations = {
@@ -219,20 +218,10 @@ class Block:
             self.x += (dx / dist) * self.move_speed
             self.y += (dy / dist) * self.move_speed
 
-#    def draw(self, x_offset, y_offset, cell_size):
-#        """
-#        実際に画面に描画するときの処理。
-#        x_offset, y_offset はグリッドの表示開始座標
-#        cell_size はセルのサイズ
-#        """
-#        x = x_offset + self.col * cell_size
-#        y = y_offset + self.row * cell_size
-#        pyxel.rect(x, y, cell_size, cell_size, COLORS[self.color])
     def draw(self):
         """
         実際に画面に描画するときの処理。
         """
-#        pyxel.rect(int(self.x), int(self.y), CELL_SIZE, CELL_SIZE, COLORS[self.color])
         pyxel.rect(int(self.x), int(self.y), self.cell_size, self.cell_size, COLORS[self.color])
 
 
@@ -289,10 +278,6 @@ class ScorePopup:
         self.game = game  # ゲームオブジェクトを保持
         self.lifetime = 15
         self.age = 0
-#        self.size = max(10, min(20, int(score / 50)))  # スコアに応じて文字サイズを調整
-#        self.size = max(20, int(20 * (score / 100) ** 0.5)) # スコアに応じて文字サイズを調整
-#        self.vy = -0.5  # 上昇速度
-#        self.vy = -1.5  # 上昇速度
 
         # スコアに応じた色、スケール、上昇速度を設定
         if score <= 99:
@@ -534,8 +519,6 @@ class SameGame:
 
     def stop_bgm(self):
         print(f"Stopping all BGM channels")
-#        bgm_channels = [0, 1, 2, 3]  # 全チャンネル消す
-#        bgm_channels = [1, 2, 3]  # 0以外を消す
         bgm_channels = [0, 1, 2]  # 0以外を消す
         for ch in bgm_channels:
             # サウンドデータをリセット（空データを設定）
@@ -682,13 +665,6 @@ class SameGame:
     def play_effect(self, blocks_to_remove):
         num_blocks = len(blocks_to_remove)
     
-#        # Cメジャーコードを基にした音階
-#        base_notes = [
-#            "C2", "E2", "G2",  # Cメジャーコード低音域
-#            "C3", "F3", "A3",  # Fメジャーコード中音域
-#            "G3", "B3", "D4",  # Gメジャーコード中高音域
-#            "C4", "E4", "G4",  # Cメジャーコード高音域
-#        ]
         # I - VII♭ のコード進行に基づく音階
         base_notes = [
             "C2", "E2", "G2",  # I (Cメジャー)
@@ -766,8 +742,7 @@ class SameGame:
         previous_state = self.state  # ステータスの変更を追跡
 
         # RetryボタンとQuitボタンの処理を特定の状態に限定
-#        if self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
-        if self.state in [GameState.GAME_START, GameState.GAME_MID]:
+        if self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
             # Retryボタンの処理
             retry_x = BUTTON_SPACING
             retry_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
@@ -888,10 +863,6 @@ class SameGame:
             if not self.is_falling and not self.is_shifting:
                 if self.is_grid_empty():
                     self.state = GameState.GAME_CLEARED
-#                elif self.has_valid_moves():  # このタイミングで判定
-#                    self.state = GameState.GAME_MID  # 通常のプレイに戻る
-#                else:
-#                    self.state = GameState.NO_MOVES
                 elif not self.has_valid_moves():  # 盤面にコマはあるが手がない
                     self.state = GameState.NO_MOVES
 
@@ -964,14 +935,8 @@ class SameGame:
             elif self.is_shifting:
                 if self.all_blocks_stopped():
                     self.is_shifting = False
-                    # 全アニメが終わったのでアニメフラグオフ
-#                    print("Falling + shifting finished!")
-#                    self.is_animating = False
     
-            # 3. 上記以外のタイミングでアニメを始めた場合は、まとめて is_animating = True など
-            #   (「ブロックを消去したタイミング」で is_animating = True にするなど)
-    
-            # 4. パーティクルやブロック更新
+            # パーティクルやブロック更新
             self.update_particles()
             
             for row in range(self.grid_rows):
@@ -1003,7 +968,6 @@ class SameGame:
 
     def handle_click(self, mx, my):
         # アニメ中はクリック無視
-#        if self.is_animating:
         if self.is_falling or self.is_shifting:
             return
 
@@ -1101,13 +1065,6 @@ class SameGame:
             self.current_score_rank = self.high_scores.index(self.score)
         except ValueError:
             self.current_score_rank = None
-
-#    def calculate_progress(self):
-#        """盤面の進行状況を計算"""
-#        total_cells = self.grid_rows * self.grid_cols
-#        remaining_cells = sum(1 for row in self.grid for cell in row if cell != -1)
-#        removed_percentage = (total_cells - remaining_cells) / total_cells
-#        return remaining_cells, removed_percentage
 
     def calculate_progress(self):
         """盤面の進行状況を計算"""
