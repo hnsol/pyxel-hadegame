@@ -280,6 +280,58 @@ class Particle:
         """寿命チェック"""
         return self.age < self.life
 
+class ScorePopup:
+    def __init__(self, x, y, score, color, game):
+        self.x = x
+        self.y = y
+        self.score = score
+        self.color = color
+        self.game = game  # ゲームオブジェクトを保持
+        self.lifetime = 15
+        self.age = 0
+#        self.size = max(10, min(20, int(score / 50)))  # スコアに応じて文字サイズを調整
+        self.size = max(20, int(20 * (score / 100) ** 0.5)) # スコアに応じて文字サイズを調整
+#        self.vy = -0.5  # 上昇速度
+#        self.vy = -1.5  # 上昇速度
+
+        # スコアに応じた色と上昇速度を設定
+        if score <= 99:
+#            self.color = pyxel.COLOR_GRAY
+            self.color = pyxel.COLOR_LIGHT_BLUE
+            self.vy = -1.0
+        elif score <= 999:
+            self.color = pyxel.COLOR_WHITE
+            self.vy = -2.0
+        elif score <= 4999:
+            self.color = pyxel.COLOR_YELLOW
+            self.vy = -4.0
+        else:
+            self.color = pyxel.COLOR_RED
+            self.vy = -4.0
+
+    def update(self):
+        self.y += self.vy
+        self.age += 1
+
+    def draw(self):
+        text = f"+{self.score}"
+#        x = int(self.x)
+        text_width = self.game.font_small.text_width(text)  # テキスト幅を取得
+        x = int(self.x - text_width / 2)  # テキスト幅を考慮した中心位置
+        y = int(self.y)
+        # 袋文字付きの描画を draw_text に置き換え
+        self.game.draw_text(
+            y=y,
+            text=text,
+            color=self.color,
+            align="left",
+            x_offset=x,
+            border_color=pyxel.COLOR_BLACK  # 袋文字の色
+        )
+
+    def is_alive(self):
+        return self.age < self.lifetime
+
 
 class SameGame:
 # 各ゲームステートごとのカスタムパラメータ
@@ -400,6 +452,9 @@ class SameGame:
 
         # パーティクル設定
         self.particles = []
+
+        # スコア表示設定
+        self.score_popups = []
 
         # 画面シェイク関連の変数
         self.shake_timer = 0      # シェイクが発生しているフレーム数
@@ -614,101 +669,6 @@ class SameGame:
                 border_color=pyxel.COLOR_DARK_BLUE
             )
 
-#    def play_effect(self, blocks_to_remove):
-#        num_blocks = len(blocks_to_remove)
-#    
-#        # 有効な音符のリストを定義 ('CDEFGAB'+'#-'+'0123' または 'R' の形式)
-#        VALID_NOTES = [
-#            f"{note}{accidental}{octave}"
-#            for octave in "0123"
-#            for note in "CDEFGAB"
-#            for accidental in ("", "#", "-")
-#        ] + ["R"]  # 'R' は休符
-#    
-#        # 明るく、上昇感を強調した音階を定義
-##        base_notes = ["C2", "E2", "G2", "C3", "E3", "G3", "C4", "E4", "G4"]
-#        # Cメジャーコード進行を意識した音階を定義
-#        base_notes = [
-##            "C0", "E0", "G0",
-##            "C1", "E1", "G1",
-#            "C2", "E2", "G2",
-#            "C3", "E3", "G3",
-#            "C4", "E4", "G4",
-#        ]
-#        # 音の長さを指数関数的に伸ばす
-#        max_notes = min(len(base_notes), int(3 * (1.2 ** num_blocks)))
-##        max_notes = min(len(base_notes), int(3 * (1.5 ** num_blocks)))
-##        max_notes = min(len(base_notes), int(3 * (2.0 ** num_blocks)))
-##        selected_notes = base_notes[:max_notes]
-##        selected_notes = [note for note in base_notes[:max_notes] if note in VALID_NOTES]
-##        selected_notes = base_notes[:max_notes]
-##        filtered_notes = [note for note in selected_notes if note in VALID_NOTES]
-##        
-##        print(f"[DEBUG] Selected notes before filtering: {selected_notes}")
-##        print(f"[DEBUG] Filtered notes: {filtered_notes}")
-#
-#        # 有効な音符のみを残す
-##        notes = [note for note in selected_notes if note in VALID_NOTES]
-##        notes = selected_notes
-#        notes = base_notes[:max_notes]
-#    
-#        if not notes:
-#            print("[DEBUG] No valid notes available, skipping sound effect.")
-#            return
-#    
-#        # トーンを連鎖数に応じて調整
-#        noise_ratio = min(0.5, 0.2 + num_blocks * 0.05)  # ノイズ割合（最大50%）
-#        pulse_ratio = 1 - noise_ratio  # パルスの割合
-#        tones = "".join([
-#            "p" if r < pulse_ratio else "n" if r < pulse_ratio + noise_ratio else "t"
-#            for r in [random.random() for _ in notes]
-#        ])
-#
-#        # ボリューム設定：強弱を付けつつ大きめに
-#        base_volume = 5
-#        volumes = [
-#            base_volume + int((i / len(notes)) * 2) if tones[i] in "pt" else base_volume - 1
-#            for i in range(len(notes))
-#        ]
-#        volumes = "".join([str(min(7, max(1, int(v)))) for v in volumes])
-#    
-#        # 効果を上昇感があるように設定
-#        effects = "".join([
-#            "f" if i % 3 == 0 else "n" if i % 3 == 1 else "s"  # フェード、ノイズ、スライド
-#            for i in range(len(notes))
-#        ])
-#    
-#        # 速度を連鎖数に応じて速くする
-##        speed = max(3, 8 - int(num_blocks ** 0.3))  # 大きな連鎖で速くなる
-##        speed = max(3, 8 - int(num_blocks ** 2))  # 大きな連鎖で速くなる
-##        speed = max(2, 8 - int(num_blocks * 1.5))  # 大きな連鎖で速くなる
-##        speed = max(2, 8 - int(num_blocks ** 0.5))  # ゆるやかな非線形スケール
-##        speed = max(2, 8 - int(num_blocks ** 0.8))
-#        speed = min(8, 2 + int(num_blocks ** 0.8)) # 連鎖に応じて遅く        
-#
-#        # デバッグ情報
-#        print(f"[DEBUG] base_notes: {base_notes}")
-#        print(f"[DEBUG] max_notes: {max_notes}")
-##        print(f"[DEBUG] Notes (before filtering): {selected_notes}")
-#        print(f"[DEBUG] Notes: {' '.join(notes)}")
-#        print(f"[DEBUG] Tones: {tones}")
-#        print(f"[DEBUG] Volumes: {volumes}")
-#        print(f"[DEBUG] Effects: {effects}")
-#        print(f"[DEBUG] Speed: {speed}")
-#
-#    
-#        # Pyxel サウンド設定
-#        try:
-#            pyxel.sounds[0].set(
-#                notes=" ".join(notes),
-#                tones=tones,
-#                volumes=volumes,
-#                effects=effects,
-#                speed=speed,
-#            )
-#            pyxel.play(3, 0)
-#        except Exception as e:
-#            print(f"[ERROR] Failed to set sound: {e}")
 
     def play_effect(self, blocks_to_remove):
         num_blocks = len(blocks_to_remove)
@@ -915,19 +875,6 @@ class SameGame:
                 self.handle_click(mx, my)
             if self.time_limit and pyxel.frame_count - self.start_time > self.time_limit * 30:
                 self.state = GameState.TIME_UP
-#            elif self.is_grid_empty():
-#                self.state = GameState.GAME_CLEARED
-#            elif not self.has_valid_moves():
-#                self.state = GameState.NO_MOVES
-#            if self.all_blocks_stopped():
-#                self.is_shifting = False
-#                # アニメーション完了後にhas_valid_moves()を判定
-#                if self.is_grid_empty():
-#                    self.state = GameState.GAME_CLEARED
-#                elif not self.has_valid_moves():
-#                    self.state = GameState.NO_MOVES
-
-#            if self.all_blocks_stopped():  # 全てのブロックが停止した状態
             if not self.is_falling and not self.is_shifting:
                 if self.is_grid_empty():
                     self.state = GameState.GAME_CLEARED
@@ -1014,11 +961,20 @@ class SameGame:
     
             # 4. パーティクルやブロック更新
             self.update_particles()
+            
             for row in range(self.grid_rows):
                 for col in range(self.grid_cols):
                     block = self.grid[row][col]
                     if block:
                         block.update()
+
+            # スコアポップアップの更新
+            alive_popups = []
+            for popup in self.score_popups:
+                popup.update()
+                if popup.is_alive():
+                    alive_popups.append(popup)
+            self.score_popups = alive_popups
 
     def apply_difficulty_settings(self, difficulty_key):
         print(f"Applying difficulty: {self.current_difficulty}")  # デバッグ出力
@@ -1067,25 +1023,44 @@ class SameGame:
 #                self.spawn_particles(blocks_to_remove, cell_size, grid_x_start, grid_y_start)
                 self.spawn_particles(blocks_to_remove, points_gained, cell_size, grid_x_start, grid_y_start)
 
-                # 2) ブロック消去
-                for bx, by in blocks_to_remove:
-                    self.grid[by][bx] = None
-
-                # 3) 効果音・スコア等
+                # 2) 効果音・スコア等
                 self.play_effect(blocks_to_remove)
 #                self.score += int(len(blocks_to_remove) * (len(blocks_to_remove) ** 2) * self.score_multiplier)
                 self.score += points_gained
 
-                # 4) 重力 & 列詰め
+                # 3) スコアポップアップの生成（最初のブロックを使用）
+                if blocks_to_remove:
+                    # 最初のブロックを取得
+                    bx, by = blocks_to_remove[0]
+                    block = self.grid[by][bx]
+                    if block:
+                        x = grid_x_start + block.col * cell_size + cell_size / 2
+                        y = grid_y_start + block.row * cell_size + cell_size / 2
+#                        popup = ScorePopup(x, y, points_gained, COLORS[block.color])
+                        popup = ScorePopup(x, y, points_gained, pyxel.COLOR_WHITE, game=self)
+                        self.score_popups.append(popup)
+                        # デバッグメッセージ
+                        print(f"[DEBUG] ScorePopup created at ({x}, {y}) with score: {points_gained}")
+                    else:
+                        print(f"[DEBUG] Block at ({bx}, {by}) is None. No ScorePopup created.")
+                else:
+                    print("[DEBUG] blocks_to_remove is empty. No ScorePopup created.")
+
+                # 4) ブロック消去
+                for bx, by in blocks_to_remove:
+                    self.grid[by][bx] = None
+
+                # 5) 重力 & 列詰め
 
                 # まず落下アニメだけを始める
                 self.apply_gravity_animated()
                 self.is_falling = True
 
-                # 画面を揺らすフラグをセット
+                # 6) 画面を揺らすフラグをセット
                 # シェイクレベルをポイントに応じて増やす
                 # 点数ごとに+1, 最長20フレーム
-                self.shake_magnitude = min(5, 1 + points_gained // 500)
+#                self.shake_magnitude = min(5, 1 + points_gained // 500)
+                self.shake_magnitude = min(8, 1 + points_gained // 500)
                 self.shake_timer = min(20, 2 + points_gained // 100)
 #                print(f"Debug: shake_magnitude={self.shake_magnitude}, shake_timer={self.shake_timer}, points_gained={points_gained}")
 
@@ -1327,8 +1302,6 @@ class SameGame:
         # まずシェイクのオフセットを決定
         # シェイクタイマーが残っていればランダムにオフセット
         if self.shake_timer > 0:
-#            shake_x = random.uniform(-self.shake_magnitude, self.shake_magnitude)
-#            shake_y = random.uniform(-self.shake_magnitude, self.shake_magnitude)
             # 残りタイマーに基づいて非線形減衰を計算
             normalized_timer = self.shake_timer / 20  # 0〜1に正規化
             current_magnitude = max(1, self.shake_magnitude * (normalized_timer ** 2))  # 平方減衰
@@ -1495,11 +1468,13 @@ class SameGame:
 
         # === パーティクル描画 ===
         self.draw_particles()
+        # スコアポップアップの描画
+        for popup in self.score_popups:
+            popup.draw()
 
     def draw_text(self, y, text, color, align="center", x_offset=0, font=None, border_color=None):
         """BDFフォントを使用してテキストを描画"""
         font = font or self.font_small  # デフォルトで self.font_small を使用
-#        text_width = len(text) * 4  # フォントの幅を計算（適切に変更可能）
         text_width = font.text_width(text)  # フォントの幅を計算（適切に変更可能）
         
         if align == "center":
