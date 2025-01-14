@@ -287,74 +287,6 @@ class SameGame:
     }
 
     def __init__(self):
-#        self.current_language = "ja"
-#
-#        # ベースパスを取得
-#        self.base_path = os.path.dirname(os.path.abspath(__file__))
-#
-#        # フォントの読み込み
-#        try:
-#            self.font_small = self.load_font("assets/fonts/k8x12.bdf")
-#        except FileNotFoundError as e:
-#            print(f"Error loading font: {e}")
-#            exit(1)  # フォントがない場合はエラー終了
-#
-#        # BGM関連の初期化
-#        self.bgm = BGMGenerator()
-#        self.bgm_files = {
-#            GameState.OPENING: "assets/game_music/opening.json",            # オープニング画面のBGM
-#            GameState.DIFFICULTY_SELECTION: "assets/game_music/selection.json", # 難易度選択画面のBGM
-#            GameState.GAME_START: "assets/game_music/gameplay_start.json", # ゲーム序盤のBGM
-#            GameState.GAME_MID: "assets/game_music/gameplay_mid.json",     # ゲーム中盤のBGM
-#            GameState.GAME_END: "assets/game_music/gameplay_end.json",     # ゲーム終盤のBGM
-#            GameState.TIME_UP: "assets/game_music/time_up.json",           # タイムアップ時のBGM
-#            GameState.NO_MOVES: "assets/game_music/no_moves.json",         # 動ける手がなくなった時のBGM
-#            GameState.GAME_CLEARED: "assets/game_music/cleared.json",      # ゲームクリア時のBGM
-#        }
-#        self.bgm_data = {}
-#        self.base_path = os.path.dirname(os.path.abspath(__file__))
-#        self.current_bgm = None
-#
-#        self.load_bgms()
-#
-#        self.difficulty_levels = {
-#            "easy":      {"grid_rows":  5, "grid_cols":  5, "colors": 3, "time_limit": None, "score_multiplier": 1.0},
-#            "normal":    {"grid_rows":  6, "grid_cols":  8, "colors": 4, "time_limit": None, "score_multiplier": 1.2},
-#            "hard":      {"grid_rows":  9, "grid_cols": 12, "colors": 5, "time_limit":  108, "score_multiplier": 1.5},
-#            "very_hard": {"grid_rows": 10, "grid_cols": 15, "colors": 5, "time_limit":   81, "score_multiplier": 2.0},
-#            "expert":    {"grid_rows": 12, "grid_cols": 18, "colors": 5, "time_limit":   54, "score_multiplier": 3.0},
-#        }
-#        self.current_difficulty = "easy"
-#        self.grid_rows = self.difficulty_levels[self.current_difficulty]["grid_rows"]
-#        self.grid_cols = self.difficulty_levels[self.current_difficulty]["grid_cols"]
-#        self.num_colors = self.difficulty_levels[self.current_difficulty]["colors"]
-#        self.time_limit = self.difficulty_levels[self.current_difficulty]["time_limit"]
-#        self.score_multiplier = self.difficulty_levels[self.current_difficulty]["score_multiplier"]
-#        self.bonus_added = False  # ボーナススコア加算済みかを判定するフラグ
-#
-#        pyxel.init(WINDOW_WIDTH, WINDOW_HEIGHT)
-#        pyxel.mouse(True)
-#        pyxel.title = "SameGame"
-#        self.state = GameState.OPENING
-#        self.high_scores = DEFAULT_TOP_SCORES[:]
-#        self.current_score_rank = None
-#        self.start_time = None
-#        self.initial_grid = []
-#        self.current_bgm = None
-#
-#        # BoardGenerator のインスタンスを作成
-#        self.board_generator = BoardGenerator()
-#        # パーティクルを格納するリスト
-#        self.particles = []
-#
-#        self.difficulty_buttons = []
-#        self.create_difficulty_buttons()
-#        self.create_language_button()  # 言語切り替えボタンを作成
-#        self.create_game_buttons()
-#        
-#        self.current_bgm = None  # 現在再生中のBGMを記録
-#        pyxel.run(self.update, self.draw)
-
         """ゲーム全体の初期化"""
 
         # 言語設定
@@ -429,15 +361,6 @@ class SameGame:
         # ゲームループ開始
         pyxel.run(self.update, self.draw)
 
-    def update_difficulty_settings(self):
-        """現在の難易度設定を反映"""
-        settings = self.difficulty_levels[self.current_difficulty]
-        self.grid_rows = settings["grid_rows"]
-        self.grid_cols = settings["grid_cols"]
-        self.num_colors = settings["colors"]
-        self.time_limit = settings["time_limit"]
-        self.score_multiplier = settings["score_multiplier"]
-
     def load_font(self, relative_path):
         """BDFフォントを絶対パスで読み込む"""
         absolute_path = os.path.join(self.base_path, relative_path)
@@ -510,6 +433,15 @@ class SameGame:
             pyxel.stop(ch)  # チャンネルごとに停止
         self.current_bgm = None  # 現在のBGM状態をリセット
 
+    def update_difficulty_settings(self):
+        """現在の難易度設定を反映"""
+        settings = self.difficulty_levels[self.current_difficulty]
+        self.grid_rows = settings["grid_rows"]
+        self.grid_cols = settings["grid_cols"]
+        self.num_colors = settings["colors"]
+        self.time_limit = settings["time_limit"]
+        self.score_multiplier = settings["score_multiplier"]
+
     def create_language_button(self):
         """オープニング画面用の言語切り替えボタンを作成"""
         button_width = 20
@@ -542,120 +474,86 @@ class SameGame:
             button.key = diff["key"]  # 内部キーをボタンに追加
             self.difficulty_buttons.append(button)
 
-    def play_effect(self, blocks_to_remove):
-        """消したマスの数に応じて上昇音階の効果音を再生"""
-        num_blocks = len(blocks_to_remove)
+    def create_game_buttons(self):
+        """
+        Retry, Quit などのゲーム用ボタンをインスタンス生成
+        """
+        # Retry ボタン
+        retry_x = BUTTON_SPACING
+        retry_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
+        retry_label = translations["button_labels"]["retry"][self.current_language]
+        self.retry_button = Button(retry_x, retry_y, BUTTON_WIDTH, BUTTON_HEIGHT, retry_label)
     
-        # 基本となる上昇音階の定義
-#        base_notes = ["c2", "d2", "e2", "g2", "a2", "c3"]
-        base_notes = ["c2", "d2", "e2", "g2", "a2", "c3", "d3", "e3", "g3", "a3"]
-        max_notes = min(len(base_notes), num_blocks)  # 消したマス数に応じて音階を制限
-        notes = base_notes[:max_notes]  # 必要な音階だけを取得
-    
-        # 再生速度を調整（少ない場合は速く、多い場合は少しゆっくり）
-        speed = max(5, 15 - (num_blocks // 2))
-    
-        # 効果音を設定
-        pyxel.sounds[0].set(
-            notes="".join(notes),  # 上昇音階を生成
-            tones="p",            # パルス音（爽やかな音）
-            volumes="5" * max_notes,  # 音量を一定に
-            effects="n" * max_notes,  # 効果なし（シンプルに）
-            speed=speed,          # スピード設定
+        # Quit ボタン
+        quit_x = BUTTON_SPACING + BUTTON_WIDTH + BUTTON_SPACING
+        quit_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
+        quit_label = translations["button_labels"]["quit"][self.current_language]
+        self.quit_button = Button(quit_x, quit_y, BUTTON_WIDTH, BUTTON_HEIGHT, quit_label)
+
+    def update_game_buttons(self):
+        """
+        Retry, Quit ボタンのクリック判定を行う
+        """
+        mx, my = pyxel.mouse_x, pyxel.mouse_y
+        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+            # Retry
+            if self.retry_button.is_hovered(mx, my):
+                # リセットしてステートを変更
+                self.reset_game(use_saved_initial_state=True)
+                self.state = GameState.GAME_START
+                return
+            
+            # Quit
+            if self.quit_button.is_hovered(mx, my):
+                self.update_high_scores()
+                # ゲーム状態を初期化してOPENINGに戻る
+                self.reset_game(use_saved_initial_state=False)
+                self.state = GameState.SCORE_DISPLAY
+                return
+
+    def draw_game_buttons(self):
+        """
+        Retry, Quit ボタンを描画
+        """
+        mx, my = pyxel.mouse_x, pyxel.mouse_y
+        # Retry
+        self.retry_button.draw(
+            is_hovered=self.retry_button.is_hovered(mx, my),
+            draw_text_func=self.draw_text,
+            font=self.font_small
         )
-    
-        # 効果音を再生
-        pyxel.play(3, 0)
+        # Quit
+        self.quit_button.draw(
+            is_hovered=self.quit_button.is_hovered(mx, my),
+            draw_text_func=self.draw_text,
+            font=self.font_small
+        )
 
-    def calculate_progress(self):
-        """盤面の進行状況を計算"""
-        total_cells = self.grid_rows * self.grid_cols
-        remaining_cells = sum(1 for row in self.grid for cell in row if cell != -1)
-        removed_percentage = (total_cells - remaining_cells) / total_cells
-        return remaining_cells, removed_percentage
-
-#    def generate_board(self):
-#        """新しい盤面を生成する"""
-#        return self.board_generator.generate_filled_solvable_board(
-#            rows=self.grid_rows,
-#            cols=self.grid_cols,
-#            colors=self.num_colors,
-#            timeout=3  # 3秒タイムアウト
-#        )
-
-#    def reset_game(self, use_saved_initial_state=False):
-#        """
-#        ゲームをリセット。盤面生成を別メソッドに分離。
-#        """
-#        if use_saved_initial_state and hasattr(self, 'initial_grid'):
-#            self.grid = copy.deepcopy(self.initial_grid)
-#        else:
-#            self.grid = self.generate_board()
-#            self.initial_grid = copy.deepcopy(self.grid)
-#    
-#        # スコアと時間をリセット
-##        self.start_time = pyxel.frame_count if self.time_limit else 0
-#        self.start_time = pyxel.frame_count  # 常に現在のフレーム数で初期化
-#        self.score = 0
-#        self.bonus_added = False
-
-    def reset_game_state(self):
-        """
-        盤面以外の情報（スコアやタイマーなど）だけをリセットする処理。
-        """
-        # タイマーリセット
-        self.start_time = pyxel.frame_count if self.time_limit else 0
+    def draw_difficulty_label(self):
+        difficulty_options = translations["difficulty_options"]
+        difficulty_levels = [
+            {"key": option["key"], "label": option["label"][self.current_language]}
+            for option in difficulty_options
+        ]
+        difficulty_keys = [level["key"] for level in difficulty_levels]
         
-        # スコアやボーナスフラグのリセット
-        self.score = 0
-        self.bonus_added = False
+        current_difficulty_label = None
+        for key, level in zip(difficulty_keys, difficulty_levels):
+            if key == self.current_difficulty:
+                current_difficulty_label = level["label"]
+                break
         
-        # BGM停止などが必要であればここに入れる
-        self.stop_bgm()
-
-#    def generate_new_board(self, use_saved_initial_state=False):
-#        """
-#        新たに盤面を生成する。
-#        すでに self.initial_grid を持っているなら使う／使わないの制御もここで。
-#        """
-#        if use_saved_initial_state and hasattr(self, 'initial_grid'):
-#            self.grid = copy.deepcopy(self.initial_grid)
-#        else:
-#            self.grid = self.board_generator.generate_filled_solvable_board(
-#                rows=self.grid_rows,
-#                cols=self.grid_cols,
-#                colors=self.num_colors,
-#                timeout=3
-#            )
-#            self.initial_grid = copy.deepcopy(self.grid)
-
-    def generate_new_board(self, use_saved_initial_state=False):
-        if use_saved_initial_state and hasattr(self, 'initial_grid'):
-            # すでに保存済みの Block 配列があるなら、それを deepcopy で再現
-            self.grid = copy.deepcopy(self.initial_grid)
-        else:
-            # まずは BoardGenerator で「色番号の2次元リスト」を取得
-            int_grid = self.board_generator.generate_filled_solvable_board(
-                rows=self.grid_rows,
-                cols=self.grid_cols,
-                colors=self.num_colors,
-                timeout=3
+        if current_difficulty_label:
+            difficulty_text_x = WINDOW_WIDTH - 60
+            difficulty_text_y = (BUTTON_AREA_HEIGHT - 14) // 2
+            self.draw_text(
+                difficulty_text_y,
+                current_difficulty_label,
+                pyxel.COLOR_WHITE,
+                align="right",
+                x_offset=10,
+                border_color=pyxel.COLOR_DARK_BLUE
             )
-    
-            # これを「Block (または None) の2次元リスト」に変換
-            block_grid = []
-            for row in range(self.grid_rows):
-                block_row = []
-                for col in range(self.grid_cols):
-                    color = int_grid[row][col]
-                    if color == -1:
-                        block_row.append(None)
-                    else:
-                        block_row.append(Block(row, col, color))
-                block_grid.append(block_row)
-    
-            self.grid = block_grid
-            self.initial_grid = copy.deepcopy(self.grid)  # 保存
 
     def update(self):
         """ゲームの状態を更新"""
@@ -846,22 +744,6 @@ class SameGame:
         self.score_multiplier = settings["score_multiplier"]
         print(f"Settings applied: {settings}")
 
-    def get_grid_layout(self):
-        """
-        グリッドを描画・クリックする際の cell_size / grid_x_start / grid_y_start を統一計算する
-        """
-        left_margin = 4
-        game_area_y = BUTTON_AREA_HEIGHT
-        game_area_height = WINDOW_HEIGHT - BUTTON_AREA_HEIGHT - STATUS_AREA_HEIGHT
-        
-        cell_size = min((WINDOW_WIDTH - 2 * left_margin) // self.grid_cols,
-                        game_area_height // self.grid_rows)
-        grid_x_start = left_margin + ((WINDOW_WIDTH - 2 * left_margin)
-                                      - (cell_size * self.grid_cols)) // 2
-        grid_y_start = game_area_y + (game_area_height - (cell_size * self.grid_rows)) // 2
-    
-        return cell_size, grid_x_start, grid_y_start
-
     def handle_click(self, mx, my):
         """盤面クリック時の処理"""
         cell_size, grid_x_start, grid_y_start = self.get_grid_layout()
@@ -870,9 +752,6 @@ class SameGame:
         y = (my - grid_y_start) // cell_size
     
         if 0 <= x < self.grid_cols and 0 <= y < self.grid_rows:
-#            color = self.grid[y][x]
-#            if color == -1:
-#                return
             block = self.grid[y][x]
             # ブロックが存在しないなら (= None) 何もしない
             if block is None:
@@ -922,22 +801,64 @@ class SameGame:
         if bgm_state:
             self.play_bgm(bgm_state)
 
-#    def find_connected_blocks(self, x, y, color):
-#        stack = [(x, y)]
-#        visited = set()
-#        connected = []
-#
-#        while stack:
-#            cx, cy = stack.pop()
-#            if (cx, cy) in visited:
-#                continue
-#            visited.add((cx, cy))
-#            if self.grid[cy][cx] == color:
-#                connected.append((cx, cy))
-#                for nx, ny in [(cx - 1, cy), (cx + 1, cy), (cx, cy - 1), (cx, cy + 1)]:
-#                    if 0 <= nx < self.grid_cols and 0 <= ny < self.grid_rows:
-#                        stack.append((nx, ny))
-#        return connected
+    def update_high_scores(self):
+        if self.score not in self.high_scores:
+            self.high_scores.append(self.score)
+        self.high_scores.sort(reverse=True)
+        self.high_scores = self.high_scores[:10]
+        try:
+            self.current_score_rank = self.high_scores.index(self.score)
+        except ValueError:
+            self.current_score_rank = None
+
+    def calculate_progress(self):
+        """盤面の進行状況を計算"""
+        total_cells = self.grid_rows * self.grid_cols
+        remaining_cells = sum(1 for row in self.grid for cell in row if cell != -1)
+        removed_percentage = (total_cells - remaining_cells) / total_cells
+        return remaining_cells, removed_percentage
+
+    def reset_game_state(self):
+        """
+        盤面以外の情報（スコアやタイマーなど）だけをリセットする処理。
+        """
+        # タイマーリセット
+        self.start_time = pyxel.frame_count if self.time_limit else 0
+        
+        # スコアやボーナスフラグのリセット
+        self.score = 0
+        self.bonus_added = False
+        
+        # BGM停止などが必要であればここに入れる
+        self.stop_bgm()
+
+    def generate_new_board(self, use_saved_initial_state=False):
+        if use_saved_initial_state and hasattr(self, 'initial_grid'):
+            # すでに保存済みの Block 配列があるなら、それを deepcopy で再現
+            self.grid = copy.deepcopy(self.initial_grid)
+        else:
+            # まずは BoardGenerator で「色番号の2次元リスト」を取得
+            int_grid = self.board_generator.generate_filled_solvable_board(
+                rows=self.grid_rows,
+                cols=self.grid_cols,
+                colors=self.num_colors,
+                timeout=3
+            )
+    
+            # これを「Block (または None) の2次元リスト」に変換
+            block_grid = []
+            for row in range(self.grid_rows):
+                block_row = []
+                for col in range(self.grid_cols):
+                    color = int_grid[row][col]
+                    if color == -1:
+                        block_row.append(None)
+                    else:
+                        block_row.append(Block(row, col, color))
+                block_grid.append(block_row)
+    
+            self.grid = block_grid
+            self.initial_grid = copy.deepcopy(self.grid)  # 保存
 
     def find_connected_blocks(self, x, y, color):
         stack = [(x, y)]
@@ -960,12 +881,6 @@ class SameGame:
     
         return connected
 
-#    def apply_gravity(self):
-#        for x in range(self.grid_cols):
-#            column = [self.grid[y][x] for y in range(self.grid_rows) if self.grid[y][x] != -1]
-#            for y in range(self.grid_rows):
-#                self.grid[self.grid_rows - y - 1][x] = column[-(y + 1)] if y < len(column) else -1
-
     def apply_gravity(self):
         for col in range(self.grid_cols):
             # "None じゃないブロック" を上から順に集めたリストを作る
@@ -980,20 +895,6 @@ class SameGame:
                     self.grid[target_row][col] = block
                 else:
                     self.grid[target_row][col] = None
-
-#    def shift_columns_left(self):
-#        new_grid = []
-#        for x in range(self.grid_cols):
-#            # 列が全て -1 ではないときだけ新しいグリッドに追加
-#            if any(self.grid[y][x] != -1 for y in range(self.grid_rows)):
-#                new_grid.append([self.grid[y][x] for y in range(self.grid_rows)])
-#        # 空の列を追加してグリッドサイズを維持
-#        while len(new_grid) < self.grid_cols:
-#            new_grid.append([-1] * self.grid_rows)
-#        # グリッドを更新
-#        for x in range(self.grid_cols):
-#            for y in range(self.grid_rows):
-#                self.grid[y][x] = new_grid[x][y]
 
     def shift_columns_left(self):
         """
@@ -1021,14 +922,6 @@ class SameGame:
                 if block is not None:
                     block.col = new_col_index
 
-#    def has_valid_moves(self):
-#        for y in range(self.grid_rows):
-#            for x in range(self.grid_cols):
-#                color = self.grid[y][x]
-#                if color != -1 and len(self.find_connected_blocks(x, y, color)) > 1:
-#                    return True
-#        return False
-
     def has_valid_moves(self):
         for row in range(self.grid_rows):
             for col in range(self.grid_cols):
@@ -1049,73 +942,30 @@ class SameGame:
                     return False
         return True
 
-    def update_high_scores(self):
-        if self.score not in self.high_scores:
-            self.high_scores.append(self.score)
-        self.high_scores.sort(reverse=True)
-        self.high_scores = self.high_scores[:10]
-        try:
-            self.current_score_rank = self.high_scores.index(self.score)
-        except ValueError:
-            self.current_score_rank = None
-
-#    def spawn_particles(self, blocks_to_remove, cell_size, grid_x_start, grid_y_start):
-#        """
-#        消えるブロックの画面上の位置あたりにパーティクルを出す。
-#        """
-#        for (bx, by) in blocks_to_remove:
-#            block = self.grid[by][bx]
-#            if block is None:
-#                # すでに消されている場合はスキップ（2回呼ばれても大丈夫なように）
-#                continue
-#    
-#            # ブロックの左上座標
-#            x = grid_x_start + block.col * cell_size + cell_size / 2
-#            y = grid_y_start + block.row * cell_size + cell_size / 2
-#            # ブロックの色に対応するPyxel上のカラー
-#            pyxel_color = COLORS[block.color]
-#    
-#            # ここで例として 6 個くらいパーティクルを出す
-#            for _ in range(6):
-#                p = Particle(x, y, pyxel_color)
-#                self.particles.append(p)
-
-#    def spawn_particles(self, blocks_to_remove, cell_size, grid_x_start, grid_y_start):
-#        num_removed = len(blocks_to_remove)
-#        # 派手さを指数的にする例（連鎖数が大きいほど一気に増加）
-#        # 例： double くらいのイメージでexp成長させる
-##        particle_factor = 2 ** (num_removed / 10.0)  # 10ブロックで倍々くらい
-#        particle_factor = 1.0 + (self.score / 500.0) # ある程度線形で増加
-#        # 必要に応じて上限を設ける
-##        particle_factor = min(particle_factor, 10.0)
-#        particle_factor = min(particle_factor, 20.0)
-#    
-#        for (bx, by) in blocks_to_remove:
-#            block = self.grid[by][bx]
-#            if block is None:
-#                continue
-#            x = grid_x_start + block.col * cell_size + cell_size / 2
-#            y = grid_y_start + block.row * cell_size + cell_size / 2
-#            color = COLORS[block.color]
-#    
-#            # コマの大きさに基づくパーティクルサイズ (例: 20% にする)
-#            p_size = max(1, int(cell_size * 0.2))
-#    
-#            # 連鎖数から決まる “派手さ係数”
-#            # これを使ってパーティクル数や速度レンジを変化
-#            base_particle_count = int(5 * particle_factor)  # 最低5個、指数で増加
-#    
-#            for _ in range(base_particle_count):
-#                # 飛び散るスピードを particle_factor に応じて拡大
-#                vx = random.uniform(-1.0 * particle_factor, 1.0 * particle_factor)
-#                vy = random.uniform(-2.0 * particle_factor, -0.5 * particle_factor)
-#    
-#                # Particleクラスのコンストラクタ引数を可変にしてカスタマイズ
-#                p = Particle(x, y, color, p_size)
-#                p.vx = vx
-#                p.vy = vy
-#    
-#                self.particles.append(p)
+    def play_effect(self, blocks_to_remove):
+        """消したマスの数に応じて上昇音階の効果音を再生"""
+        num_blocks = len(blocks_to_remove)
+    
+        # 基本となる上昇音階の定義
+#        base_notes = ["c2", "d2", "e2", "g2", "a2", "c3"]
+        base_notes = ["c2", "d2", "e2", "g2", "a2", "c3", "d3", "e3", "g3", "a3"]
+        max_notes = min(len(base_notes), num_blocks)  # 消したマス数に応じて音階を制限
+        notes = base_notes[:max_notes]  # 必要な音階だけを取得
+    
+        # 再生速度を調整（少ない場合は速く、多い場合は少しゆっくり）
+        speed = max(5, 15 - (num_blocks // 2))
+    
+        # 効果音を設定
+        pyxel.sounds[0].set(
+            notes="".join(notes),  # 上昇音階を生成
+            tones="p",            # パルス音（爽やかな音）
+            volumes="5" * max_notes,  # 音量を一定に
+            effects="n" * max_notes,  # 効果なし（シンプルに）
+            speed=speed,          # スピード設定
+        )
+    
+        # 効果音を再生
+        pyxel.play(3, 0)
 
     def spawn_particles(self, blocks_to_remove, points_gained, cell_size, grid_x_start, grid_y_start):
         """
@@ -1167,29 +1017,6 @@ class SameGame:
                 alive_particles.append(p)
         self.particles = alive_particles
 
-#    def draw_text(self, y, text, color, align="center", x_offset=0, font=None):
-    def draw_text(self, y, text, color, align="center", x_offset=0, font=None, border_color=None):
-        """BDFフォントを使用してテキストを描画"""
-        font = font or self.font_small  # デフォルトで self.font_small を使用
-#        text_width = len(text) * 4  # フォントの幅を計算（適切に変更可能）
-        text_width = font.text_width(text)  # フォントの幅を計算（適切に変更可能）
-        
-        if align == "center":
-            x = (WINDOW_WIDTH - text_width) // 2
-        elif align == "left":
-            x = x_offset
-        elif align == "right":
-            x = WINDOW_WIDTH - text_width - x_offset
-        else:
-            raise ValueError(f"Invalid alignment: {align}")
-
-        if border_color is not None:
-            for dx in range(-1, 2):
-                for dy in range(-1, 2):
-                    if dx != 0 or dy != 0:  # 中心位置 (0, 0) はスキップ
-                        pyxel.text(x + dx, y + dy, text, border_color, font)
-
-        pyxel.text(x, y, text, color, font)
 
     def draw(self):
         # 画面をクリア
@@ -1338,104 +1165,28 @@ class SameGame:
         # === パーティクル描画 ===
         self.draw_particles()
 
-    def create_game_buttons(self):
-        """
-        Retry, Quit などのゲーム用ボタンをインスタンス生成
-        """
-        # Retry ボタン
-        retry_x = BUTTON_SPACING
-        retry_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
-        retry_label = translations["button_labels"]["retry"][self.current_language]
-        self.retry_button = Button(retry_x, retry_y, BUTTON_WIDTH, BUTTON_HEIGHT, retry_label)
-    
-        # Quit ボタン
-        quit_x = BUTTON_SPACING + BUTTON_WIDTH + BUTTON_SPACING
-        quit_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
-        quit_label = translations["button_labels"]["quit"][self.current_language]
-        self.quit_button = Button(quit_x, quit_y, BUTTON_WIDTH, BUTTON_HEIGHT, quit_label)
-    
-    def update_game_buttons(self):
-        """
-        Retry, Quit ボタンのクリック判定を行う
-        """
-        mx, my = pyxel.mouse_x, pyxel.mouse_y
-        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-            # Retry
-            if self.retry_button.is_hovered(mx, my):
-                # リセットしてステートを変更
-                self.reset_game(use_saved_initial_state=True)
-                self.state = GameState.GAME_START
-                return
-            
-            # Quit
-            if self.quit_button.is_hovered(mx, my):
-                self.update_high_scores()
-                # ゲーム状態を初期化してOPENINGに戻る
-                self.reset_game(use_saved_initial_state=False)
-                self.state = GameState.SCORE_DISPLAY
-                return
-    
-    def draw_game_buttons(self):
-        """
-        Retry, Quit ボタンを描画
-        """
-        mx, my = pyxel.mouse_x, pyxel.mouse_y
-        # Retry
-        self.retry_button.draw(
-            is_hovered=self.retry_button.is_hovered(mx, my),
-            draw_text_func=self.draw_text,
-            font=self.font_small
-        )
-        # Quit
-        self.quit_button.draw(
-            is_hovered=self.quit_button.is_hovered(mx, my),
-            draw_text_func=self.draw_text,
-            font=self.font_small
-        )
-
-    def draw_difficulty_label(self):
-        difficulty_options = translations["difficulty_options"]
-        difficulty_levels = [
-            {"key": option["key"], "label": option["label"][self.current_language]}
-            for option in difficulty_options
-        ]
-        difficulty_keys = [level["key"] for level in difficulty_levels]
+    def draw_text(self, y, text, color, align="center", x_offset=0, font=None, border_color=None):
+        """BDFフォントを使用してテキストを描画"""
+        font = font or self.font_small  # デフォルトで self.font_small を使用
+#        text_width = len(text) * 4  # フォントの幅を計算（適切に変更可能）
+        text_width = font.text_width(text)  # フォントの幅を計算（適切に変更可能）
         
-        current_difficulty_label = None
-        for key, level in zip(difficulty_keys, difficulty_levels):
-            if key == self.current_difficulty:
-                current_difficulty_label = level["label"]
-                break
-        
-        if current_difficulty_label:
-            difficulty_text_x = WINDOW_WIDTH - 60
-            difficulty_text_y = (BUTTON_AREA_HEIGHT - 14) // 2
-            self.draw_text(
-                difficulty_text_y,
-                current_difficulty_label,
-                pyxel.COLOR_WHITE,
-                align="right",
-                x_offset=10,
-                border_color=pyxel.COLOR_DARK_BLUE
-            )
+        if align == "center":
+            x = (WINDOW_WIDTH - text_width) // 2
+        elif align == "left":
+            x = x_offset
+        elif align == "right":
+            x = WINDOW_WIDTH - text_width - x_offset
+        else:
+            raise ValueError(f"Invalid alignment: {align}")
 
-#    def draw_grid(self):
-#        """
-#        盤面を描画
-#        """
-#        cell_size, grid_x_start, grid_y_start = self.get_grid_layout()
-#
-#        for y in range(self.grid_rows):
-#            for x in range(self.grid_cols):
-#                color = self.grid[y][x]
-#                if color != -1:
-#                    pyxel.rect(
-#                        grid_x_start + x * cell_size,
-#                        grid_y_start + y * cell_size,
-#                        cell_size,
-#                        cell_size,
-#                        COLORS[color]
-#                    )
+        if border_color is not None:
+            for dx in range(-1, 2):
+                for dy in range(-1, 2):
+                    if dx != 0 or dy != 0:  # 中心位置 (0, 0) はスキップ
+                        pyxel.text(x + dx, y + dy, text, border_color, font)
+
+        pyxel.text(x, y, text, color, font)
 
     def draw_grid(self):
         cell_size, grid_x_start, grid_y_start = self.get_grid_layout()
@@ -1446,6 +1197,22 @@ class SameGame:
                 if block is not None:
                     # block.draw(...) メソッドを呼ぶ形に変更
                     block.draw(grid_x_start, grid_y_start, cell_size)
+
+    def get_grid_layout(self):
+        """
+        グリッドを描画・クリックする際の cell_size / grid_x_start / grid_y_start を統一計算する
+        """
+        left_margin = 4
+        game_area_y = BUTTON_AREA_HEIGHT
+        game_area_height = WINDOW_HEIGHT - BUTTON_AREA_HEIGHT - STATUS_AREA_HEIGHT
+        
+        cell_size = min((WINDOW_WIDTH - 2 * left_margin) // self.grid_cols,
+                        game_area_height // self.grid_rows)
+        grid_x_start = left_margin + ((WINDOW_WIDTH - 2 * left_margin)
+                                      - (cell_size * self.grid_cols)) // 2
+        grid_y_start = game_area_y + (game_area_height - (cell_size * self.grid_rows)) // 2
+    
+        return cell_size, grid_x_start, grid_y_start
 
     def draw_particles(self):
         for p in self.particles:
@@ -1486,6 +1253,7 @@ class SameGame:
             font=self.font_small,
             border_color=pyxel.COLOR_DARK_BLUE
         )
+
 
 # ゲームの開始
 SameGame()
