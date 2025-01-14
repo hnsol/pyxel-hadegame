@@ -314,7 +314,7 @@ class ScorePopup:
             self.vy = -4.0
 
         # デバッグ出力: 初期設定確認
-        print(f"[DEBUG] ScorePopup initialized: score={self.score}, color={self.color}, scale={self.scale}, vy={self.vy}")
+#        print(f"[DEBUG] ScorePopup initialized: score={self.score}, color={self.color}, scale={self.scale}, vy={self.vy}")
 
 
     def update(self):
@@ -503,7 +503,7 @@ class SameGame:
     def play_bgm(self, state):
         """指定された状態に対応するBGMを再生"""
         if self.current_bgm == state:
-#            print(f"BGM already playing for state: {state.name}")
+            print(f"BGM already playing for state: {state.name}")
             return  # 既に再生中の場合は何もしない
         print(f"Switching to BGM for state in play_bgm: {state.name}")  # デバッグ用
 
@@ -519,7 +519,7 @@ class SameGame:
                 key: random.choice(values) if isinstance(values, list) else values
                 for key, values in custom_parm_options.items()
             }
-#            print(f"Custom parameters for {state.name}: {custom_parm}")  # デバッグ用
+            print(f"Custom parameters for {state.name}: {custom_parm}")  # デバッグ用
             self.bgm.set_parm(custom_parm)
             self.bgm.generate_music()
             self.bgm.play()
@@ -755,6 +755,7 @@ class SameGame:
 
     def update(self):
         # A. 今のステートに応じて行うゲームロジック（難易度選択・スコア更新など）
+#        print(f"in update func: {self.state}")  # デバッグ用
         self.handle_current_state()
     
         # B. ゲームステートやアニメフラグに応じたブロックアニメ更新
@@ -775,8 +776,6 @@ class SameGame:
                 and retry_y <= my <= retry_y + BUTTON_HEIGHT
                 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)
             ):
-#                print("Retry button clicked")
-#                self.reset_game(use_saved_initial_state=True)  # 保存済みの初期状態に戻す
                 self.generate_new_board(use_saved_initial_state=True) # 盤面は変えずに
                 self.reset_game_state()  # タイマーとスコアだけリセット
                 self.state = GameState.GAME_START  # ゲームを最初から開始
@@ -825,7 +824,6 @@ class SameGame:
             if self.current_bgm != GameState.DIFFICULTY_SELECTION:
                 self.play_bgm(GameState.DIFFICULTY_SELECTION)
                 print(f"Switching to BGM for state state name: {state.name}")  # デバッグ用
-                print(f"Switching to BGM for state game state: {GameState.DIFFICULTY_SELECTION}")  # デバッグ用
             for button in self.difficulty_buttons:
                 if button.is_hovered(pyxel.mouse_x, pyxel.mouse_y) and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                     print(f"Difficulty button clicked: {button.key}")
@@ -863,7 +861,9 @@ class SameGame:
                 if self.current_bgm != GameState.GAME_START:
                     self.play_bgm(GameState.GAME_START)
 
+#                print(f"[DEBUG] Remaining cells: {remaining_cells}, Removed percentage: {removed_percentage}")
                 if removed_percentage >= 0.2:  # コマ数が20%減少したら中盤へ移行
+                    print(f"[DEBUG] Moved to GameState.GAME_MID")
                     self.state = GameState.GAME_MID
     
             elif self.state == GameState.GAME_MID:
@@ -875,6 +875,7 @@ class SameGame:
                 )
                 if remaining_cells / (self.grid_rows * self.grid_cols) <= 0.25 or is_low_time:
                     self.state = GameState.GAME_END
+
             elif self.state == GameState.GAME_END:
                 if self.current_bgm != GameState.GAME_END:
                     self.play_bgm(GameState.GAME_END)
@@ -887,9 +888,11 @@ class SameGame:
             if not self.is_falling and not self.is_shifting:
                 if self.is_grid_empty():
                     self.state = GameState.GAME_CLEARED
-                elif self.has_valid_moves():  # このタイミングで判定
-                    self.state = GameState.GAME_MID  # 通常のプレイに戻る
-                else:
+#                elif self.has_valid_moves():  # このタイミングで判定
+#                    self.state = GameState.GAME_MID  # 通常のプレイに戻る
+#                else:
+#                    self.state = GameState.NO_MOVES
+                elif not self.has_valid_moves():  # 盤面にコマはあるが手がない
                     self.state = GameState.NO_MOVES
 
         # 5. TIME_UP, NO_MOVES, GAME_CLEARED
@@ -1049,11 +1052,11 @@ class SameGame:
                         popup = ScorePopup(x, y, points_gained, pyxel.COLOR_WHITE, game=self)
                         self.score_popups.append(popup)
                         # デバッグメッセージ
-                        print(f"[DEBUG] ScorePopup created at ({x}, {y}) with score: {points_gained}")
-                    else:
-                        print(f"[DEBUG] Block at ({bx}, {by}) is None. No ScorePopup created.")
-                else:
-                    print("[DEBUG] blocks_to_remove is empty. No ScorePopup created.")
+#                        print(f"[DEBUG] ScorePopup created at ({x}, {y}) with score: {points_gained}")
+#                    else:
+#                        print(f"[DEBUG] Block at ({bx}, {by}) is None. No ScorePopup created.")
+#                else:
+#                    print("[DEBUG] blocks_to_remove is empty. No ScorePopup created.")
 
                 # 4) ブロック消去
                 for bx, by in blocks_to_remove:
@@ -1099,11 +1102,20 @@ class SameGame:
         except ValueError:
             self.current_score_rank = None
 
+#    def calculate_progress(self):
+#        """盤面の進行状況を計算"""
+#        total_cells = self.grid_rows * self.grid_cols
+#        remaining_cells = sum(1 for row in self.grid for cell in row if cell != -1)
+#        removed_percentage = (total_cells - remaining_cells) / total_cells
+#        return remaining_cells, removed_percentage
+
     def calculate_progress(self):
         """盤面の進行状況を計算"""
         total_cells = self.grid_rows * self.grid_cols
-        remaining_cells = sum(1 for row in self.grid for cell in row if cell != -1)
+        # `Block` オブジェクトが存在するセルをカウント
+        remaining_cells = sum(1 for row in self.grid for cell in row if cell is not None)
         removed_percentage = (total_cells - remaining_cells) / total_cells
+#        print(f"[DEBUG] Remaining cells: {remaining_cells}, Removed percentage: {removed_percentage}")
         return remaining_cells, removed_percentage
 
     def reset_game_state(self):
