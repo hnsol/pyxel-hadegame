@@ -411,7 +411,9 @@ class SameGame:
         self.shake_magnitude = 0  # シェイクの強さ（ピクセル単位）
 
         # **アニメーション中フラグを追加**
-        self.is_animating = False
+#        self.is_animating = False
+        self.is_falling = False     # 落下アニメーションフラグ
+        self.is_shifting = False    # 横シフトアニメーションフラグ
 
         # ゲームループ開始
         pyxel.run(self.update, self.draw)
@@ -617,8 +619,239 @@ class SameGame:
                 border_color=pyxel.COLOR_DARK_BLUE
             )
 
+#    def update(self):
+#        """ゲームの状態を更新"""
+#        mx, my = pyxel.mouse_x, pyxel.mouse_y
+#        previous_state = self.state  # ステータスの変更を追跡
+#
+#        # RetryボタンとQuitボタンの処理を特定の状態に限定
+##        if self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
+#        if self.state in [GameState.GAME_START, GameState.GAME_MID]:
+#            # Retryボタンの処理
+#            retry_x = BUTTON_SPACING
+#            retry_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
+#            if (
+#                retry_x <= mx <= retry_x + BUTTON_WIDTH
+#                and retry_y <= my <= retry_y + BUTTON_HEIGHT
+#                and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)
+#            ):
+#                print("Retry button clicked")
+##                self.reset_game(use_saved_initial_state=True)  # 保存済みの初期状態に戻す
+#                self.generate_new_board(use_saved_initial_state=True) # 盤面は変えずに
+#                self.reset_game_state()  # タイマーとスコアだけリセット
+#                self.state = GameState.GAME_START  # ゲームを最初から開始
+#                return
+#    
+#            # Quitボタンの処理
+#            quit_x = BUTTON_SPACING + BUTTON_WIDTH + BUTTON_SPACING
+#            quit_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
+#            if (
+#                quit_x <= mx <= quit_x + BUTTON_WIDTH
+#                and quit_y <= my <= quit_y + BUTTON_HEIGHT
+#                and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)
+#            ):
+#                print("Quit button clicked")
+#                self.update_high_scores()  # スコアランキングを更新
+#                self.state = GameState.SCORE_DISPLAY  # SCORE_DISPLAY画面に遷移
+#                return
+#
+#        if self.state == GameState.OPENING:
+##            print("GameState is OPENING")  # デバッグ出力
+#            if self.current_bgm != GameState.OPENING:
+#                self.play_bgm(GameState.OPENING)
+#
+#            # 言語切り替えボタンのクリック処理
+#            language_button_clicked = False  # フラグを初期化
+#            if self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y):
+#                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+#                    self.current_language = "en" if self.current_language == "ja" else "ja"
+#                    print(f"Language changed to: {self.current_language}")  # デバッグ用
+#                    # ボタンのラベルを翻訳データから取得して更新
+##                    self.language_button.label = translations[self.current_language]["language_button_label"]
+#                    self.language_button.label = translations["language_button"][self.current_language]
+#                    self.create_difficulty_buttons()  # 言語切り替え時にボタンを再生成
+#                    language_button_clicked = True  # ボタンが押されたことを記録
+#
+#            # 言語ボタンがクリックされていない場合のみ、次の処理を実行
+#            if not language_button_clicked and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+#                print("Clicked in opening screen")  # デバッグ出力
+#                self.state = GameState.DIFFICULTY_SELECTION
+#                print(f"State changed to: {self.state}")  # 状態変更後の確認
+#
+#        elif self.state == GameState.DIFFICULTY_SELECTION:
+##            print(f"GameState is: {self.state}") # デバッグ出力
+#            if self.current_bgm != GameState.DIFFICULTY_SELECTION:
+#                self.play_bgm(GameState.DIFFICULTY_SELECTION)
+#                print(f"Switching to BGM for state state name: {state.name}")  # デバッグ用
+#                print(f"Switching to BGM for state game state: {GameState.DIFFICULTY_SELECTION}")  # デバッグ用
+#            for button in self.difficulty_buttons:
+#                if button.is_hovered(pyxel.mouse_x, pyxel.mouse_y) and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+#                    print(f"Difficulty button clicked: {button.key}")
+#                    self.apply_difficulty_settings(button.key)
+#                    self.state = GameState.BOARD_GENERATION
+#                    self.stop_bgm()
+#
+#        elif self.state == GameState.BOARD_GENERATION:
+#            if not hasattr(self, 'board_generated'):
+#                self.board_generated = False
+#        
+#            if not self.board_generated:
+#
+#                # 盤面を新たに生成（リセットはタイミングに応じて）
+#                self.generate_new_board(use_saved_initial_state=False)
+#                
+#                # スコアやタイマーはここでリセットしたい場合に呼ぶ
+#                self.reset_game_state()
+#                
+#                self.board_generated = True
+# 
+#            else:
+#                # 生成が完了したら次のステートへ移行
+#                del self.board_generated
+#                self.state = GameState.GAME_START
+#                self.play_bgm(GameState.GAME_START)  # BGM開始
+#
+#
+#    
+#        elif self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
+#            # 序盤、中盤、終盤の進行状態を確認
+#            remaining_cells, removed_percentage = self.calculate_progress()
+#
+#            if self.state == GameState.GAME_START:
+#                if self.current_bgm != GameState.GAME_START:
+#                    self.play_bgm(GameState.GAME_START)
+#
+#                if removed_percentage >= 0.2:  # コマ数が20%減少したら中盤へ移行
+#                    self.state = GameState.GAME_MID
+#    
+#            elif self.state == GameState.GAME_MID:
+#                if self.current_bgm != GameState.GAME_MID:
+#                    self.play_bgm(GameState.GAME_MID)
+#                is_low_time = (
+#                    self.time_limit
+#                    and (self.time_limit - (pyxel.frame_count - self.start_time) // 30) <= 10
+#                )
+#                if remaining_cells / (self.grid_rows * self.grid_cols) <= 0.25 or is_low_time:
+#                    self.state = GameState.GAME_END
+#            elif self.state == GameState.GAME_END:
+#                if self.current_bgm != GameState.GAME_END:
+#                    self.play_bgm(GameState.GAME_END)
+#    
+#            # 共通ゲーム進行処理
+#            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+#                self.handle_click(mx, my)
+#            if self.time_limit and pyxel.frame_count - self.start_time > self.time_limit * 30:
+#                self.state = GameState.TIME_UP
+#            elif self.is_grid_empty():
+#                self.state = GameState.GAME_CLEARED
+#            elif not self.has_valid_moves():
+#                self.state = GameState.NO_MOVES
+#    
+#        elif self.state == GameState.TIME_UP:
+#            if self.current_bgm != GameState.TIME_UP:
+#                self.play_bgm(GameState.TIME_UP)
+#            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+#                self.update_high_scores()
+#                self.state = GameState.SCORE_DISPLAY
+#    
+#        elif self.state == GameState.NO_MOVES:
+#            if self.current_bgm != GameState.NO_MOVES:
+#                self.play_bgm(GameState.NO_MOVES)
+#            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+#                self.update_high_scores()
+#                self.state = GameState.SCORE_DISPLAY
+#    
+#        elif self.state == GameState.GAME_CLEARED:
+#            if self.current_bgm != GameState.GAME_CLEARED:
+#                self.play_bgm(GameState.GAME_CLEARED)
+#
+#            # ボーナススコアの加算を1度だけ実行
+#            if not self.bonus_added:
+#                bonus_score = int(self.score * 0.5)  # 現在のスコアの50%をボーナス
+#                self.score += bonus_score
+#                self.bonus_added = True  # フラグを立てる
+#                print(f"Bonus Score Added: {bonus_score}")  # デバッグ用
+#
+#            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+#                self.update_high_scores()
+#                self.state = GameState.SCORE_DISPLAY
+#    
+#        elif self.state == GameState.SCORE_DISPLAY:
+#            if self.current_bgm != GameState.OPENING:
+#                self.play_bgm(GameState.OPENING)
+#            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+#                self.state = GameState.HIGH_SCORE_DISPLAY
+#    
+#        elif self.state == GameState.HIGH_SCORE_DISPLAY:
+#            if self.current_bgm != GameState.OPENING:
+#                self.play_bgm(GameState.OPENING)
+#            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+#                self.state = GameState.OPENING
+#    
+#        # ステータス変更時のBGM切り替え
+#        if self.state != previous_state:
+#            self.handle_state_change()
+#
+#        # シェイクタイマーの更新
+#        if self.shake_timer > 0:
+#            self.shake_timer -= 1
+#
+#        # もし is_animating が True なら、ブロックがすべてアニメ完了しているかチェック
+#        if self.is_animating:
+#            all_done = True
+#            for row in range(self.grid_rows):
+#                for col in range(self.grid_cols):
+#                    block = self.grid[row][col]
+#                    if block is not None:
+#                        # まだ動いているブロックがあるか？
+#                        if abs(block.x - block.target_x) > 0.1 or abs(block.y - block.target_y) > 0.1:
+#                            all_done = False
+#                            break
+#                if not all_done:
+#                    break
+#            
+#            if all_done:
+#                print("Animation finished.")
+#                self.is_animating = False
+#    
+##        # パーティクルやブロックアニメの更新
+##        self.update_particles()
+##        
+##        # 二重ループの直前にサイズを出してみる
+##        print(f"DEBUG: grid_rows={self.grid_rows}, grid_cols={self.grid_cols}")
+##        print(f"DEBUG: actual grid size = {len(self.grid)} x {len(self.grid[0]) if self.grid else '??'}")
+##
+##        for row in range(self.grid_rows):
+##            for col in range(self.grid_cols):
+##                block = self.grid[row][col]
+##                if block:
+##                    block.update()
+#
+#        if self.state in [GameState.GAME_START,
+#                          GameState.GAME_MID,
+#                          GameState.GAME_END,
+#                          GameState.TIME_UP,
+#                          GameState.NO_MOVES,
+#                          GameState.GAME_CLEARED]:
+#            # ブロックやパーティクル等のアニメーション更新
+#            self.update_particles()
+#            # 二重ループの直前にサイズを出してみる
+##            print(f"DEBUG: grid_rows={self.grid_rows}, grid_cols={self.grid_cols}")
+##            print(f"DEBUG: actual grid size = {len(self.grid)} x {len(self.grid[0]) if self.grid else '??'}")
+#            for row in range(self.grid_rows):
+#                for col in range(self.grid_cols):
+#                    block = self.grid[row][col]
+#                    if block is not None:
+#                        block.update()
+
     def update(self):
-        """ゲームの状態を更新"""
+        # A. 今のステートに応じて行うゲームロジック（難易度選択・スコア更新など）
+        self.handle_current_state()
+    
+        # B. ゲームステートやアニメフラグに応じたブロックアニメ更新
+        self.handle_animations()
+
+    def handle_current_state(self):
         mx, my = pyxel.mouse_x, pyxel.mouse_y
         previous_state = self.state  # ステータスの変更を追跡
 
@@ -653,6 +886,7 @@ class SameGame:
                 self.state = GameState.SCORE_DISPLAY  # SCORE_DISPLAY画面に遷移
                 return
 
+        # 1. OPENING のとき
         if self.state == GameState.OPENING:
 #            print("GameState is OPENING")  # デバッグ出力
             if self.current_bgm != GameState.OPENING:
@@ -676,6 +910,7 @@ class SameGame:
                 self.state = GameState.DIFFICULTY_SELECTION
                 print(f"State changed to: {self.state}")  # 状態変更後の確認
 
+        # 2. DIFFICULTY_SELECTION のとき
         elif self.state == GameState.DIFFICULTY_SELECTION:
 #            print(f"GameState is: {self.state}") # デバッグ出力
             if self.current_bgm != GameState.DIFFICULTY_SELECTION:
@@ -689,6 +924,7 @@ class SameGame:
                     self.state = GameState.BOARD_GENERATION
                     self.stop_bgm()
 
+        # 3. BOARD_GENERATION のとき
         elif self.state == GameState.BOARD_GENERATION:
             if not hasattr(self, 'board_generated'):
                 self.board_generated = False
@@ -709,8 +945,7 @@ class SameGame:
                 self.state = GameState.GAME_START
                 self.play_bgm(GameState.GAME_START)  # BGM開始
 
-
-    
+        # 4. ゲームプレイ（GAME_START, GAME_MID, GAME_ENDなど）
         elif self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
             # 序盤、中盤、終盤の進行状態を確認
             remaining_cells, removed_percentage = self.calculate_progress()
@@ -744,7 +979,8 @@ class SameGame:
                 self.state = GameState.GAME_CLEARED
             elif not self.has_valid_moves():
                 self.state = GameState.NO_MOVES
-    
+
+        # 5. TIME_UP, NO_MOVES, GAME_CLEARED
         elif self.state == GameState.TIME_UP:
             if self.current_bgm != GameState.TIME_UP:
                 self.play_bgm(GameState.TIME_UP)
@@ -773,7 +1009,8 @@ class SameGame:
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.update_high_scores()
                 self.state = GameState.SCORE_DISPLAY
-    
+
+        # 6. SCORE_DISPLAY, HIGH_SCORE_DISPLAY
         elif self.state == GameState.SCORE_DISPLAY:
             if self.current_bgm != GameState.OPENING:
                 self.play_bgm(GameState.OPENING)
@@ -794,52 +1031,37 @@ class SameGame:
         if self.shake_timer > 0:
             self.shake_timer -= 1
 
-        # もし is_animating が True なら、ブロックがすべてアニメ完了しているかチェック
-        if self.is_animating:
-            all_done = True
-            for row in range(self.grid_rows):
-                for col in range(self.grid_cols):
-                    block = self.grid[row][col]
-                    if block is not None:
-                        # まだ動いているブロックがあるか？
-                        if abs(block.x - block.target_x) > 0.1 or abs(block.y - block.target_y) > 0.1:
-                            all_done = False
-                            break
-                if not all_done:
-                    break
-            
-            if all_done:
-                print("Animation finished.")
-                self.is_animating = False
+    def handle_animations(self):
+        if self.state in [GameState.GAME_START, 
+                  GameState.GAME_MID, 
+                  GameState.GAME_END, 
+                  GameState.TIME_UP, 
+                  GameState.NO_MOVES, 
+                  GameState.GAME_CLEARED]:
+            # もし is_falling が True なら「全ブロック停止したか」をチェック
+            if self.is_falling:
+                if self.all_blocks_stopped():
+                    self.is_falling = False
+                    # 横シフト開始
+                    self.shift_columns_left_animated()
+                    self.is_shifting = True
     
-#        # パーティクルやブロックアニメの更新
-#        self.update_particles()
-#        
-#        # 二重ループの直前にサイズを出してみる
-#        print(f"DEBUG: grid_rows={self.grid_rows}, grid_cols={self.grid_cols}")
-#        print(f"DEBUG: actual grid size = {len(self.grid)} x {len(self.grid[0]) if self.grid else '??'}")
-#
-#        for row in range(self.grid_rows):
-#            for col in range(self.grid_cols):
-#                block = self.grid[row][col]
-#                if block:
-#                    block.update()
-
-        if self.state in [GameState.GAME_START,
-                          GameState.GAME_MID,
-                          GameState.GAME_END,
-                          GameState.TIME_UP,
-                          GameState.NO_MOVES,
-                          GameState.GAME_CLEARED]:
-            # ブロックやパーティクル等のアニメーション更新
+            elif self.is_shifting:
+                if self.all_blocks_stopped():
+                    self.is_shifting = False
+                    # 全アニメが終わったのでアニメフラグオフ
+                    print("Falling + shifting finished!")
+                    self.is_animating = False
+    
+            # 3. 上記以外のタイミングでアニメを始めた場合は、まとめて is_animating = True など
+            #   (「ブロックを消去したタイミング」で is_animating = True にするなど)
+    
+            # 4. パーティクルやブロック更新
             self.update_particles()
-            # 二重ループの直前にサイズを出してみる
-#            print(f"DEBUG: grid_rows={self.grid_rows}, grid_cols={self.grid_cols}")
-#            print(f"DEBUG: actual grid size = {len(self.grid)} x {len(self.grid[0]) if self.grid else '??'}")
             for row in range(self.grid_rows):
                 for col in range(self.grid_cols):
                     block = self.grid[row][col]
-                    if block is not None:
+                    if block:
                         block.update()
 
     def apply_difficulty_settings(self, difficulty_key):
@@ -857,7 +1079,8 @@ class SameGame:
 
     def handle_click(self, mx, my):
         # アニメ中はクリック無視
-        if self.is_animating:
+#        if self.is_animating:
+        if self.is_falling or self.is_shifting:
             return
 
         """盤面クリック時の処理"""
@@ -902,9 +1125,13 @@ class SameGame:
 #                self.shift_columns_left()
 
                 # 重力＆シフト（アニメーション版）
+#                self.apply_gravity_animated()
+#                self.shift_columns_left_animated()
+#                self.is_animating = True # ここでアニメ開始フラグをTrue
+
+                # まず落下アニメだけを始める
                 self.apply_gravity_animated()
-                self.shift_columns_left_animated()
-                self.is_animating = True # ここでアニメ開始フラグをTrue
+                self.is_falling = True
 
                 # 画面を揺らすフラグをセット
                 # シェイクレベルをポイントに応じて増やす
@@ -995,6 +1222,19 @@ class SameGame:
     
             self.grid = block_grid
             self.initial_grid = copy.deepcopy(self.grid)  # 保存
+
+    def all_blocks_stopped(self):
+        """
+        全ブロックの (x, y) が (target_x, target_y) に到達していれば True を返す
+        """
+        for row in range(self.grid_rows):
+            for col in range(self.grid_cols):
+                block = self.grid[row][col]
+                if block is not None:
+                    # まだ動いているブロックがあったら False
+                    if abs(block.x - block.target_x) > 0.1 or abs(block.y - block.target_y) > 0.1:
+                        return False
+        return True
 
     def find_connected_blocks(self, x, y, color):
         stack = [(x, y)]
