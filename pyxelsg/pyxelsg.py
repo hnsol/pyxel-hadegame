@@ -445,7 +445,7 @@ class SameGame:
     def play_bgm(self, state):
         """指定された状態に対応するBGMを再生"""
         if self.current_bgm == state:
-            print(f"BGM already playing for state: {state.name}")
+#            print(f"BGM already playing for state: {state.name}")
             return  # 既に再生中の場合は何もしない
         print(f"Switching to BGM for state in play_bgm: {state.name}")  # デバッグ用
 
@@ -461,7 +461,7 @@ class SameGame:
                 key: random.choice(values) if isinstance(values, list) else values
                 for key, values in custom_parm_options.items()
             }
-            print(f"Custom parameters for {state.name}: {custom_parm}")  # デバッグ用
+#            print(f"Custom parameters for {state.name}: {custom_parm}")  # デバッグ用
             self.bgm.set_parm(custom_parm)
             self.bgm.generate_music()
             self.bgm.play()
@@ -620,230 +620,151 @@ class SameGame:
                 border_color=pyxel.COLOR_DARK_BLUE
             )
 
-#    def update(self):
-#        """ゲームの状態を更新"""
-#        mx, my = pyxel.mouse_x, pyxel.mouse_y
-#        previous_state = self.state  # ステータスの変更を追跡
-#
-#        # RetryボタンとQuitボタンの処理を特定の状態に限定
-##        if self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
-#        if self.state in [GameState.GAME_START, GameState.GAME_MID]:
-#            # Retryボタンの処理
-#            retry_x = BUTTON_SPACING
-#            retry_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
-#            if (
-#                retry_x <= mx <= retry_x + BUTTON_WIDTH
-#                and retry_y <= my <= retry_y + BUTTON_HEIGHT
-#                and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)
-#            ):
-#                print("Retry button clicked")
-##                self.reset_game(use_saved_initial_state=True)  # 保存済みの初期状態に戻す
-#                self.generate_new_board(use_saved_initial_state=True) # 盤面は変えずに
-#                self.reset_game_state()  # タイマーとスコアだけリセット
-#                self.state = GameState.GAME_START  # ゲームを最初から開始
-#                return
-#    
-#            # Quitボタンの処理
-#            quit_x = BUTTON_SPACING + BUTTON_WIDTH + BUTTON_SPACING
-#            quit_y = (BUTTON_AREA_HEIGHT - BUTTON_HEIGHT) // 2
-#            if (
-#                quit_x <= mx <= quit_x + BUTTON_WIDTH
-#                and quit_y <= my <= quit_y + BUTTON_HEIGHT
-#                and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)
-#            ):
-#                print("Quit button clicked")
-#                self.update_high_scores()  # スコアランキングを更新
-#                self.state = GameState.SCORE_DISPLAY  # SCORE_DISPLAY画面に遷移
-#                return
-#
-#        if self.state == GameState.OPENING:
-##            print("GameState is OPENING")  # デバッグ出力
-#            if self.current_bgm != GameState.OPENING:
-#                self.play_bgm(GameState.OPENING)
-#
-#            # 言語切り替えボタンのクリック処理
-#            language_button_clicked = False  # フラグを初期化
-#            if self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y):
-#                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-#                    self.current_language = "en" if self.current_language == "ja" else "ja"
-#                    print(f"Language changed to: {self.current_language}")  # デバッグ用
-#                    # ボタンのラベルを翻訳データから取得して更新
-##                    self.language_button.label = translations[self.current_language]["language_button_label"]
-#                    self.language_button.label = translations["language_button"][self.current_language]
-#                    self.create_difficulty_buttons()  # 言語切り替え時にボタンを再生成
-#                    language_button_clicked = True  # ボタンが押されたことを記録
-#
-#            # 言語ボタンがクリックされていない場合のみ、次の処理を実行
-#            if not language_button_clicked and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-#                print("Clicked in opening screen")  # デバッグ出力
-#                self.state = GameState.DIFFICULTY_SELECTION
-#                print(f"State changed to: {self.state}")  # 状態変更後の確認
-#
-#        elif self.state == GameState.DIFFICULTY_SELECTION:
-##            print(f"GameState is: {self.state}") # デバッグ出力
-#            if self.current_bgm != GameState.DIFFICULTY_SELECTION:
-#                self.play_bgm(GameState.DIFFICULTY_SELECTION)
-#                print(f"Switching to BGM for state state name: {state.name}")  # デバッグ用
-#                print(f"Switching to BGM for state game state: {GameState.DIFFICULTY_SELECTION}")  # デバッグ用
-#            for button in self.difficulty_buttons:
-#                if button.is_hovered(pyxel.mouse_x, pyxel.mouse_y) and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-#                    print(f"Difficulty button clicked: {button.key}")
-#                    self.apply_difficulty_settings(button.key)
-#                    self.state = GameState.BOARD_GENERATION
-#                    self.stop_bgm()
-#
-#        elif self.state == GameState.BOARD_GENERATION:
-#            if not hasattr(self, 'board_generated'):
-#                self.board_generated = False
+#    def play_effect(self, blocks_to_remove):
+#        """ポップで壊れる明るい効果音を再生"""
+#        num_blocks = len(blocks_to_remove)
 #        
-#            if not self.board_generated:
-#
-#                # 盤面を新たに生成（リセットはタイミングに応じて）
-#                self.generate_new_board(use_saved_initial_state=False)
-#                
-#                # スコアやタイマーはここでリセットしたい場合に呼ぶ
-#                self.reset_game_state()
-#                
-#                self.board_generated = True
-# 
-#            else:
-#                # 生成が完了したら次のステートへ移行
-#                del self.board_generated
-#                self.state = GameState.GAME_START
-#                self.play_bgm(GameState.GAME_START)  # BGM開始
-#
-#
+#        # 明るい音階 (メジャーコードを基準に)
+#        base_notes = ["c4", "e4", "g4", "c5", "e5", "g5"]
+#        max_notes = min(len(base_notes), num_blocks)
+#        notes = base_notes[:max_notes]
+#        
+#        # 無効な音を除去
+#        valid_notes = {"c", "d", "e", "f", "g", "a", "b"}
+#        notes = [note for note in notes if note[0] in valid_notes and note[1:].isdigit()]
+#        
+#        # ノイズの混入割合を控えめに
+#        noise_ratio = min(0.3, 0.1 + num_blocks * 0.01)
+#        tones = "".join(
+#            ["n" if random.random() < noise_ratio else "p" for _ in range(len(notes))]
+#        )
+#        
+#        # 音量設定
+#        base_volume = 5
+#        volumes = "".join([str(min(7, base_volume + i)) for i in range(len(notes))])
+#        
+#        # フェード効果の強化
+#        effects = "".join(["f" if i % 2 == 0 else "n" for i in range(len(notes))])
+#        
+#        # 再生速度を速くして活発な印象に
+#        speed = max(4, 8 - (num_blocks // 5))
+#        
+#        # 効果音を設定
+#        pyxel.sounds[0].set(
+#            notes="".join(notes),
+#            tones=tones,
+#            volumes=volumes,
+#            effects=effects,
+#            speed=speed,
+#        )
+#        
+#        # 効果音を再生
+#        pyxel.play(3, 0)
+
+#    def play_effect(self, blocks_to_remove):
+#        """ポップで壊れる明るい効果音を再生"""
+#        num_blocks = len(blocks_to_remove)
 #    
-#        elif self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
-#            # 序盤、中盤、終盤の進行状態を確認
-#            remaining_cells, removed_percentage = self.calculate_progress()
+#        # 有効な音階を定義
+#        valid_notes = [
+#            "c2", "d2", "e2", "f2", "g2", "a2", "b2",
+#            "c3", "d3", "e3", "f3", "g3", "a3", "b3",
+#            "c4", "d4", "e4", "f4", "g4", "a4", "b4",
+#            "c5", "d5", "e5", "f5", "g5", "a5", "b5"
+#        ]
+#    
+#        # 明るい音階の基本セット
+#        base_notes = ["c4", "e4", "g4", "c5", "e5", "g5"]
+#        max_notes = min(len(base_notes), num_blocks)
+#        notes = base_notes[:max_notes]
+#    
+#        # 無効な音階を除外
+#        notes = [note for note in notes if note in valid_notes]
 #
-#            if self.state == GameState.GAME_START:
-#                if self.current_bgm != GameState.GAME_START:
-#                    self.play_bgm(GameState.GAME_START)
+#        # デバッグ用出力
+#        print(f"[DEBUG] Blocks to remove: {num_blocks}")
+#        print(f"[DEBUG] Selected notes (before validation): {base_notes[:max_notes]}")
+#        print(f"[DEBUG] Valid notes (after validation): {notes}")
 #
-#                if removed_percentage >= 0.2:  # コマ数が20%減少したら中盤へ移行
-#                    self.state = GameState.GAME_MID
+#        # ノイズの混入割合を調整
+#        noise_ratio = min(0.5, 0.2 + num_blocks * 0.02)  # 最大50%までノイズを混入
+#        tones = "".join(
+#            ["n" if random.random() < noise_ratio else "p" for _ in range(len(notes))]
+#        )
 #    
-#            elif self.state == GameState.GAME_MID:
-#                if self.current_bgm != GameState.GAME_MID:
-#                    self.play_bgm(GameState.GAME_MID)
-#                is_low_time = (
-#                    self.time_limit
-#                    and (self.time_limit - (pyxel.frame_count - self.start_time) // 30) <= 10
-#                )
-#                if remaining_cells / (self.grid_rows * self.grid_cols) <= 0.25 or is_low_time:
-#                    self.state = GameState.GAME_END
-#            elif self.state == GameState.GAME_END:
-#                if self.current_bgm != GameState.GAME_END:
-#                    self.play_bgm(GameState.GAME_END)
-#    
-#            # 共通ゲーム進行処理
-#            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-#                self.handle_click(mx, my)
-#            if self.time_limit and pyxel.frame_count - self.start_time > self.time_limit * 30:
-#                self.state = GameState.TIME_UP
-#            elif self.is_grid_empty():
-#                self.state = GameState.GAME_CLEARED
-#            elif not self.has_valid_moves():
-#                self.state = GameState.NO_MOVES
-#    
-#        elif self.state == GameState.TIME_UP:
-#            if self.current_bgm != GameState.TIME_UP:
-#                self.play_bgm(GameState.TIME_UP)
-#            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-#                self.update_high_scores()
-#                self.state = GameState.SCORE_DISPLAY
-#    
-#        elif self.state == GameState.NO_MOVES:
-#            if self.current_bgm != GameState.NO_MOVES:
-#                self.play_bgm(GameState.NO_MOVES)
-#            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-#                self.update_high_scores()
-#                self.state = GameState.SCORE_DISPLAY
-#    
-#        elif self.state == GameState.GAME_CLEARED:
-#            if self.current_bgm != GameState.GAME_CLEARED:
-#                self.play_bgm(GameState.GAME_CLEARED)
+#        # 音量設定
+#        base_volume = 5
+#        volumes = "".join([str(min(7, base_volume + i)) for i in range(len(notes))])
 #
-#            # ボーナススコアの加算を1度だけ実行
-#            if not self.bonus_added:
-#                bonus_score = int(self.score * 0.5)  # 現在のスコアの50%をボーナス
-#                self.score += bonus_score
-#                self.bonus_added = True  # フラグを立てる
-#                print(f"Bonus Score Added: {bonus_score}")  # デバッグ用
+#        # デバッグ用出力
+#        print(f"[DEBUG] Tones: {tones}")
+#        print(f"[DEBUG] Volumes: {volumes}")
 #
-#            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-#                self.update_high_scores()
-#                self.state = GameState.SCORE_DISPLAY
+#        # エフェクト
+#        effects = "".join(["f" if i % 2 == 0 else "n" for i in range(len(notes))])
 #    
-#        elif self.state == GameState.SCORE_DISPLAY:
-#            if self.current_bgm != GameState.OPENING:
-#                self.play_bgm(GameState.OPENING)
-#            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-#                self.state = GameState.HIGH_SCORE_DISPLAY
-#    
-#        elif self.state == GameState.HIGH_SCORE_DISPLAY:
-#            if self.current_bgm != GameState.OPENING:
-#                self.play_bgm(GameState.OPENING)
-#            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-#                self.state = GameState.OPENING
-#    
-#        # ステータス変更時のBGM切り替え
-#        if self.state != previous_state:
-#            self.handle_state_change()
+#        # 再生速度
+#        speed = max(4, 8 - (num_blocks // 5))
 #
-#        # シェイクタイマーの更新
-#        if self.shake_timer > 0:
-#            self.shake_timer -= 1
+#        # デバッグ用出力
+#        print(f"[DEBUG] Effects: {effects}")
+#        print(f"[DEBUG] Speed: {speed}")
 #
-#        # もし is_animating が True なら、ブロックがすべてアニメ完了しているかチェック
-#        if self.is_animating:
-#            all_done = True
-#            for row in range(self.grid_rows):
-#                for col in range(self.grid_cols):
-#                    block = self.grid[row][col]
-#                    if block is not None:
-#                        # まだ動いているブロックがあるか？
-#                        if abs(block.x - block.target_x) > 0.1 or abs(block.y - block.target_y) > 0.1:
-#                            all_done = False
-#                            break
-#                if not all_done:
-#                    break
-#            
-#            if all_done:
-#                print("Animation finished.")
-#                self.is_animating = False
+#        # サウンドの設定
+#        pyxel.sounds[0].set(
+#            notes="".join(notes),
+#            tones=tones,
+#            volumes=volumes,
+#            effects=effects,
+#            speed=speed,
+#        )
 #    
-##        # パーティクルやブロックアニメの更新
-##        self.update_particles()
-##        
-##        # 二重ループの直前にサイズを出してみる
-##        print(f"DEBUG: grid_rows={self.grid_rows}, grid_cols={self.grid_cols}")
-##        print(f"DEBUG: actual grid size = {len(self.grid)} x {len(self.grid[0]) if self.grid else '??'}")
-##
-##        for row in range(self.grid_rows):
-##            for col in range(self.grid_cols):
-##                block = self.grid[row][col]
-##                if block:
-##                    block.update()
-#
-#        if self.state in [GameState.GAME_START,
-#                          GameState.GAME_MID,
-#                          GameState.GAME_END,
-#                          GameState.TIME_UP,
-#                          GameState.NO_MOVES,
-#                          GameState.GAME_CLEARED]:
-#            # ブロックやパーティクル等のアニメーション更新
-#            self.update_particles()
-#            # 二重ループの直前にサイズを出してみる
-##            print(f"DEBUG: grid_rows={self.grid_rows}, grid_cols={self.grid_cols}")
-##            print(f"DEBUG: actual grid size = {len(self.grid)} x {len(self.grid[0]) if self.grid else '??'}")
-#            for row in range(self.grid_rows):
-#                for col in range(self.grid_cols):
-#                    block = self.grid[row][col]
-#                    if block is not None:
-#                        block.update()
+#        # 効果音の再生
+#        pyxel.play(3, 0)
+
+    def play_effect(self, blocks_to_remove):
+        num_blocks = len(blocks_to_remove)
+    
+        # 高音域で明るい音階を定義
+        base_notes = ["c3", "d3", "e3", "g3", "a3", "c4", "d4", "e4", "g4", "a4"]
+        max_notes = min(len(base_notes), num_blocks)
+        selected_notes = base_notes[:max_notes]
+    
+        # 有効な音符のみを残す
+        VALID_NOTES = [f"{note}{octave}" for octave in range(1, 7) for note in "cdefgab"]
+        notes = [note for note in selected_notes if note in VALID_NOTES]
+    
+        # デバッグ情報を出力
+        print(f"[DEBUG] Selected notes (before validation): {selected_notes}")
+        print(f"[DEBUG] Valid notes (after validation): {notes}")
+    
+        # ここでエラーを防ぐ
+        if not notes:
+            print("[DEBUG] No valid notes available, skipping sound effect.")
+            return
+    
+        # サウンド設定
+        tones = "".join(["p" if random.random() < 0.7 else "n" for _ in notes])
+        volumes = "".join([str(random.randint(4, 7)) for _ in notes])
+        effects = "".join(["n" if i % 2 == 0 else "f" for i in range(len(notes))])
+        speed = max(4, 8 - (num_blocks // 5))
+    
+        # デバッグ情報
+        print(f"[DEBUG] Tones: {tones}")
+        print(f"[DEBUG] Volumes: {volumes}")
+        print(f"[DEBUG] Effects: {effects}")
+        print(f"[DEBUG] Speed: {speed}")
+    
+        # Pyxel サウンド設定
+        pyxel.sounds[0].set(
+            notes="".join(notes),
+            tones=tones,
+            volumes=volumes,
+            effects=effects,
+            speed=speed,
+        )
+        pyxel.play(3, 0)
+
 
     def update(self):
         # A. 今のステートに応じて行うゲームロジック（難易度選択・スコア更新など）
@@ -867,7 +788,7 @@ class SameGame:
                 and retry_y <= my <= retry_y + BUTTON_HEIGHT
                 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)
             ):
-                print("Retry button clicked")
+#                print("Retry button clicked")
 #                self.reset_game(use_saved_initial_state=True)  # 保存済みの初期状態に戻す
                 self.generate_new_board(use_saved_initial_state=True) # 盤面は変えずに
                 self.reset_game_state()  # タイマーとスコアだけリセット
@@ -882,7 +803,7 @@ class SameGame:
                 and quit_y <= my <= quit_y + BUTTON_HEIGHT
                 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)
             ):
-                print("Quit button clicked")
+#                print("Quit button clicked")
                 self.update_high_scores()  # スコアランキングを更新
                 self.state = GameState.SCORE_DISPLAY  # SCORE_DISPLAY画面に遷移
                 return
@@ -898,7 +819,7 @@ class SameGame:
             if self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y):
                 if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                     self.current_language = "en" if self.current_language == "ja" else "ja"
-                    print(f"Language changed to: {self.current_language}")  # デバッグ用
+#                    print(f"Language changed to: {self.current_language}")  # デバッグ用
                     # ボタンのラベルを翻訳データから取得して更新
 #                    self.language_button.label = translations[self.current_language]["language_button_label"]
                     self.language_button.label = translations["language_button"][self.current_language]
@@ -907,9 +828,9 @@ class SameGame:
 
             # 言語ボタンがクリックされていない場合のみ、次の処理を実行
             if not language_button_clicked and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                print("Clicked in opening screen")  # デバッグ出力
+#                print("Clicked in opening screen")  # デバッグ出力
                 self.state = GameState.DIFFICULTY_SELECTION
-                print(f"State changed to: {self.state}")  # 状態変更後の確認
+#                print(f"State changed to: {self.state}")  # 状態変更後の確認
 
         # 2. DIFFICULTY_SELECTION のとき
         elif self.state == GameState.DIFFICULTY_SELECTION:
@@ -1058,7 +979,7 @@ class SameGame:
                 if self.all_blocks_stopped():
                     self.is_shifting = False
                     # 全アニメが終わったのでアニメフラグオフ
-                    print("Falling + shifting finished!")
+#                    print("Falling + shifting finished!")
                     self.is_animating = False
     
             # 3. 上記以外のタイミングでアニメを始めた場合は、まとめて is_animating = True など
@@ -1113,7 +1034,7 @@ class SameGame:
                 points_gained = int(len(blocks_to_remove) 
                                     * (len(blocks_to_remove) ** 2) 
                                     * self.score_multiplier)
-                print(f"First Click Debug: blocks_to_remove={len(blocks_to_remove)}, score_multiplier={self.score_multiplier}, points_gained={points_gained}")
+#                print(f"First Click Debug: blocks_to_remove={len(blocks_to_remove)}, score_multiplier={self.score_multiplier}, points_gained={points_gained}")
 
                 # 1) パーティクルの発生
 #                self.spawn_particles(blocks_to_remove, cell_size, grid_x_start, grid_y_start)
@@ -1146,7 +1067,7 @@ class SameGame:
                 # 点数ごとに+1, 最長20フレーム
                 self.shake_magnitude = min(5, 1 + points_gained // 500)
                 self.shake_timer = min(20, 2 + points_gained // 100)
-                print(f"Debug: shake_magnitude={self.shake_magnitude}, shake_timer={self.shake_timer}, points_gained={points_gained}")
+#                print(f"Debug: shake_magnitude={self.shake_magnitude}, shake_timer={self.shake_timer}, points_gained={points_gained}")
 
     def handle_state_change(self):
         """ステータス変更時のBGMを再生"""
@@ -1405,46 +1326,46 @@ class SameGame:
 #        # 効果音を再生
 #        pyxel.play(3, 0)
 
-    def play_effect(self, blocks_to_remove):
-        """ポップで壊れる明るい効果音を再生"""
-        num_blocks = len(blocks_to_remove)
-    
-        # 高音域で明るい音階を定義
-        base_notes = ["c3", "d3", "e3", "g3", "a3", "c4", "d4", "e4", "g4", "a4"]
-        max_notes = min(len(base_notes), num_blocks)
-        notes = base_notes[:max_notes]
-    
-        # ノイズ効果の混入割合を調整（ブロック数に応じて増加）
-        noise_ratio = min(0.5, 0.2 + num_blocks * 0.02)  # 最大50%までノイズを混入
-        tones = "".join(
-            ["n" if random.random() < noise_ratio else "p" for _ in range(len(notes))]
-        )
-    
-        # ボリューム設定：末尾に向けて大きくする
-        base_volume = 4 + min(3, num_blocks // 10)  # ブロック数が多いと全体的にボリュームを増加
-        volumes = [
-            base_volume + (i / len(notes)) * 2 if tones[i] == "n" else base_volume
-            for i in range(len(notes))
-        ]
-        volumes = "".join([str(min(7, int(v))) for v in volumes])  # 最大ボリュームは7
-    
-        # 効果をランダム化し、フェード効果を時折追加
-        effects = "".join(["n" if i % 3 == 0 else "f" for i in range(len(notes))])
-    
-        # 再生速度をブロック数に応じて速くする（多いほど速く）
-        speed = max(4, 8 - (num_blocks // 5))  # 最小速度4、ブロック数で短縮
-    
-        # 効果音の設定
-        pyxel.sounds[0].set(
-            notes="".join(notes),  # 音階のみを指定
-            tones=tones,          # パルスとノイズの切り替えを指定
-            volumes=volumes,      # ボリューム
-            effects=effects,      # 効果
-            speed=speed,          # 再生速度
-        )
-    
-        # 効果音を再生
-        pyxel.play(3, 0)
+#    def play_effect(self, blocks_to_remove):
+#        """ポップで壊れる明るい効果音を再生"""
+#        num_blocks = len(blocks_to_remove)
+#    
+#        # 高音域で明るい音階を定義
+#        base_notes = ["c3", "d3", "e3", "g3", "a3", "c4", "d4", "e4", "g4", "a4"]
+#        max_notes = min(len(base_notes), num_blocks)
+#        notes = base_notes[:max_notes]
+#    
+#        # ノイズ効果の混入割合を調整（ブロック数に応じて増加）
+#        noise_ratio = min(0.5, 0.2 + num_blocks * 0.02)  # 最大50%までノイズを混入
+#        tones = "".join(
+#            ["n" if random.random() < noise_ratio else "p" for _ in range(len(notes))]
+#        )
+#    
+#        # ボリューム設定：末尾に向けて大きくする
+#        base_volume = 4 + min(3, num_blocks // 10)  # ブロック数が多いと全体的にボリュームを増加
+#        volumes = [
+#            base_volume + (i / len(notes)) * 2 if tones[i] == "n" else base_volume
+#            for i in range(len(notes))
+#        ]
+#        volumes = "".join([str(min(7, int(v))) for v in volumes])  # 最大ボリュームは7
+#    
+#        # 効果をランダム化し、フェード効果を時折追加
+#        effects = "".join(["n" if i % 3 == 0 else "f" for i in range(len(notes))])
+#    
+#        # 再生速度をブロック数に応じて速くする（多いほど速く）
+#        speed = max(4, 8 - (num_blocks // 5))  # 最小速度4、ブロック数で短縮
+#    
+#        # 効果音の設定
+#        pyxel.sounds[0].set(
+#            notes="".join(notes),  # 音階のみを指定
+#            tones=tones,          # パルスとノイズの切り替えを指定
+#            volumes=volumes,      # ボリューム
+#            effects=effects,      # 効果
+#            speed=speed,          # 再生速度
+#        )
+#    
+#        # 効果音を再生
+#        pyxel.play(3, 0)
 
     def spawn_particles(self, blocks_to_remove, points_gained, cell_size, grid_x_start, grid_y_start):
         """
