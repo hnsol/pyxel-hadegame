@@ -204,7 +204,8 @@ class Block:
         self.target_y = self.y
         
         # 移動速度やアニメーション速度係数
-        self.move_speed = 3.0  # 1フレームあたりに何ピクセル移動するか
+#        self.move_speed = 3.0  # 1フレームあたりに何ピクセル移動するか
+        self.move_speed = cell_size * 0.3  # 1フレームあたりに何ピクセル移動するか
 
     def update(self):
         """
@@ -975,10 +976,17 @@ class SameGame:
                 self.handle_click(mx, my)
             if self.time_limit and pyxel.frame_count - self.start_time > self.time_limit * 30:
                 self.state = GameState.TIME_UP
-            elif self.is_grid_empty():
-                self.state = GameState.GAME_CLEARED
-            elif not self.has_valid_moves():
-                self.state = GameState.NO_MOVES
+#            elif self.is_grid_empty():
+#                self.state = GameState.GAME_CLEARED
+#            elif not self.has_valid_moves():
+#                self.state = GameState.NO_MOVES
+            if self.all_blocks_stopped():
+                self.is_shifting = False
+                # アニメーション完了後にhas_valid_moves()を判定
+                if self.is_grid_empty():
+                    self.state = GameState.GAME_CLEARED
+                elif not self.has_valid_moves():
+                    self.state = GameState.NO_MOVES
 
         # 5. TIME_UP, NO_MOVES, GAME_CLEARED
         elif self.state == GameState.TIME_UP:
@@ -1438,53 +1446,6 @@ class SameGame:
         # 効果音を再生
         pyxel.play(3, 0)
 
-
-#    def spawn_particles(self, blocks_to_remove, points_gained, cell_size, grid_x_start, grid_y_start):
-#        """
-#        今回の消去で獲得した points_gained を受け取り、
-#        それに応じてパーティクルの数や速さ・サイズを変えてみる。
-#        """
-#        # 「派手さ係数」をスコアに応じて計算
-#        particle_factor = min(5.0, 1.0 + (points_gained / 500.0))  
-#        # → 500点につき +1、ただし最大5倍に制限
-##        print(f"particle factore(max 5.0): {particle_factor}")
-#
-#        # cell_size にもとづくパーティクルの大きさ
-#        base_particle_size = max(1, int(cell_size * 0.4))
-#    
-#        for (bx, by) in blocks_to_remove:
-#            block = self.grid[by][bx]
-#            # クリックで消し終わった後だと None になっているかもしれないので要チェック
-#            if block is None:
-#                continue
-#    
-#            # 画面上の座標
-#            x = grid_x_start + block.col * cell_size + cell_size / 2
-#            y = grid_y_start + block.row * cell_size + cell_size / 2
-#            color = COLORS[block.color]
-#    
-#            # パーティクル個数をスコアに応じて増やす例
-##            base_count = int(5 * particle_factor)
-##            for _ in range(base_count):
-##                # スピードも派手さに応じて変化させる例
-##                vx = random.uniform(-1.0 * particle_factor, 1.0 * particle_factor)
-##                vy = random.uniform(-2.0 * particle_factor, -0.5 * particle_factor)
-##    
-##                # 例: Particle のコンストラクタに size を追加している
-##                p = Particle(x, y, color, base_particle_size)
-##                p.vx = vx
-##                p.vy = vy
-##    
-##                self.particles.append(p)
-#
-#            # パーティクル生成
-#            for _ in range(int(10 * particle_factor)):
-#                p = Particle(x, y, color, base_particle_size)
-#                self.particles.append(p)
-#    
-#            # 中心エフェクト
-#            self.particles.append(Particle(x, y, pyxel.COLOR_YELLOW, base_particle_size * 1.5))
-
     def spawn_particles(self, blocks_to_remove, points_gained, cell_size, grid_x_start, grid_y_start):
         """
         今回の消去で獲得した points_gained を受け取り、
@@ -1516,16 +1477,6 @@ class SameGame:
                 p.vy = random.uniform(-2.0 * particle_factor, -0.5 * particle_factor)  # ランダムな速度 (Y)
                 self.particles.append(p)
     
-#            # 中心エフェクト（速度を極端に遅くする）
-#            slow_particle = Particle(x, y, pyxel.COLOR_YELLOW, base_particle_size * 1.5)
-#            slow_particle.vx = random.uniform(-0.05, 0.05)  # 非常に遅い速度 (X)
-#            slow_particle.vy = random.uniform(-0.05, 0.05)  # 非常に遅い速度 (Y)
-#            self.particles.append(slow_particle)
-
-            # 中心エフェクト生成（重力なし）
-#            slow_particle = Particle(x, y, pyxel.COLOR_YELLOW, base_particle_size * 1.5, is_center_effect=True)
-#            self.particles.append(slow_particle)
-
     def update_particles(self):
         """self.particles 内のパーティクルを更新し、寿命が切れたものを除去"""
         alive_particles = []
@@ -1534,6 +1485,14 @@ class SameGame:
             if p.is_alive():
                 alive_particles.append(p)
         self.particles = alive_particles
+
+    def reset_particles(self):
+        """パーティクルをリセットする"""
+        self.particles = []
+
+    def draw_particles(self):
+        for p in self.particles:
+            p.draw()
 
 
     def draw(self):
@@ -1680,13 +1639,22 @@ class SameGame:
                 self.draw_text(WINDOW_HEIGHT // 2 + 20, cleared_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
             
         elif self.state == GameState.SCORE_DISPLAY:
-            # スコア表示画面の描画
+            # 画面をクリア
+            pyxel.cls(pyxel.COLOR_GRAY)
+        
+            # パーティクルをリセット
+            self.reset_particles()
+
+            # スコアメッセージを描画
             score_msg = messages["score_display"]
             self.draw_text(WINDOW_HEIGHT // 2 - 20, score_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
             self.draw_text(WINDOW_HEIGHT // 2, f"{int(self.score)}", pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
             self.draw_text(WINDOW_HEIGHT // 2 + 20, score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
         
         elif self.state == GameState.HIGH_SCORE_DISPLAY:
+            # 画面をクリア
+            pyxel.cls(pyxel.COLOR_GRAY)
+
             # ハイスコア表示画面の描画
             high_score_msg = messages["high_score_display"]
             self.draw_text(35, high_score_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
@@ -1749,10 +1717,6 @@ class SameGame:
         grid_y_start = game_area_y + (game_area_height - (cell_size * self.grid_rows)) // 2
     
         return cell_size, grid_x_start, grid_y_start
-
-    def draw_particles(self):
-        for p in self.particles:
-            p.draw()
 
     def draw_score_and_time(self):
         """
