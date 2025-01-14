@@ -200,7 +200,7 @@ class Block:
         pyxel.rect(x, y, cell_size, cell_size, COLORS[self.color])
 
 class Particle:
-    def __init__(self, x, y, color):
+    def __init__(self, x, y, color, size):
         self.x = x
         self.y = y
         self.vx = random.uniform(-1.5, 1.5)  # X方向のランダム速度
@@ -208,6 +208,7 @@ class Particle:
         self.color = color
         self.life = 20  # パーティクルの最大寿命(フレーム数)
         self.age = 0    # 生存経過フレーム
+        self.size = size  # コマに対しての相対的な大きさを設定
 
     def update(self):
         """毎フレーム呼ばれる。位置更新と寿命管理を行う"""
@@ -221,7 +222,17 @@ class Particle:
 
     def draw(self):
         """描画。Pyxelの画面座標に合わせてドットを打つ"""
-        pyxel.pset(int(self.x), int(self.y), self.color)
+#        pyxel.pset(int(self.x), int(self.y), self.color)
+        # ここでは円形パーティクルの例
+        # size が大きいほど目立つパーティクルになる
+#        pyxel.circ(self.x, self.y, self.size, self.color)
+        pyxel.rect(
+            int(self.x - self.size / 2),  # 左上X座標
+            int(self.y - self.size / 2),  # 左上Y座標
+            int(self.size),  # 幅
+            int(self.size),  # 高さ
+            self.color       # 色
+        )
 
     def is_alive(self):
         """寿命を超えていないかどうか"""
@@ -790,8 +801,14 @@ class SameGame:
             # 消去処理
             blocks_to_remove = self.find_connected_blocks(x, y, color)
             if len(blocks_to_remove) > 1:
+                # 今回の消去で得られるスコアを一時変数に入れる
+                points_gained = int(len(blocks_to_remove) 
+                                    * (len(blocks_to_remove) ** 2) 
+                                    * self.score_multiplier)
+
                 # 1) パーティクルの発生
-                self.spawn_particles(blocks_to_remove, cell_size, grid_x_start, grid_y_start)
+#                self.spawn_particles(blocks_to_remove, cell_size, grid_x_start, grid_y_start)
+                self.spawn_particles(blocks_to_remove, points_gained, cell_size, grid_x_start, grid_y_start)
 
                 # 2) ブロック消去
                 for bx, by in blocks_to_remove:
@@ -799,7 +816,8 @@ class SameGame:
 
                 # 3) 効果音・スコア等
                 self.play_effect(blocks_to_remove)
-                self.score += int(len(blocks_to_remove) * (len(blocks_to_remove) ** 2) * self.score_multiplier)
+#                self.score += int(len(blocks_to_remove) * (len(blocks_to_remove) ** 2) * self.score_multiplier)
+                self.score += points_gained
 
                 # 4) 重力 & 列詰め
                 self.apply_gravity()
@@ -958,25 +976,103 @@ class SameGame:
         except ValueError:
             self.current_score_rank = None
 
-    def spawn_particles(self, blocks_to_remove, cell_size, grid_x_start, grid_y_start):
+#    def spawn_particles(self, blocks_to_remove, cell_size, grid_x_start, grid_y_start):
+#        """
+#        消えるブロックの画面上の位置あたりにパーティクルを出す。
+#        """
+#        for (bx, by) in blocks_to_remove:
+#            block = self.grid[by][bx]
+#            if block is None:
+#                # すでに消されている場合はスキップ（2回呼ばれても大丈夫なように）
+#                continue
+#    
+#            # ブロックの左上座標
+#            x = grid_x_start + block.col * cell_size + cell_size / 2
+#            y = grid_y_start + block.row * cell_size + cell_size / 2
+#            # ブロックの色に対応するPyxel上のカラー
+#            pyxel_color = COLORS[block.color]
+#    
+#            # ここで例として 6 個くらいパーティクルを出す
+#            for _ in range(6):
+#                p = Particle(x, y, pyxel_color)
+#                self.particles.append(p)
+
+#    def spawn_particles(self, blocks_to_remove, cell_size, grid_x_start, grid_y_start):
+#        num_removed = len(blocks_to_remove)
+#        # 派手さを指数的にする例（連鎖数が大きいほど一気に増加）
+#        # 例： double くらいのイメージでexp成長させる
+##        particle_factor = 2 ** (num_removed / 10.0)  # 10ブロックで倍々くらい
+#        particle_factor = 1.0 + (self.score / 500.0) # ある程度線形で増加
+#        # 必要に応じて上限を設ける
+##        particle_factor = min(particle_factor, 10.0)
+#        particle_factor = min(particle_factor, 20.0)
+#    
+#        for (bx, by) in blocks_to_remove:
+#            block = self.grid[by][bx]
+#            if block is None:
+#                continue
+#            x = grid_x_start + block.col * cell_size + cell_size / 2
+#            y = grid_y_start + block.row * cell_size + cell_size / 2
+#            color = COLORS[block.color]
+#    
+#            # コマの大きさに基づくパーティクルサイズ (例: 20% にする)
+#            p_size = max(1, int(cell_size * 0.2))
+#    
+#            # 連鎖数から決まる “派手さ係数”
+#            # これを使ってパーティクル数や速度レンジを変化
+#            base_particle_count = int(5 * particle_factor)  # 最低5個、指数で増加
+#    
+#            for _ in range(base_particle_count):
+#                # 飛び散るスピードを particle_factor に応じて拡大
+#                vx = random.uniform(-1.0 * particle_factor, 1.0 * particle_factor)
+#                vy = random.uniform(-2.0 * particle_factor, -0.5 * particle_factor)
+#    
+#                # Particleクラスのコンストラクタ引数を可変にしてカスタマイズ
+#                p = Particle(x, y, color, p_size)
+#                p.vx = vx
+#                p.vy = vy
+#    
+#                self.particles.append(p)
+
+    def spawn_particles(self, blocks_to_remove, points_gained, cell_size, grid_x_start, grid_y_start):
         """
-        消えるブロックの画面上の位置あたりにパーティクルを出す。
+        今回の消去で獲得した points_gained を受け取り、
+        それに応じてパーティクルの数や速さ・サイズを変えてみる。
         """
+        # たとえば「派手さ係数」をスコアに応じて計算する
+        # 例:  スコアの大きさに比例 or 指数 or ステップでもOK
+        particle_factor = min(5.0, 1.0 + (points_gained / 500.0))  
+        # → 1000点につき +1、ただし最大5倍に制限
+        print(f"particle factore(max 5.0): {particle_factor}")
+
+    
+        # cell_size にもとづくパーティクルの大きさ
+#        base_particle_size = max(1, int(cell_size * 0.2))
+        base_particle_size = max(1, int(cell_size * 0.4))
+    
         for (bx, by) in blocks_to_remove:
             block = self.grid[by][bx]
+            # クリックで消し終わった後だと None になっているかもしれないので要チェック
             if block is None:
-                # すでに消されている場合はスキップ（2回呼ばれても大丈夫なように）
                 continue
     
-            # ブロックの左上座標
+            # 画面上の座標
             x = grid_x_start + block.col * cell_size + cell_size / 2
             y = grid_y_start + block.row * cell_size + cell_size / 2
-            # ブロックの色に対応するPyxel上のカラー
-            pyxel_color = COLORS[block.color]
+            color = COLORS[block.color]
     
-            # ここで例として 6 個くらいパーティクルを出す
-            for _ in range(6):
-                p = Particle(x, y, pyxel_color)
+            # パーティクル個数をスコアに応じて増やす例
+            base_count = int(5 * particle_factor)
+            for _ in range(base_count):
+                # スピードも派手さに応じて変化させる例
+                vx = random.uniform(-1.0 * particle_factor, 1.0 * particle_factor)
+                vy = random.uniform(-2.0 * particle_factor, -0.5 * particle_factor)
+    
+                # 例: Particle のコンストラクタに size を追加している
+                p = Particle(x, y, color, base_particle_size)
+                p.vx = vx
+                p.vy = vy
+    
                 self.particles.append(p)
 
     def update_particles(self):
