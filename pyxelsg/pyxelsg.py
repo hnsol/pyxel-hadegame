@@ -3,7 +3,7 @@
 # desc: A simple SameGame puzzle game built with Pyxel. Clear the board by removing groups of blocks with the same color!
 # site: https://github.com/hnsol/pyxel-samegame
 # license: MIT
-# version: 0.1
+# version: 0.5
 
 import pyxel
 import os
@@ -21,7 +21,6 @@ WINDOW_HEIGHT = 240
 BUTTON_WIDTH = 75
 BUTTON_HEIGHT = 15
 BUTTON_SPACING = 10
-#BUTTON_AREA_HEIGHT = 100  # ボタンエリアの高さ（縦にボタンを並べるため拡大）
 BUTTON_AREA_HEIGHT = 40  # ボタンエリアの高さ（縦にボタンを並べるため拡大）
 STATUS_AREA_HEIGHT = 30   # 表示エリアの高さ
 
@@ -615,47 +614,127 @@ class SameGame:
                 border_color=pyxel.COLOR_DARK_BLUE
             )
 
+#    def play_effect(self, blocks_to_remove):
+#        num_blocks = len(blocks_to_remove)
+#    
+#        # 有効な音符のリストを定義 ('CDEFGAB'+'#-'+'0123' または 'R' の形式)
+#        VALID_NOTES = [
+#            f"{note}{accidental}{octave}"
+#            for octave in "0123"
+#            for note in "CDEFGAB"
+#            for accidental in ("", "#", "-")
+#        ] + ["R"]  # 'R' は休符
+#    
+#        # 明るく、上昇感を強調した音階を定義
+##        base_notes = ["C2", "E2", "G2", "C3", "E3", "G3", "C4", "E4", "G4"]
+#        # Cメジャーコード進行を意識した音階を定義
+#        base_notes = [
+##            "C0", "E0", "G0",
+##            "C1", "E1", "G1",
+#            "C2", "E2", "G2",
+#            "C3", "E3", "G3",
+#            "C4", "E4", "G4",
+#        ]
+#        # 音の長さを指数関数的に伸ばす
+#        max_notes = min(len(base_notes), int(3 * (1.2 ** num_blocks)))
+##        max_notes = min(len(base_notes), int(3 * (1.5 ** num_blocks)))
+##        max_notes = min(len(base_notes), int(3 * (2.0 ** num_blocks)))
+##        selected_notes = base_notes[:max_notes]
+##        selected_notes = [note for note in base_notes[:max_notes] if note in VALID_NOTES]
+##        selected_notes = base_notes[:max_notes]
+##        filtered_notes = [note for note in selected_notes if note in VALID_NOTES]
+##        
+##        print(f"[DEBUG] Selected notes before filtering: {selected_notes}")
+##        print(f"[DEBUG] Filtered notes: {filtered_notes}")
+#
+#        # 有効な音符のみを残す
+##        notes = [note for note in selected_notes if note in VALID_NOTES]
+##        notes = selected_notes
+#        notes = base_notes[:max_notes]
+#    
+#        if not notes:
+#            print("[DEBUG] No valid notes available, skipping sound effect.")
+#            return
+#    
+#        # トーンを連鎖数に応じて調整
+#        noise_ratio = min(0.5, 0.2 + num_blocks * 0.05)  # ノイズ割合（最大50%）
+#        pulse_ratio = 1 - noise_ratio  # パルスの割合
+#        tones = "".join([
+#            "p" if r < pulse_ratio else "n" if r < pulse_ratio + noise_ratio else "t"
+#            for r in [random.random() for _ in notes]
+#        ])
+#
+#        # ボリューム設定：強弱を付けつつ大きめに
+#        base_volume = 5
+#        volumes = [
+#            base_volume + int((i / len(notes)) * 2) if tones[i] in "pt" else base_volume - 1
+#            for i in range(len(notes))
+#        ]
+#        volumes = "".join([str(min(7, max(1, int(v)))) for v in volumes])
+#    
+#        # 効果を上昇感があるように設定
+#        effects = "".join([
+#            "f" if i % 3 == 0 else "n" if i % 3 == 1 else "s"  # フェード、ノイズ、スライド
+#            for i in range(len(notes))
+#        ])
+#    
+#        # 速度を連鎖数に応じて速くする
+##        speed = max(3, 8 - int(num_blocks ** 0.3))  # 大きな連鎖で速くなる
+##        speed = max(3, 8 - int(num_blocks ** 2))  # 大きな連鎖で速くなる
+##        speed = max(2, 8 - int(num_blocks * 1.5))  # 大きな連鎖で速くなる
+##        speed = max(2, 8 - int(num_blocks ** 0.5))  # ゆるやかな非線形スケール
+##        speed = max(2, 8 - int(num_blocks ** 0.8))
+#        speed = min(8, 2 + int(num_blocks ** 0.8)) # 連鎖に応じて遅く        
+#
+#        # デバッグ情報
+#        print(f"[DEBUG] base_notes: {base_notes}")
+#        print(f"[DEBUG] max_notes: {max_notes}")
+##        print(f"[DEBUG] Notes (before filtering): {selected_notes}")
+#        print(f"[DEBUG] Notes: {' '.join(notes)}")
+#        print(f"[DEBUG] Tones: {tones}")
+#        print(f"[DEBUG] Volumes: {volumes}")
+#        print(f"[DEBUG] Effects: {effects}")
+#        print(f"[DEBUG] Speed: {speed}")
+#
+#    
+#        # Pyxel サウンド設定
+#        try:
+#            pyxel.sounds[0].set(
+#                notes=" ".join(notes),
+#                tones=tones,
+#                volumes=volumes,
+#                effects=effects,
+#                speed=speed,
+#            )
+#            pyxel.play(3, 0)
+#        except Exception as e:
+#            print(f"[ERROR] Failed to set sound: {e}")
+
     def play_effect(self, blocks_to_remove):
         num_blocks = len(blocks_to_remove)
     
-        # 有効な音符のリストを定義 ('CDEFGAB'+'#-'+'0123' または 'R' の形式)
-        VALID_NOTES = [
-            f"{note}{accidental}{octave}"
-            for octave in "0123"
-            for note in "CDEFGAB"
-            for accidental in ("", "#", "-")
-        ] + ["R"]  # 'R' は休符
-    
-        # 明るく、上昇感を強調した音階を定義
-#        base_notes = ["C2", "E2", "G2", "C3", "E3", "G3", "C4", "E4", "G4"]
-        # Cメジャーコード進行を意識した音階を定義
+#        # Cメジャーコードを基にした音階
+#        base_notes = [
+#            "C2", "E2", "G2",  # Cメジャーコード低音域
+#            "C3", "F3", "A3",  # Fメジャーコード中音域
+#            "G3", "B3", "D4",  # Gメジャーコード中高音域
+#            "C4", "E4", "G4",  # Cメジャーコード高音域
+#        ]
+        # I - VII♭ のコード進行に基づく音階
         base_notes = [
-#            "C0", "E0", "G0",
-#            "C1", "E1", "G1",
-            "C2", "E2", "G2",
+            "C2", "E2", "G2",  # I (Cメジャー)
             "C3", "E3", "G3",
             "C4", "E4", "G4",
+            "B-2", "D3", "F3",  # VII♭ (B♭メジャー)
+            "B-3", "D4", "F4",
         ]
-        # 音の長さを指数関数的に伸ばす
-        max_notes = min(len(base_notes), int(3 * (1.2 ** num_blocks)))
-#        max_notes = min(len(base_notes), int(3 * (1.5 ** num_blocks)))
-#        max_notes = min(len(base_notes), int(3 * (2.0 ** num_blocks)))
-#        selected_notes = base_notes[:max_notes]
-#        selected_notes = [note for note in base_notes[:max_notes] if note in VALID_NOTES]
-#        selected_notes = base_notes[:max_notes]
-#        filtered_notes = [note for note in selected_notes if note in VALID_NOTES]
-#        
-#        print(f"[DEBUG] Selected notes before filtering: {selected_notes}")
-#        print(f"[DEBUG] Filtered notes: {filtered_notes}")
 
-        # 有効な音符のみを残す
-#        notes = [note for note in selected_notes if note in VALID_NOTES]
-#        notes = selected_notes
-        notes = base_notes[:max_notes]
+        # 連鎖数が多いほど高音域を使う
+        max_notes = min(len(base_notes), int(3 * (1.2 ** num_blocks)))
+        selected_notes = base_notes[:max_notes]
     
-        if not notes:
-            print("[DEBUG] No valid notes available, skipping sound effect.")
-            return
+        # 音をランダムに選択または順に鳴らす
+        notes = selected_notes if random.random() < 0.5 else random.sample(selected_notes, len(selected_notes))
     
         # トーンを連鎖数に応じて調整
         noise_ratio = min(0.5, 0.2 + num_blocks * 0.05)  # ノイズ割合（最大50%）
@@ -664,7 +743,7 @@ class SameGame:
             "p" if r < pulse_ratio else "n" if r < pulse_ratio + noise_ratio else "t"
             for r in [random.random() for _ in notes]
         ])
-
+    
         # ボリューム設定：強弱を付けつつ大きめに
         base_volume = 5
         volumes = [
@@ -679,24 +758,17 @@ class SameGame:
             for i in range(len(notes))
         ])
     
-        # 速度を連鎖数に応じて速くする
-#        speed = max(3, 8 - int(num_blocks ** 0.3))  # 大きな連鎖で速くなる
-#        speed = max(3, 8 - int(num_blocks ** 2))  # 大きな連鎖で速くなる
-#        speed = max(2, 8 - int(num_blocks * 1.5))  # 大きな連鎖で速くなる
-#        speed = max(2, 8 - int(num_blocks ** 0.5))  # ゆるやかな非線形スケール
-#        speed = max(2, 8 - int(num_blocks ** 0.8))
-        speed = min(8, 2 + int(num_blocks ** 0.8)) # 連鎖に応じて遅く        
-
+        # 速度を連鎖数に応じて遅くする
+        speed = min(8, 2 + int(num_blocks ** 0.8))
+    
         # デバッグ情報
         print(f"[DEBUG] base_notes: {base_notes}")
         print(f"[DEBUG] max_notes: {max_notes}")
-#        print(f"[DEBUG] Notes (before filtering): {selected_notes}")
         print(f"[DEBUG] Notes: {' '.join(notes)}")
         print(f"[DEBUG] Tones: {tones}")
         print(f"[DEBUG] Volumes: {volumes}")
         print(f"[DEBUG] Effects: {effects}")
         print(f"[DEBUG] Speed: {speed}")
-
     
         # Pyxel サウンド設定
         try:
