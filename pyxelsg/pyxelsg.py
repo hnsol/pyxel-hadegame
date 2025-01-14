@@ -204,7 +204,8 @@ class Particle:
         self.x = x
         self.y = y
         self.vx = random.uniform(-1.5, 1.5)  # X方向のランダム速度
-        self.vy = random.uniform(-2.0, -0.5) # Y方向のランダム速度 (ちょっと上向き)
+#        self.vy = random.uniform(-2.0, -0.5) # Y方向のランダム速度 (ちょっと上向き)
+        self.vy = random.uniform(-1.0, 1.5) # Y方向のランダム速度 (ちょっと下向き)
         self.color = color
         self.life = 20  # パーティクルの最大寿命(フレーム数)
         self.age = 0    # 生存経過フレーム
@@ -216,7 +217,8 @@ class Particle:
         self.y += self.vy
 
         # 重力っぽい効果を加える(任意)
-        self.vy += 0.1
+#        self.vy += 0.1
+        self.vy += 0.3
 
         self.age += 1
 
@@ -767,6 +769,7 @@ class SameGame:
                 points_gained = int(len(blocks_to_remove) 
                                     * (len(blocks_to_remove) ** 2) 
                                     * self.score_multiplier)
+                print(f"First Click Debug: blocks_to_remove={len(blocks_to_remove)}, score_multiplier={self.score_multiplier}, points_gained={points_gained}")
 
                 # 1) パーティクルの発生
 #                self.spawn_particles(blocks_to_remove, cell_size, grid_x_start, grid_y_start)
@@ -942,30 +945,128 @@ class SameGame:
                     return False
         return True
 
+#    def play_effect(self, blocks_to_remove):
+#        """消したマスの数に応じて上昇音階の効果音を再生"""
+#        num_blocks = len(blocks_to_remove)
+#    
+#        # 基本となる上昇音階の定義
+##        base_notes = ["c2", "d2", "e2", "g2", "a2", "c3"]
+#        base_notes = ["c2", "d2", "e2", "g2", "a2", "c3", "d3", "e3", "g3", "a3"]
+#        max_notes = min(len(base_notes), num_blocks)  # 消したマス数に応じて音階を制限
+#        notes = base_notes[:max_notes]  # 必要な音階だけを取得
+#    
+#        # 再生速度を調整（少ない場合は速く、多い場合は少しゆっくり）
+#        speed = max(5, 15 - (num_blocks // 2))
+#    
+#        # 効果音を設定
+#        pyxel.sounds[0].set(
+#            notes="".join(notes),  # 上昇音階を生成
+#            tones="p",            # パルス音（爽やかな音）
+#            volumes="5" * max_notes,  # 音量を一定に
+#            effects="n" * max_notes,  # 効果なし（シンプルに）
+#            speed=speed,          # スピード設定
+#        )
+#    
+#        # 効果音を再生
+#        pyxel.play(3, 0)
+
+#    def play_effect(self, blocks_to_remove):
+#        """消したマスの数に応じて壊れた実感のある効果音を再生"""
+#        num_blocks = len(blocks_to_remove)
+#    
+#        # 使用可能なノートを限定
+#        base_notes = ["c1", "d1", "e1", "f1", "g1", "a1", "b1", "c2", "d2", "e2"]
+#        max_notes = min(len(base_notes), num_blocks)
+#        notes = base_notes[:max_notes]  # 必要な音階だけを取得
+#    
+#        # ノイズ部分の音符を明確にする（ノイズ 'n' を混ぜる場合も検証済みのデータにする）
+#        noise_notes = "".join(["c1" for _ in range(max_notes)])  # ノイズを置き換える場合の例
+#    
+#        # 効果音を生成する設定
+#        tones = "".join(["p" if i % 2 == 0 else "n" for i in range(max_notes)])  # パルスとノイズを交互に
+#        volumes = "".join(["5" for _ in range(max_notes)])  # 一定音量
+#        effects = "".join(["f" if i % 2 == 0 else "n" for i in range(max_notes)])  # フェードと通常を交互
+#    
+#        # 再生速度をブロック数に応じて変化させる
+#        speed = max(5, 15 - (num_blocks // 2))
+#    
+#        # 効果音設定
+#        pyxel.sounds[0].set(
+#            notes="".join(notes) + noise_notes,  # ノイズ音を後半に追加
+#            tones=tones,
+#            volumes=volumes,
+#            effects=effects,
+#            speed=speed,
+#        )
+#    
+#        # 効果音を再生
+#        pyxel.play(3, 0)
+
+#    def play_effect(self, blocks_to_remove):
+#        """ポップで明るく壊れる効果音を再生"""
+#        num_blocks = len(blocks_to_remove)
+#    
+#        # 高音域で明るい音階を定義
+#        base_notes = ["c3", "d3", "e3", "g3", "a3", "c4", "d4", "e4", "g4", "a4"]
+#        max_notes = min(len(base_notes), num_blocks)
+#        notes = base_notes[:max_notes]
+#    
+#        # ノイズ効果は「tones」で指定
+#        tones = "".join(["p" if i % 2 == 0 else "n" for i in range(len(notes))])  # パルスとノイズ交互
+#        volumes = "".join([str(random.randint(4, 6)) for _ in range(len(notes))])  # 音量をランダム化
+#        effects = "".join(["n" if i % 3 == 0 else "f" for i in range(len(notes))])  # ノイズとフェードをミックス
+#    
+#        # 再生速度をブロック数に応じて調整
+#        speed = max(4, 12 - (num_blocks // 3))
+#    
+#        # 効果音の設定
+#        pyxel.sounds[0].set(
+#            notes="".join(notes),  # 音階のみを指定
+#            tones=tones,          # パルスとノイズの切り替えを指定
+#            volumes=volumes,      # ボリューム
+#            effects=effects,      # 効果
+#            speed=speed,          # 再生速度
+#        )
+#    
+#        # 効果音を再生
+#        pyxel.play(3, 0)
+
     def play_effect(self, blocks_to_remove):
-        """消したマスの数に応じて上昇音階の効果音を再生"""
+        """ポップで壊れる明るい効果音を再生"""
         num_blocks = len(blocks_to_remove)
     
-        # 基本となる上昇音階の定義
-#        base_notes = ["c2", "d2", "e2", "g2", "a2", "c3"]
-        base_notes = ["c2", "d2", "e2", "g2", "a2", "c3", "d3", "e3", "g3", "a3"]
-        max_notes = min(len(base_notes), num_blocks)  # 消したマス数に応じて音階を制限
-        notes = base_notes[:max_notes]  # 必要な音階だけを取得
+        # 高音域で明るい音階を定義
+        base_notes = ["c3", "d3", "e3", "g3", "a3", "c4", "d4", "e4", "g4", "a4"]
+        max_notes = min(len(base_notes), num_blocks)
+        notes = base_notes[:max_notes]
     
-        # 再生速度を調整（少ない場合は速く、多い場合は少しゆっくり）
-        speed = max(5, 15 - (num_blocks // 2))
+        # ノイズ効果の混入割合を調整（ブロック数に応じて増加）
+        noise_ratio = min(0.5, 0.2 + num_blocks * 0.02)  # 最大50%までノイズを混入
+        tones = "".join(
+            ["n" if random.random() < noise_ratio else "p" for _ in range(len(notes))]
+        )
     
-        # 効果音を設定
+        # 音量をランダム化して変化をつける
+        volumes = "".join([str(random.randint(4, 6)) for _ in range(len(notes))])
+    
+        # 効果をランダム化し、フェード効果を時折追加
+        effects = "".join(["n" if i % 3 == 0 else "f" for i in range(len(notes))])
+    
+        # 再生速度をブロック数に応じて速くする（多いほど速く）
+        speed = max(4, 8 - (num_blocks // 5))  # 最小速度4、ブロック数で短縮
+    
+        # 効果音の設定
         pyxel.sounds[0].set(
-            notes="".join(notes),  # 上昇音階を生成
-            tones="p",            # パルス音（爽やかな音）
-            volumes="5" * max_notes,  # 音量を一定に
-            effects="n" * max_notes,  # 効果なし（シンプルに）
-            speed=speed,          # スピード設定
+            notes="".join(notes),  # 音階のみを指定
+            tones=tones,          # パルスとノイズの切り替えを指定
+            volumes=volumes,      # ボリューム
+            effects=effects,      # 効果
+            speed=speed,          # 再生速度
         )
     
         # 効果音を再生
         pyxel.play(3, 0)
+
 
     def spawn_particles(self, blocks_to_remove, points_gained, cell_size, grid_x_start, grid_y_start):
         """
@@ -976,7 +1077,7 @@ class SameGame:
         # 例:  スコアの大きさに比例 or 指数 or ステップでもOK
         particle_factor = min(5.0, 1.0 + (points_gained / 500.0))  
         # → 1000点につき +1、ただし最大5倍に制限
-        print(f"particle factore(max 5.0): {particle_factor}")
+#        print(f"particle factore(max 5.0): {particle_factor}")
 
     
         # cell_size にもとづくパーティクルの大きさ
