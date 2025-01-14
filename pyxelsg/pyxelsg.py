@@ -615,345 +615,6 @@ class SameGame:
                 border_color=pyxel.COLOR_DARK_BLUE
             )
 
-#    def play_effect(self, blocks_to_remove):
-#        """ポップで壊れる明るい効果音を再生"""
-#        num_blocks = len(blocks_to_remove)
-#        
-#        # 明るい音階 (メジャーコードを基準に)
-#        base_notes = ["c4", "e4", "g4", "c5", "e5", "g5"]
-#        max_notes = min(len(base_notes), num_blocks)
-#        notes = base_notes[:max_notes]
-#        
-#        # 無効な音を除去
-#        valid_notes = {"c", "d", "e", "f", "g", "a", "b"}
-#        notes = [note for note in notes if note[0] in valid_notes and note[1:].isdigit()]
-#        
-#        # ノイズの混入割合を控えめに
-#        noise_ratio = min(0.3, 0.1 + num_blocks * 0.01)
-#        tones = "".join(
-#            ["n" if random.random() < noise_ratio else "p" for _ in range(len(notes))]
-#        )
-#        
-#        # 音量設定
-#        base_volume = 5
-#        volumes = "".join([str(min(7, base_volume + i)) for i in range(len(notes))])
-#        
-#        # フェード効果の強化
-#        effects = "".join(["f" if i % 2 == 0 else "n" for i in range(len(notes))])
-#        
-#        # 再生速度を速くして活発な印象に
-#        speed = max(4, 8 - (num_blocks // 5))
-#        
-#        # 効果音を設定
-#        pyxel.sounds[0].set(
-#            notes="".join(notes),
-#            tones=tones,
-#            volumes=volumes,
-#            effects=effects,
-#            speed=speed,
-#        )
-#        
-#        # 効果音を再生
-#        pyxel.play(3, 0)
-
-#    def play_effect(self, blocks_to_remove):
-#        """ポップで壊れる明るい効果音を再生"""
-#        num_blocks = len(blocks_to_remove)
-#    
-#        # 有効な音階を定義
-#        valid_notes = [
-#            "c2", "d2", "e2", "f2", "g2", "a2", "b2",
-#            "c3", "d3", "e3", "f3", "g3", "a3", "b3",
-#            "c4", "d4", "e4", "f4", "g4", "a4", "b4",
-#            "c5", "d5", "e5", "f5", "g5", "a5", "b5"
-#        ]
-#    
-#        # 明るい音階の基本セット
-#        base_notes = ["c4", "e4", "g4", "c5", "e5", "g5"]
-#        max_notes = min(len(base_notes), num_blocks)
-#        notes = base_notes[:max_notes]
-#    
-#        # 無効な音階を除外
-#        notes = [note for note in notes if note in valid_notes]
-#
-#        # デバッグ用出力
-#        print(f"[DEBUG] Blocks to remove: {num_blocks}")
-#        print(f"[DEBUG] Selected notes (before validation): {base_notes[:max_notes]}")
-#        print(f"[DEBUG] Valid notes (after validation): {notes}")
-#
-#        # ノイズの混入割合を調整
-#        noise_ratio = min(0.5, 0.2 + num_blocks * 0.02)  # 最大50%までノイズを混入
-#        tones = "".join(
-#            ["n" if random.random() < noise_ratio else "p" for _ in range(len(notes))]
-#        )
-#    
-#        # 音量設定
-#        base_volume = 5
-#        volumes = "".join([str(min(7, base_volume + i)) for i in range(len(notes))])
-#
-#        # デバッグ用出力
-#        print(f"[DEBUG] Tones: {tones}")
-#        print(f"[DEBUG] Volumes: {volumes}")
-#
-#        # エフェクト
-#        effects = "".join(["f" if i % 2 == 0 else "n" for i in range(len(notes))])
-#    
-#        # 再生速度
-#        speed = max(4, 8 - (num_blocks // 5))
-#
-#        # デバッグ用出力
-#        print(f"[DEBUG] Effects: {effects}")
-#        print(f"[DEBUG] Speed: {speed}")
-#
-#        # サウンドの設定
-#        pyxel.sounds[0].set(
-#            notes="".join(notes),
-#            tones=tones,
-#            volumes=volumes,
-#            effects=effects,
-#            speed=speed,
-#        )
-#    
-#        # 効果音の再生
-#        pyxel.play(3, 0)
-
-#    def play_effect(self, blocks_to_remove):
-#        num_blocks = len(blocks_to_remove)
-#    
-#        # 高音域で明るい音階を定義
-#        base_notes = ["c3", "d3", "e3", "g3", "a3", "c4", "d4", "e4", "g4", "a4"]
-#        max_notes = min(len(base_notes), num_blocks)
-#        selected_notes = base_notes[:max_notes]
-#    
-#        # 有効な音符のみを残す
-#        VALID_NOTES = [f"{note}{octave}" for octave in range(1, 7) for note in "cdefgab"]
-#        notes = [note for note in selected_notes if note in VALID_NOTES]
-#    
-#        # デバッグ情報を出力
-#        print(f"[DEBUG] Selected notes (before validation): {selected_notes}")
-#        print(f"[DEBUG] Valid notes (after validation): {notes}")
-#    
-#        # ここでエラーを防ぐ
-#        if not notes:
-#            print("[DEBUG] No valid notes available, skipping sound effect.")
-#            return
-#    
-#        # サウンド設定
-#        tones = "".join(["p" if random.random() < 0.7 else "n" for _ in notes])
-#        volumes = "".join([str(random.randint(4, 7)) for _ in notes])
-#        effects = "".join(["n" if i % 2 == 0 else "f" for i in range(len(notes))])
-#        speed = max(4, 8 - (num_blocks // 5))
-#    
-#        # デバッグ情報
-#        print(f"[DEBUG] Tones: {tones}")
-#        print(f"[DEBUG] Volumes: {volumes}")
-#        print(f"[DEBUG] Effects: {effects}")
-#        print(f"[DEBUG] Speed: {speed}")
-#    
-#        # Pyxel サウンド設定
-#        pyxel.sounds[0].set(
-#            notes="".join(notes),
-#            tones=tones,
-#            volumes=volumes,
-#            effects=effects,
-#            speed=speed,
-#        )
-#        pyxel.play(3, 0)
-
-#    def play_effect(self, blocks_to_remove):
-#        num_blocks = len(blocks_to_remove)
-#    
-#        # 有効な音符のリストを定義 (オクターブを6まで拡張)
-##        VALID_NOTES = [f"{note}{octave}" for octave in range(1, 7) for note in "cdefgab"]
-#        # 有効な音符のリストを定義 ('CDEFGAB'+'#-'+'0123' または 'R' の形式)
-#        VALID_NOTES = [
-#            f"{note}{accidental}{octave}"
-#            for octave in "0123"
-#            for note in "CDEFGAB"
-#            for accidental in ("", "#", "-")
-#        ] + ["R"]  # 'R' は休符
-#
-#        # 高音域で明るい音階を定義
-##        base_notes = ["c4", "e4", "g4", "c5", "e5", "g5", "c6"]
-#        base_notes = ["C2", "E2", "G2", "C3", "E3", "G3", "C4"]
-#        max_notes = min(len(base_notes), num_blocks + 2)
-#        selected_notes = base_notes[:max_notes]
-#    
-#        # 有効な音符のみを残す
-#        notes = [note for note in selected_notes if note in VALID_NOTES]
-#    
-#        print(f"[DEBUG] Selected notes (before validation): {selected_notes}")
-#        print(f"[DEBUG] Valid notes (after validation): {notes}")
-#
-#        if not notes:
-#            print("[DEBUG] No valid notes available, skipping sound effect.")
-#            return
-#    
-#        # 柔らかいトーンを追加
-#        tones = "".join(["p" if random.random() < 0.7 else "t" if random.random() < 0.3 else "s" for _ in notes])
-#    
-#        # ボリューム設定：音符に応じて調整
-#        base_volume = 4 + min(3, num_blocks // 10)
-#        volumes = [
-#            base_volume + int((1 - i / len(notes)) * 3) if tones[i] in "pt" else base_volume
-#            for i in range(len(notes))
-#        ]
-#        volumes = "".join([str(min(7, max(1, int(v)))) for v in volumes])
-#    
-#        # 効果を明るめに
-#        effects = "".join(["f" if i % 2 == 0 else "n" for i in range(len(notes))])
-#    
-#        # 再生速度を調整
-#        speed = max(6, 8 - (num_blocks // 5))
-#    
-#        # デバッグ情報
-#        print(f"[DEBUG] Notes as string: {''.join(notes)}")
-#        print(f"[DEBUG] Tones: {tones}")
-#        print(f"[DEBUG] Volumes: {volumes}")
-#        print(f"[DEBUG] Effects: {effects}")
-#        print(f"[DEBUG] Speed: {speed}")
-#    
-#        # Pyxel サウンド設定
-#        try:
-#            pyxel.sounds[0].set(
-#                notes=" ".join(notes),
-#                tones=tones,
-#                volumes=volumes,
-#                effects=effects,
-#                speed=speed,
-#            )
-#            pyxel.play(3, 0)
-#        except Exception as e:
-#            print(f"[ERROR] Failed to set sound: {e}")
-
-#    def play_effect(self, blocks_to_remove):
-#        num_blocks = len(blocks_to_remove)
-#        
-#        # 有効な音符のリストを定義 ('CDEFGAB'+'#-'+'0123' または 'R' の形式)
-#        VALID_NOTES = [
-#            f"{note}{accidental}{octave}"
-#            for octave in "0123"
-#            for note in "CDEFGAB"
-#            for accidental in ("", "#", "-")
-#        ] + ["R"]  # 'R' は休符
-#    
-#        # メジャーコード進行に基づく音階を定義
-#        base_notes = ["C2", "E2", "G2", "C3", "E3", "G3", "C4"]
-#        max_notes = min(len(base_notes), num_blocks + 2)
-#        selected_notes = base_notes[:max_notes]
-#    
-#        # 有効な音符のみを残す
-#        notes = [note for note in selected_notes if note in VALID_NOTES]
-#    
-#        if not notes:
-#            print("[DEBUG] No valid notes available, skipping sound effect.")
-#            return
-#    
-#        # 音色（トーン）を柔らかめに設定
-#        tones = "".join(["p" if random.random() < 0.8 else "t" for _ in notes])
-#    
-#        # ボリューム設定：音符の強弱を加える
-#        base_volume = 5
-#        volumes = [
-#            base_volume + int((1 - i / len(notes)) * 2) for i in range(len(notes))
-#        ]
-#        volumes = "".join([str(min(7, max(1, int(v)))) for v in volumes])
-#    
-#        # 効果を柔らかく、明るい印象に
-#        effects = "".join(["f" if i % 2 == 0 else "n" for i in range(len(notes))])
-#    
-#        # 再生速度を少し遅めに設定
-#        speed = max(5, 8 - (num_blocks // 5))
-#    
-#        # デバッグ情報
-#        print(f"[DEBUG] Notes: {' '.join(notes)}")
-#        print(f"[DEBUG] Tones: {tones}")
-#        print(f"[DEBUG] Volumes: {volumes}")
-#        print(f"[DEBUG] Effects: {effects}")
-#        print(f"[DEBUG] Speed: {speed}")
-#    
-#        # Pyxel サウンド設定
-#        try:
-#            pyxel.sounds[0].set(
-#                notes=" ".join(notes),
-#                tones=tones,
-#                volumes=volumes,
-#                effects=effects,
-#                speed=speed,
-#            )
-#            pyxel.play(3, 0)
-#        except Exception as e:
-#            print(f"[ERROR] Failed to set sound: {e}")
-
-
-#    def play_effect(self, blocks_to_remove):
-#        num_blocks = len(blocks_to_remove)
-#    
-#        # 有効な音符のリストを定義 ('CDEFGAB'+'#-'+'0123' または 'R' の形式)
-#        VALID_NOTES = [
-#            f"{note}{accidental}{octave}"
-#            for octave in "0123"
-#            for note in "CDEFGAB"
-#            for accidental in ("", "#", "-")
-#        ] + ["R"]  # 'R' は休符
-#    
-#        # 明るく、上昇感を強調した音階を定義
-#        base_notes = ["C2", "E2", "G2", "C3", "E3", "G3", "C4", "E4", "G4"]
-##        max_notes = min(len(base_notes), int(3 + num_blocks ** 0.5))  # 線形でなく、√で伸びる
-#        # 音の長さを指数関数的に伸ばす
-#        max_notes = min(len(base_notes), int(3 * (1.2 ** num_blocks)))
-#        selected_notes = base_notes[:max_notes]
-#    
-#        # 有効な音符のみを残す
-#        notes = [note for note in selected_notes if note in VALID_NOTES]
-#    
-#        if not notes:
-#            print("[DEBUG] No valid notes available, skipping sound effect.")
-#            return
-#    
-#        # トーンを明るく、ノイズを多めに
-#        tones = "".join([
-#            "p" if random.random() < 0.5 else "t" if random.random() < 0.3 else "n"
-#            for _ in notes
-#        ])
-#    
-#        # ボリューム設定：強弱を付けつつ大きめに
-#        base_volume = 5
-#        volumes = [
-#            base_volume + int((i / len(notes)) * 3) if tones[i] in "pt" else base_volume - 1
-#            for i in range(len(notes))
-#        ]
-#        volumes = "".join([str(min(7, max(1, int(v)))) for v in volumes])
-#    
-#        # 効果を上昇感があるように設定
-#        effects = "".join([
-#            "f" if i % 3 == 0 else "n" if i % 3 == 1 else "s"  # フェード、ノイズ、スライド
-#            for i in range(len(notes))
-#        ])
-#    
-#        # 連鎖数に応じて速度を大幅に変化
-#        speed = max(3, 10 - int(num_blocks ** 0.5))  # 長い連鎖ほどゆっくりに
-#    
-#        # デバッグ情報
-#        print(f"[DEBUG] Notes: {' '.join(notes)}")
-#        print(f"[DEBUG] Tones: {tones}")
-#        print(f"[DEBUG] Volumes: {volumes}")
-#        print(f"[DEBUG] Effects: {effects}")
-#        print(f"[DEBUG] Speed: {speed}")
-#    
-#        # Pyxel サウンド設定
-#        try:
-#            pyxel.sounds[0].set(
-#                notes=" ".join(notes),
-#                tones=tones,
-#                volumes=volumes,
-#                effects=effects,
-#                speed=speed,
-#            )
-#            pyxel.play(3, 0)
-#        except Exception as e:
-#            print(f"[ERROR] Failed to set sound: {e}")
-
     def play_effect(self, blocks_to_remove):
         num_blocks = len(blocks_to_remove)
     
@@ -970,7 +631,7 @@ class SameGame:
         # Cメジャーコード進行を意識した音階を定義
         base_notes = [
 #            "C0", "E0", "G0",
-            "C1", "E1", "G1",
+#            "C1", "E1", "G1",
             "C2", "E2", "G2",
             "C3", "E3", "G3",
             "C4", "E4", "G4",
@@ -979,27 +640,23 @@ class SameGame:
         max_notes = min(len(base_notes), int(3 * (1.2 ** num_blocks)))
 #        max_notes = min(len(base_notes), int(3 * (1.5 ** num_blocks)))
 #        max_notes = min(len(base_notes), int(3 * (2.0 ** num_blocks)))
-        selected_notes = base_notes[:max_notes]
-    
+#        selected_notes = base_notes[:max_notes]
+#        selected_notes = [note for note in base_notes[:max_notes] if note in VALID_NOTES]
+#        selected_notes = base_notes[:max_notes]
+#        filtered_notes = [note for note in selected_notes if note in VALID_NOTES]
+#        
+#        print(f"[DEBUG] Selected notes before filtering: {selected_notes}")
+#        print(f"[DEBUG] Filtered notes: {filtered_notes}")
+
         # 有効な音符のみを残す
-        notes = [note for note in selected_notes if note in VALID_NOTES]
+#        notes = [note for note in selected_notes if note in VALID_NOTES]
+#        notes = selected_notes
+        notes = base_notes[:max_notes]
     
         if not notes:
             print("[DEBUG] No valid notes available, skipping sound effect.")
             return
     
-#        # トーンを明るく、ノイズを多めに
-##        tones = "".join([
-##            "p" if random.random() < 0.8 else "t" if random.random() < 0.2 else "n"
-##            for _ in notes
-##        ])
-#        tones = "".join([
-##            "p" if r < 0.5 else "t" if r < 0.8 else "n"
-##            "p" if r < 0.8 else "t" if r < 0.9 else "n"
-#            "p" if r < 0.6 else "t" if r < 0.8 else "n"
-#            for r in [random.random() for _ in notes]
-#        ])
-
         # トーンを連鎖数に応じて調整
         noise_ratio = min(0.5, 0.2 + num_blocks * 0.05)  # ノイズ割合（最大50%）
         pulse_ratio = 1 - noise_ratio  # パルスの割合
@@ -1033,7 +690,7 @@ class SameGame:
         # デバッグ情報
         print(f"[DEBUG] base_notes: {base_notes}")
         print(f"[DEBUG] max_notes: {max_notes}")
-        print(f"[DEBUG] Notes (before filtering): {selected_notes}")
+#        print(f"[DEBUG] Notes (before filtering): {selected_notes}")
         print(f"[DEBUG] Notes: {' '.join(notes)}")
         print(f"[DEBUG] Tones: {tones}")
         print(f"[DEBUG] Volumes: {volumes}")
@@ -1477,21 +1134,6 @@ class SameGame:
     
         return connected
 
-#    def apply_gravity(self):
-#        for col in range(self.grid_cols):
-#            # "None じゃないブロック" を上から順に集めたリストを作る
-#            column_blocks = [self.grid[row][col] for row in range(self.grid_rows) if self.grid[row][col] is not None]
-#            # 下から埋める形で再配置
-#            for row in range(self.grid_rows):
-#                # 下の行(y=grid_rows-1)ほど先に埋まる
-#                target_row = self.grid_rows - 1 - row
-#                if row < len(column_blocks):
-#                    block = column_blocks[-(row+1)]
-#                    block.row = target_row  # Block自体の row も更新しておく
-#                    self.grid[target_row][col] = block
-#                else:
-#                    self.grid[target_row][col] = None
-
     def apply_gravity_animated(self):
         """
         従来の apply_gravity() と同じように「最終 row」を計算しつつ、
@@ -1517,32 +1159,6 @@ class SameGame:
             # 残りは None 埋め
             for r in range(curr_row, -1, -1):
                 self.grid[r][col] = None
-
-#    def shift_columns_left(self):
-#        """
-#        列が全て None なら、その列を左に詰める。
-#        動かしたブロックは .col を更新しておく。
-#        """
-#        new_columns = []
-#        
-#        # 1. 空でない列 (少なくとも1つ Block がある列) だけ収集
-#        for col in range(self.grid_cols):
-#            # この列のブロック情報を縦にスキャン
-#            column_data = [self.grid[row][col] for row in range(self.grid_rows)]
-#            # ひとつでも None でないマスがあれば「有効な列」
-#            if any(block is not None for block in column_data):
-#                new_columns.append(column_data)
-#        
-#        # 2. 足りない列は全て None 列で埋める
-#        while len(new_columns) < self.grid_cols:
-#            new_columns.append([None] * self.grid_rows)
-#        
-#        # 3. new_columns を grid に書き戻し + 移動したブロックの col を更新
-#        for new_col_index, column_data in enumerate(new_columns):
-#            for row_index, block in enumerate(column_data):
-#                self.grid[row_index][new_col_index] = block
-#                if block is not None:
-#                    block.col = new_col_index
 
     def shift_columns_left_animated(self):
         new_columns = []
@@ -1570,10 +1186,10 @@ class SameGame:
                     connected = self.find_connected_blocks(col, row, block.color)
                     if len(connected) > 1:
                         return True
-                else:
-                    print(f"[DEBUG] Block at row={row}, col={col} is None.")
+#                else:
+#                    print(f"[DEBUG] Block at row={row}, col={col} is None.")
         # すべてのブロックをチェックした後
-        print(f"[DEBUG] No valid moves. Last checked block: None or invalid.")
+#        print(f"[DEBUG] No valid moves. Last checked block: None or invalid.")
         return False
 
     def is_grid_empty(self):
@@ -1585,82 +1201,6 @@ class SameGame:
                     return False
         return True
 
-#    def play_effect(self, blocks_to_remove):
-#        """ポップで壊れる明るい効果音を再生"""
-#        num_blocks = len(blocks_to_remove)
-#    
-#        # 高音域で明るい音階を定義
-#        base_notes = ["c3", "d3", "e3", "g3", "a3", "c4", "d4", "e4", "g4", "a4"]
-#        max_notes = min(len(base_notes), num_blocks)
-#        notes = base_notes[:max_notes]
-#    
-#        # ノイズ効果の混入割合を調整（ブロック数に応じて増加）
-#        noise_ratio = min(0.5, 0.2 + num_blocks * 0.02)  # 最大50%までノイズを混入
-#        tones = "".join(
-#            ["n" if random.random() < noise_ratio else "p" for _ in range(len(notes))]
-#        )
-#    
-#        # 音量をランダム化して変化をつける
-#        volumes = "".join([str(random.randint(4, 6)) for _ in range(len(notes))])
-#    
-#        # 効果をランダム化し、フェード効果を時折追加
-#        effects = "".join(["n" if i % 3 == 0 else "f" for i in range(len(notes))])
-#    
-#        # 再生速度をブロック数に応じて速くする（多いほど速く）
-#        speed = max(4, 8 - (num_blocks // 5))  # 最小速度4、ブロック数で短縮
-#    
-#        # 効果音の設定
-#        pyxel.sounds[0].set(
-#            notes="".join(notes),  # 音階のみを指定
-#            tones=tones,          # パルスとノイズの切り替えを指定
-#            volumes=volumes,      # ボリューム
-#            effects=effects,      # 効果
-#            speed=speed,          # 再生速度
-#        )
-#    
-#        # 効果音を再生
-#        pyxel.play(3, 0)
-
-#    def play_effect(self, blocks_to_remove):
-#        """ポップで壊れる明るい効果音を再生"""
-#        num_blocks = len(blocks_to_remove)
-#    
-#        # 高音域で明るい音階を定義
-#        base_notes = ["c3", "d3", "e3", "g3", "a3", "c4", "d4", "e4", "g4", "a4"]
-#        max_notes = min(len(base_notes), num_blocks)
-#        notes = base_notes[:max_notes]
-#    
-#        # ノイズ効果の混入割合を調整（ブロック数に応じて増加）
-#        noise_ratio = min(0.5, 0.2 + num_blocks * 0.02)  # 最大50%までノイズを混入
-#        tones = "".join(
-#            ["n" if random.random() < noise_ratio else "p" for _ in range(len(notes))]
-#        )
-#    
-#        # ボリューム設定：末尾に向けて大きくする
-#        base_volume = 4 + min(3, num_blocks // 10)  # ブロック数が多いと全体的にボリュームを増加
-#        volumes = [
-#            base_volume + (i / len(notes)) * 2 if tones[i] == "n" else base_volume
-#            for i in range(len(notes))
-#        ]
-#        volumes = "".join([str(min(7, int(v))) for v in volumes])  # 最大ボリュームは7
-#    
-#        # 効果をランダム化し、フェード効果を時折追加
-#        effects = "".join(["n" if i % 3 == 0 else "f" for i in range(len(notes))])
-#    
-#        # 再生速度をブロック数に応じて速くする（多いほど速く）
-#        speed = max(4, 8 - (num_blocks // 5))  # 最小速度4、ブロック数で短縮
-#    
-#        # 効果音の設定
-#        pyxel.sounds[0].set(
-#            notes="".join(notes),  # 音階のみを指定
-#            tones=tones,          # パルスとノイズの切り替えを指定
-#            volumes=volumes,      # ボリューム
-#            effects=effects,      # 効果
-#            speed=speed,          # 再生速度
-#        )
-#    
-#        # 効果音を再生
-#        pyxel.play(3, 0)
 
     def spawn_particles(self, blocks_to_remove, points_gained, cell_size, grid_x_start, grid_y_start):
         """
