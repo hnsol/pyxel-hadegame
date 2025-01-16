@@ -532,11 +532,28 @@ class TransitionEffect:
                     "color": pyxel.COLOR_WHITE,
                 }
 #                for _ in range(100)
-                for _ in range(200)
+                for _ in range(400)
             ]
             for particle in self.particles:
                 particle["original_x"] = particle["x"]
                 particle["original_y"] = particle["y"]
+
+        elif effect_type == "rays":
+            self.particles = [
+                {
+#                    "center_x": self.center_x + random.uniform(-50, 50),  # 中心位置をランダムにずらす
+                    "center_x": self.center_x + random.uniform(-100, 100),  # 中心位置をランダムにずらす
+                    "center_y": self.center_y + random.uniform(-100, 100),
+                    "angle": random.uniform(0, 360),
+                    "radius": 0,
+#                    "speed": random.uniform(2, 8),
+                    "speed": random.uniform(4, 8),
+                    "color": pyxel.COLOR_WHITE,
+#                    "color": pyxel.COLOR_YELLOW,
+                }
+#                for _ in range(50)
+                for _ in range(400)
+            ]
 
     def update(self):
         """エフェクトの進行"""
@@ -547,6 +564,8 @@ class TransitionEffect:
 
         if self.effect_type == "warp":
             self._update_warp()
+        elif self.effect_type == "rays":
+            self._update_rays()
 
         # エフェクト終了
         if self.timer >= self.duration:
@@ -562,6 +581,8 @@ class TransitionEffect:
 
         if self.effect_type == "warp":
             self._draw_warp()
+        elif self.effect_type == "rays":
+            self._draw_rays()
 
     def _update_warp(self):
         """ワープエフェクトの更新処理"""
@@ -603,6 +624,37 @@ class TransitionEffect:
                     int(particle["y"]),
                     particle["color"],
                 )
+
+    def _update_rays(self):
+        """放射状の光線エフェクトの更新処理"""
+        for particle in self.particles:
+#            particle["radius"] += particle["speed"]
+            # phase_delay の間は速度を半分に
+            if self.timer < self.phase_delay:
+                particle["radius"] += particle["speed"]
+            else:
+                particle["radius"] += particle["speed"] * 0.5
+
+    def _draw_rays(self):
+        """放射状の光線エフェクトの描画処理"""
+        for particle in self.particles:
+            x_end = int(self.center_x + particle["radius"] * pyxel.cos(particle["angle"]))
+            y_end = int(self.center_y + particle["radius"] * pyxel.sin(particle["angle"]))
+
+            pyxel.line(self.center_x, self.center_y, x_end, y_end, particle["color"])
+
+#        # 中央から広がる白い円を描画
+#        # 半径はタイマーの進行に応じて増加
+#        max_radius = max(pyxel.width, pyxel.height)
+#        progress = self.timer / self.duration
+#        current_radius = int(progress * max_radius)
+#    
+#        pyxel.circ(
+#            self.center_x,
+#            self.center_y,
+#            current_radius,
+#            pyxel.COLOR_WHITE
+#        )
 
 
 class SameGame:
@@ -1565,8 +1617,11 @@ class SameGame:
         if bgm_state:
             self.play_bgm(bgm_state)
 
-        if self.state in [GameState.GAME_CLEARED, GameState.TIME_UP, GameState.NO_MOVES]:
+        if self.state in [GameState.TIME_UP, GameState.NO_MOVES]:
             self.transition_effect.start(effect_type="warp", duration=60, phase_delay=15)
+            self.show_message = False  # メッセージを非表示にする
+        elif self.state in [GameState.GAME_CLEARED]:
+            self.transition_effect.start(effect_type="rays", duration=60, phase_delay=15)
             self.show_message = False  # メッセージを非表示にする
 
     def update_high_scores(self):
@@ -1934,12 +1989,19 @@ class SameGame:
                 
                 elif self.state == GameState.GAME_CLEARED:
                     # ゲームクリア画面の描画
+                    # 画面をクリア
+                    pyxel.cls(pyxel.COLOR_WHITE)
+
                     cleared_msg = messages["game_cleared"]
                     self.draw_text(WINDOW_HEIGHT // 2 - 40, cleared_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
                     self.draw_text(WINDOW_HEIGHT // 2 - 20, cleared_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
                     bonus_text = cleared_msg["bonus"][self.current_language].format(bonus=int(self.score * 0.5))
                     self.draw_text(WINDOW_HEIGHT // 2, bonus_text, pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
                     self.draw_text(WINDOW_HEIGHT // 2 + 20, cleared_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+
+                    self.draw_difficulty_label()
+                    self.draw_score_and_time()
+
             
         elif self.state == GameState.SCORE_DISPLAY:
             # 画面をクリア
