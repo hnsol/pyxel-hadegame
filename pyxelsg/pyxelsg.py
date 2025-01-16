@@ -284,20 +284,24 @@ class ScorePopup:
         if score <= 99:
 #            self.color = pyxel.COLOR_GRAY
             self.color = pyxel.COLOR_LIGHT_BLUE
-            self.scale = 1
+#            self.scale = 1
             self.vy = -1.0
+            self.font = self.game.font_medium
         elif score <= 999:
             self.color = pyxel.COLOR_WHITE
-            self.scale = 2
+#            self.scale = 2
             self.vy = -2.0
+            self.font = self.game.font_medium
         elif score <= 4999:
             self.color = pyxel.COLOR_YELLOW
-            self.scale = 3
+#            self.scale = 3
             self.vy = -4.0
+            self.font = self.game.font_medium
         else:
             self.color = pyxel.COLOR_RED
-            self.scale = 4
+#            self.scale = 4
             self.vy = -4.0
+            self.font = self.game.font_large
 
         # デバッグ出力: 初期設定確認
 #        print(f"[DEBUG] ScorePopup initialized: score={self.score}, color={self.color}, scale={self.scale}, vy={self.vy}")
@@ -310,7 +314,9 @@ class ScorePopup:
     def draw(self):
         text = f"+{self.score}"
 #        x = int(self.x)
-        text_width = self.game.font_small.text_width(text)  # テキスト幅を取得
+#        text_width = self.game.font_small.text_width(text)  # テキスト幅を取得
+#        text_width = self.game.font_medium.text_width(text)  # テキスト幅を取得
+        text_width = self.font.text_width(text)  # 使用するフォントでテキスト幅を計算
         x = int(self.x - text_width / 2)  # テキスト幅を考慮した中心位置
         y = int(self.y)
         # 袋文字付きの描画を draw_text に置き換え
@@ -320,6 +326,7 @@ class ScorePopup:
             color=self.color,
             align="left",
             x_offset=x,
+            font=self.font,
             border_color=pyxel.COLOR_BLACK,  # 袋文字の色
         )
 
@@ -396,6 +403,8 @@ class SameGame:
         # フォント読み込み
         try:
             self.font_small = self.load_font("assets/fonts/k8x12.bdf")
+            self.font_medium = self.load_font("assets/fonts/umplus_j10r.bdf")
+            self.font_large = self.load_font("assets/fonts/umplus_j12r.bdf")
         except FileNotFoundError as e:
             print(f"Error loading font: {e}")
             exit(1)
