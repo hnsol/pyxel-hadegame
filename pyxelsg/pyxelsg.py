@@ -271,37 +271,54 @@ class Particle:
         return self.age < self.life
 
 class ScorePopup:
+    # ティア設定（データ定義）
+    TIERS = [
+        {"max_score": 99, "color": pyxel.COLOR_WHITE, "vy": -1.0, "font": "font_medium"},
+        {"max_score": 999, "color": pyxel.COLOR_WHITE, "vy": -2.0, "font": "font_medium"},
+#        {"max_score": 4999, "color": pyxel.COLOR_YELLOW, "vy": -3.0, "font": "font_medium"},
+        {"max_score": 4999, "color": pyxel.COLOR_YELLOW, "vy": -3.0, "font": "font_large"},
+        {"max_score": float("inf"), "color": pyxel.COLOR_RED, "vy": -4.0, "font": "font_large"},
+    ]
+
     def __init__(self, x, y, score, color, game):
         self.x = x
         self.y = y
         self.score = score
         self.color = color
         self.game = game  # ゲームオブジェクトを保持
-        self.lifetime = 15
+        self.lifetime = 20
         self.age = 0
 
-        # スコアに応じた色、スケール、上昇速度を設定
-        if score <= 99:
-#            self.color = pyxel.COLOR_GRAY
-            self.color = pyxel.COLOR_LIGHT_BLUE
-#            self.scale = 1
-            self.vy = -1.0
-            self.font = self.game.font_medium
-        elif score <= 999:
-            self.color = pyxel.COLOR_WHITE
-#            self.scale = 2
-            self.vy = -2.0
-            self.font = self.game.font_medium
-        elif score <= 4999:
-            self.color = pyxel.COLOR_YELLOW
-#            self.scale = 3
-            self.vy = -4.0
-            self.font = self.game.font_medium
-        else:
-            self.color = pyxel.COLOR_RED
-#            self.scale = 4
-            self.vy = -4.0
-            self.font = self.game.font_large
+#        # スコアに応じた色、スケール、上昇速度を設定
+#        if score <= 99:
+#            self.color = pyxel.COLOR_LIGHT_BLUE
+#            self.vy = -1.0
+#            self.font = self.game.font_medium
+#        elif score <= 999:
+#            self.color = pyxel.COLOR_WHITE
+#            self.vy = -2.0
+#            self.font = self.game.font_medium
+#        elif score <= 4999:
+#            self.color = pyxel.COLOR_YELLOW
+#            self.vy = -4.0
+#            self.font = self.game.font_medium
+#        else:
+#            self.color = pyxel.COLOR_RED
+#            self.vy = -4.0
+#            self.font = self.game.font_large
+
+        # スコアに応じたティア設定を適用
+        tier = self.get_tier(score)
+        self.color = tier["color"]
+        self.vy = tier["vy"]
+        self.font = getattr(self.game, tier["font"])  # フォント名からゲームオブジェクトの属性を取得
+
+    def get_tier(self, score):
+        """スコアに応じたティア設定を取得"""
+        for tier in self.TIERS:
+            if score <= tier["max_score"]:
+                return tier
+        raise ValueError(f"Invalid score: {score}")
 
         # デバッグ出力: 初期設定確認
 #        print(f"[DEBUG] ScorePopup initialized: score={self.score}, color={self.color}, scale={self.scale}, vy={self.vy}")
@@ -313,9 +330,6 @@ class ScorePopup:
 
     def draw(self):
         text = f"+{self.score}"
-#        x = int(self.x)
-#        text_width = self.game.font_small.text_width(text)  # テキスト幅を取得
-#        text_width = self.game.font_medium.text_width(text)  # テキスト幅を取得
         text_width = self.font.text_width(text)  # 使用するフォントでテキスト幅を計算
         x = int(self.x - text_width / 2)  # テキスト幅を考慮した中心位置
         y = int(self.y)
