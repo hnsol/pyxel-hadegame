@@ -274,10 +274,10 @@ class ScorePopup:
     # ティア設定（データ定義）
     TIERS = [
         {"max_score": 99, "color": pyxel.COLOR_WHITE, "vy": -1.0, "font": "font_medium"},
-        {"max_score": 999, "color": pyxel.COLOR_WHITE, "vy": -2.0, "font": "font_medium"},
+        {"max_score": 999, "color": pyxel.COLOR_WHITE, "vy": -1.5, "font": "font_medium"},
 #        {"max_score": 4999, "color": pyxel.COLOR_YELLOW, "vy": -3.0, "font": "font_medium"},
-        {"max_score": 4999, "color": pyxel.COLOR_YELLOW, "vy": -3.0, "font": "font_large"},
-        {"max_score": float("inf"), "color": pyxel.COLOR_RED, "vy": -4.0, "font": "font_large"},
+        {"max_score": 4999, "color": pyxel.COLOR_YELLOW, "vy": -2.0, "font": "font_large"},
+        {"max_score": float("inf"), "color": pyxel.COLOR_RED, "vy": -2.5, "font": "font_large"},
     ]
 
     def __init__(self, x, y, score, color, game):
@@ -289,23 +289,6 @@ class ScorePopup:
         self.lifetime = 20
         self.age = 0
 
-#        # スコアに応じた色、スケール、上昇速度を設定
-#        if score <= 99:
-#            self.color = pyxel.COLOR_LIGHT_BLUE
-#            self.vy = -1.0
-#            self.font = self.game.font_medium
-#        elif score <= 999:
-#            self.color = pyxel.COLOR_WHITE
-#            self.vy = -2.0
-#            self.font = self.game.font_medium
-#        elif score <= 4999:
-#            self.color = pyxel.COLOR_YELLOW
-#            self.vy = -4.0
-#            self.font = self.game.font_medium
-#        else:
-#            self.color = pyxel.COLOR_RED
-#            self.vy = -4.0
-#            self.font = self.game.font_large
 
         # スコアに応じたティア設定を適用
         tier = self.get_tier(score)
@@ -751,6 +734,224 @@ class SameGame:
             pyxel.play(3, 0)
         except Exception as e:
             print(f"[ERROR] Failed to set sound: {e}")
+
+#    def play_effect(self, blocks_to_remove):
+#        num_blocks = len(blocks_to_remove)
+#        
+#        # 音階：I - VII♭ のコード進行
+#        base_notes = [
+#            "C2", "E2", "G2",  # I (Cメジャー)
+#            "C3", "E3", "G3",
+#            "C4", "E4", "G4",
+#            "B-2", "D3", "F3",  # VII♭ (B♭メジャー)
+#            "B-3", "D4", "F4",
+#        ]
+#    
+#        # 音階を連鎖数に応じて高音域にする
+#        max_notes = min(len(base_notes), int(4 * (1.3 ** min(num_blocks, 10))))  # 最大10連鎖程度を上限
+#        selected_notes = random.sample(base_notes[:max_notes], min(8, max_notes))  # 最大8音をランダム選択
+#    
+#        # トーン設定：ノイズを多用してRez風の雰囲気を強調
+#        noise_ratio = min(0.7, 0.3 + num_blocks * 0.05)  # ノイズ割合（最大70%）
+#        pulse_ratio = 1 - noise_ratio  # パルスの割合
+#        tones = "".join([
+#            "p" if r < pulse_ratio else "n" if r < pulse_ratio + noise_ratio else "t"
+#            for r in [random.random() for _ in selected_notes]
+#        ])
+#    
+#        # ボリューム設定：最初は大きく、徐々に減衰
+#        base_volume = 6
+#        volumes = [
+#            base_volume - int(i / len(selected_notes) * 3) if tones[i] in "pn" else base_volume - 2
+#            for i in range(len(selected_notes))
+#        ]
+#        volumes = "".join([str(min(7, max(1, v))) for v in volumes])
+#    
+#        # 効果：フェードアウト、スライド、ノイズを動的に設定
+#        effects = "".join([
+#            "f" if i % 3 == 0 else "n" if i % 3 == 1 else "s"
+#            for i in range(len(selected_notes))
+#        ])
+#    
+#        # 再生速度：連鎖数が多いほど速くなる（エネルギー感を演出）
+#        speed = max(2, 10 - int(num_blocks ** 0.5))  # 大連鎖ほど速くなる
+#    
+#        # デバッグ情報
+#        print(f"[DEBUG] Selected Notes: {selected_notes}")
+#        print(f"[DEBUG] Tones: {tones}")
+#        print(f"[DEBUG] Volumes: {volumes}")
+#        print(f"[DEBUG] Effects: {effects}")
+#        print(f"[DEBUG] Speed: {speed}")
+#        
+#        # Pyxel サウンド設定
+#        try:
+#            pyxel.sounds[0].set(
+#                notes=" ".join(selected_notes),
+#                tones=tones,
+#                volumes=volumes,
+#                effects=effects,
+#                speed=speed,
+#            )
+#            pyxel.play(3, 0)  # チャンネル3で再生
+#        except Exception as e:
+#            print(f"[ERROR] Failed to set sound: {e}")
+
+
+#    def play_effect(self, blocks_to_remove):
+#        num_blocks = len(blocks_to_remove)
+#    
+#        # ロック音の設定
+#        lock_notes = ["C4", "E4", "G4", "B4"]
+#        lock_tones = "p" * len(lock_notes)  # パルス波のみ
+#        lock_volumes = "5555"  # 一定の音量
+#        lock_effects = "nfsn"  # フェードとスライドを少し
+#        lock_speed = 10  # ロック音は比較的ゆっくり
+#    
+#        # Pyxel サウンドでロック音を再生
+#        try:
+#            pyxel.sounds[1].set(
+#                notes=" ".join(lock_notes),
+#                tones=lock_tones,
+#                volumes=lock_volumes,
+#                effects=lock_effects,
+#                speed=lock_speed,
+#            )
+#            pyxel.play(2, 1)  # チャンネル2でロック音を再生
+#        except Exception as e:
+#            print(f"[ERROR] Failed to set lock sound: {e}")
+#    
+#        # 破壊音の設定
+#        destroy_notes = [
+#            "C1", "E1", "G1", "B1",  # 高音域
+#            "C2", "D2", "F2", "G2",  # 爆発的な音
+#        ]
+#        destroy_tones = "".join([
+#            "n" if i % 2 == 0 else "t"
+#            for i in range(len(destroy_notes))
+#        ])  # ノイズと三角波を交互に
+#        destroy_volumes = "".join([
+#            str(7 - (i // 2)) for i in range(len(destroy_notes))
+#        ])  # 音量を段階的に減衰
+#        destroy_effects = "".join([
+#            "s" if i % 3 == 0 else "f" if i % 3 == 1 else "n"
+#            for i in range(len(destroy_notes))
+#        ])  # スライド、フェード、ノイズを適用
+#        destroy_speed = max(2, 10 - int(num_blocks ** 0.5))  # 連鎖数に応じて速く
+#    
+#        # Pyxel サウンドで破壊音を再生
+#        try:
+#            pyxel.sounds[2].set(
+#                notes=" ".join(destroy_notes),
+#                tones=destroy_tones,
+#                volumes=destroy_volumes,
+#                effects=destroy_effects,
+#                speed=destroy_speed,
+#            )
+#            pyxel.play(3, 2)  # チャンネル3で破壊音を再生
+#        except Exception as e:
+#            print(f"[ERROR] Failed to set destroy sound: {e}")
+
+#    def play_effect(self, blocks_to_remove):
+#        num_blocks = len(blocks_to_remove)
+#    
+#        # **ロックオン音の設定**
+#        lock_notes = [
+#            "C4", "E4", "G4",  # 高音域のIメジャーコード
+#            "D4", "F4", "A4",  # 次の音に遷移（Dマイナー風）
+#            "E4", "G4", "B4",  # 再び高音域
+#        ]
+#        # 連鎖数に応じて音符を追加
+#        lock_notes = lock_notes[: min(len(lock_notes), num_blocks)]
+#        lock_tones = "p" * len(lock_notes)  # パルス波のみ
+#        lock_volumes = "7" * len(lock_notes)  # 最大音量で一定
+#        lock_effects = "s" * len(lock_notes)  # スライドで軽快感を演出
+#        lock_speed = max(4, 16 - int(num_blocks ** 0.5))  # ブロック数が多いほど速く
+#    
+#        # ロックオン音を再生
+#        try:
+#            pyxel.sounds[1].set(
+#                notes=" ".join(lock_notes),
+#                tones=lock_tones,
+#                volumes=lock_volumes,
+#                effects=lock_effects,
+#                speed=lock_speed,
+#            )
+#            pyxel.play(2, 1)  # チャンネル2でロックオン音を再生
+#        except Exception as e:
+#            print(f"[ERROR] Failed to set lock sound: {e}")
+#    
+#        # **爆発音の設定**
+#        destroy_notes = [
+#            "C3", "G2", "C2",  # 低音域で迫力を演出
+#            "R",                # 休符で間を作る
+#        ]
+#        destroy_tones = "nntn"  # ノイズと三角波で爆発感を表現
+#        destroy_volumes = "7766"  # 音量を少しずつ減衰
+#        destroy_effects = "sffs"  # スライドとフェードで余韻を演出
+#        destroy_speed = 8  # 爆発音はゆっくり
+#    
+#        # 爆発音を再生
+#        try:
+#            pyxel.sounds[2].set(
+#                notes=" ".join(destroy_notes),
+#                tones=destroy_tones,
+#                volumes=destroy_volumes,
+#                effects=destroy_effects,
+#                speed=destroy_speed,
+#            )
+##            pyxel.play(3, 2)  # チャンネル3で爆発音を再生
+#        except Exception as e:
+#            print(f"[ERROR] Failed to set destroy sound: {e}")
+
+#    def play_effect(self, blocks_to_remove):
+#        num_blocks = len(blocks_to_remove)
+#        
+#        # **ロックオン音の設定**
+#        lock_notes = []
+#        for _ in range(num_blocks):
+#            lock_notes.extend(["C4", "R", "E4", "R", "G4", "R"])  # 音符と休符を交互に配置
+#        
+#        # 最大音符数を制限（あまり長すぎないようにする）
+#        max_notes = min(len(lock_notes), 9)
+#        lock_notes = lock_notes[:max_notes]
+#        
+#        lock_tones = "".join(["p" if note != "R" else " " for note in lock_notes])  # 休符は空白
+#        lock_volumes = "".join(["7" if note != "R" else "0" for note in lock_notes])  # 休符は音量0
+#        lock_effects = "".join(["s" if note != "R" else "n" for note in lock_notes])  # スライド効果を適用
+#        lock_speed = 8  # ロックオン音は速め
+#    
+#        # ロックオン音を再生
+#        try:
+#            pyxel.sounds[1].set(
+#                notes=" ".join(lock_notes),
+#                tones=lock_tones,
+#                volumes=lock_volumes,
+#                effects=lock_effects,
+#                speed=lock_speed,
+#            )
+#            pyxel.play(2, 1)  # チャンネル2でロックオン音を再生
+#        except Exception as e:
+#            print(f"[ERROR] Failed to set lock sound: {e}")
+#        
+#        # **爆発音の設定**
+#        destroy_notes = ["C3", "R", "G2", "R", "C2"]  # 低音と休符で迫力を演出
+#        destroy_tones = "nntnn"  # ノイズと三角波で爆発感を表現
+#        destroy_volumes = "77660"  # 音量を減衰しつつ休符を挿入
+#        destroy_effects = "sfsff"  # スライドとフェードで余韻を追加
+#        destroy_speed = 10  # 爆発音は少しゆっくり
+#    
+#        # 爆発音を再生
+#        try:
+#            pyxel.sounds[2].set(
+#                notes=" ".join(destroy_notes),
+#                tones=destroy_tones,
+#                volumes=destroy_volumes,
+#                effects=destroy_effects,
+#                speed=destroy_speed,
+#            )
+#            pyxel.play(3, 2)  # チャンネル3で爆発音を再生
+#        except Exception as e:
+#            print(f"[ERROR] Failed to set destroy sound: {e}")
 
 
     def update(self):
