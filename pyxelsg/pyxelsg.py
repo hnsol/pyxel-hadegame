@@ -1875,16 +1875,253 @@ class SameGame:
             p.draw()
 
 
+#    def draw(self):
+#        # まずシェイクのオフセットを決定
+#        # シェイクタイマーが残っていればランダムにオフセット
+#        if self.shake_timer > 0:
+#            # 残りタイマーに基づいて非線形減衰を計算
+#            normalized_timer = self.shake_timer / 20  # 0〜1に正規化
+##            current_magnitude = max(1, self.shake_magnitude * (normalized_timer ** 2))  # 平方減衰
+##            shake_x = random.uniform(-current_magnitude, current_magnitude)
+##            shake_y = random.uniform(-current_magnitude, current_magnitude)
+#
+#            # 減衰を緩やかに（直線減衰や平方根を使用）
+#            current_magnitude = self.shake_magnitude * (normalized_timer ** 0.5)  # 緩やかな減衰
+#            # ランダム性を強化（ノイズのような動きを追加）
+#            shake_x = random.uniform(-current_magnitude, current_magnitude) + math.sin(pyxel.frame_count * 0.1) * current_magnitude * 0.2
+#            shake_y = random.uniform(-current_magnitude, current_magnitude) + math.cos(pyxel.frame_count * 0.1) * current_magnitude * 0.2
+#        else:
+#            shake_x = 0
+#            shake_y = 0
+#    
+#        # Pyxel のカメラをセット
+#        pyxel.camera(shake_x, shake_y)
+#
+#        # 画面をクリア
+#        pyxel.cls(0)
+#
+#        # トランジション更新
+#        self.transition_effect.draw()
+#
+#        # ゲーム状態に応じたメッセージの描画
+#        messages = translations["game_state_messages"]
+#    
+#        if self.state == GameState.OPENING:
+#
+#            """開始画面のテキストを描画"""
+#            game_title = translations["titles"]["game_title"][self.current_language]
+#            for y, text, color in game_title:
+#                self.draw_text(y, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+#    
+#            """左揃えのテキストを描画"""
+#            instruction_data = translations["instructions"]["intro"][self.current_language]
+#            base_y = instruction_data["base_y"]
+#            line_spacing = instruction_data["line_spacing"]
+#            
+#            left_aligned_texts = [
+#                (base_y + index * line_spacing, line_data["line"], line_data["color"])
+#                for index, line_data in enumerate(instruction_data["lines"])
+#            ]
+#            
+#            for y, text, color in left_aligned_texts:
+#                self.draw_text(y, text, color, align="left", x_offset=50, border_color=pyxel.COLOR_DARK_BLUE)
+#
+#            # 言語切り替えボタンの描画
+#            is_hovered = self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
+##            self.language_button.draw(is_hovered)
+#            self.language_button.draw(is_hovered, draw_text_func=self.draw_text, font=self.font_small)
+#
+#        elif self.state == GameState.DIFFICULTY_SELECTION:
+#            # タイトルを描画
+#            """難易度選択画面のタイトルを描画"""
+#            difficulty_data = translations["titles"]["difficulty_selection"][self.current_language]
+#        
+#            # タイトルを描画
+#            self.draw_text(
+#                difficulty_data["y"], 
+#                difficulty_data["text"], 
+#                difficulty_data["color"], 
+#                align="center",
+#                border_color=pyxel.COLOR_DARK_BLUE
+#            )
+#            
+#            """難易度選択画面のボタンと説明を描画"""
+#            difficulty_options = translations["difficulty_options"]
+#            
+#            for i, button in enumerate(self.difficulty_buttons):
+#                # 現在の言語に対応するボタンラベルと説明を取得
+#                option = difficulty_options[i]
+#                label = option["label"][self.current_language]
+#                description = option["description"][self.current_language]
+#            
+#                # ボタンのホバー状態を確認
+#                is_hovered = button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
+#            
+#                # ボタンを描画
+#                button.label = label  # ボタンにラベルをセット
+#                button.draw(
+#                    is_hovered,
+#                    draw_text_func=self.draw_text,
+#                    font=self.font_small
+#                )
+#            
+#                # 説明文をボタンの右側に描画
+#                self.draw_text(
+#                    y=button.y + 2,
+#                    text=description,
+#                    color=pyxel.COLOR_WHITE,
+#                    align="left",
+#                    x_offset=button.x + button.width + 10,
+#                    font=self.font_small,
+#                    border_color=pyxel.COLOR_DARK_BLUE
+#                )
+#
+#        elif self.state == GameState.BOARD_GENERATION:
+#            board_gen_msg = translations["game_state_messages"]["board_generation"]
+#            text = board_gen_msg["message"][self.current_language]
+#            color = board_gen_msg["color"]
+#            self.draw_text(
+#                WINDOW_HEIGHT // 2,
+#                text,
+#                color,
+#                align="center",
+#                border_color=pyxel.COLOR_DARK_BLUE,
+#            )
+#
+#        elif self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
+#            # 盤面とボタン・ステータスを描画
+##            self.draw_buttons()
+#            self.draw_game_buttons()
+#            self.draw_difficulty_label()
+#            self.draw_grid()
+#            self.draw_score_and_time()
+#    
+#        elif self.state in [GameState.TIME_UP, GameState.NO_MOVES, GameState.GAME_CLEARED]:
+##            self.draw_buttons()
+##            self.draw_game_buttons()
+#            self.draw_difficulty_label()
+#            self.draw_grid()
+#            self.draw_score_and_time()
+#
+#            
+#            # トランジションが終了した場合のみメッセージを描画
+#            if self.show_message:
+#                if self.state == GameState.TIME_UP:
+#                    # タイムアップ画面の描画
+#                    time_up_msg = messages["time_up"]
+#                    self.draw_text(WINDOW_HEIGHT // 2 - 20, time_up_msg["title"][self.current_language], pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+#                    self.draw_text(WINDOW_HEIGHT // 2, time_up_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+#                
+#                elif self.state == GameState.NO_MOVES:
+#                    # 手詰まり画面の描画
+#                    no_moves_msg = messages["no_moves"]
+#                    self.draw_text(WINDOW_HEIGHT // 2 - 20, no_moves_msg["title"][self.current_language], pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+#                    self.draw_text(WINDOW_HEIGHT // 2, no_moves_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+#                
+#                elif self.state == GameState.GAME_CLEARED:
+#                    # ゲームクリア画面の描画
+#                    # 画面をクリア
+#                    pyxel.cls(pyxel.COLOR_WHITE)
+#
+#                    cleared_msg = messages["game_cleared"]
+#                    self.draw_text(WINDOW_HEIGHT // 2 - 40, cleared_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+#                    self.draw_text(WINDOW_HEIGHT // 2 - 20, cleared_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+#                    bonus_text = cleared_msg["bonus"][self.current_language].format(bonus=int(self.score * 0.5))
+#                    self.draw_text(WINDOW_HEIGHT // 2, bonus_text, pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+#                    self.draw_text(WINDOW_HEIGHT // 2 + 20, cleared_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+#
+#                    self.draw_difficulty_label()
+#                    self.draw_score_and_time()
+#
+#            
+#        elif self.state == GameState.SCORE_DISPLAY:
+#            # 画面をクリア
+#            pyxel.cls(pyxel.COLOR_GRAY)
+#        
+#            # パーティクルをリセット
+#            self.reset_particles()
+#
+#            # スコアメッセージを描画
+#            score_msg = messages["score_display"]
+#            self.draw_text(WINDOW_HEIGHT // 2 - 20, score_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+#            self.draw_text(WINDOW_HEIGHT // 2, f"{int(self.score)}", pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+#            self.draw_text(WINDOW_HEIGHT // 2 + 20, score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+#        
+#        elif self.state == GameState.HIGH_SCORE_DISPLAY:
+#            # 画面をクリア
+#            pyxel.cls(pyxel.COLOR_GRAY)
+#
+#            # ハイスコア表示画面の描画
+#            high_score_msg = messages["high_score_display"]
+#            self.draw_text(35, high_score_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+#            for i, score in enumerate(self.high_scores):
+#                rank = f"{i + 1:>2}"  # 順位を右詰めで整形
+#                text = f"{rank}: {score:>6}"  # スコアを右詰めで整形
+#                color = pyxel.COLOR_YELLOW if i == self.current_score_rank else pyxel.COLOR_WHITE
+#                self.draw_text(60 + i * 12, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+#            self.draw_text(200, high_score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+#
+#        # === パーティクル描画 ===
+#        self.draw_particles()
+#        # スコアポップアップの描画
+#        for popup in self.score_popups:
+#            popup.draw()
+
     def draw(self):
-        # まずシェイクのオフセットを決定
-        # シェイクタイマーが残っていればランダムにオフセット
+        # シェイクのオフセット計算
+        shake_x, shake_y = self.calculate_shake_offset()
+        pyxel.camera(shake_x, shake_y)
+    
+        # 画面クリアとトランジション描画
+        pyxel.cls(0)
+        self.transition_effect.draw()
+    
+        # ステートに基づいて適切な描画処理を呼び出す
+        draw_methods = {
+            GameState.OPENING: self.draw_opening,
+            GameState.DIFFICULTY_SELECTION: self.draw_difficulty_selection,
+            GameState.BOARD_GENERATION: self.draw_board_generation,
+            GameState.GAME_START: self.draw_gameplay,
+            GameState.GAME_MID: self.draw_gameplay,
+            GameState.GAME_END: self.draw_gameplay,
+            GameState.TIME_UP: self.draw_end_message,
+            GameState.NO_MOVES: self.draw_end_message,
+            GameState.GAME_CLEARED: self.draw_end_message,
+            GameState.SCORE_DISPLAY: self.draw_score_display,
+            GameState.HIGH_SCORE_DISPLAY: self.draw_high_score_display,
+        }
+    
+        # 該当ステートの描画メソッドを呼び出し
+        if self.state in draw_methods:
+            draw_methods[self.state]()
+    
+        # パーティクルとスコアポップアップの描画
+        self.draw_particles()
+        for popup in self.score_popups:
+            popup.draw()
+
+    def draw_opening(self):
+        game_title = translations["titles"]["game_title"][self.current_language]
+        for y, text, color in game_title:
+            self.draw_text(y, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+    
+        instruction_data = translations["instructions"]["intro"][self.current_language]
+        base_y = instruction_data["base_y"]
+        line_spacing = instruction_data["line_spacing"]
+    
+        for index, line_data in enumerate(instruction_data["lines"]):
+            y = base_y + index * line_spacing
+            text = line_data["line"]
+            color = line_data["color"]
+            self.draw_text(y, text, color, align="left", x_offset=50, border_color=pyxel.COLOR_DARK_BLUE)
+    
+        is_hovered = self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
+        self.language_button.draw(is_hovered, draw_text_func=self.draw_text, font=self.font_small)
+
+    def calculate_shake_offset(self):
         if self.shake_timer > 0:
             # 残りタイマーに基づいて非線形減衰を計算
             normalized_timer = self.shake_timer / 20  # 0〜1に正規化
-#            current_magnitude = max(1, self.shake_magnitude * (normalized_timer ** 2))  # 平方減衰
-#            shake_x = random.uniform(-current_magnitude, current_magnitude)
-#            shake_y = random.uniform(-current_magnitude, current_magnitude)
-
             # 減衰を緩やかに（直線減衰や平方根を使用）
             current_magnitude = self.shake_magnitude * (normalized_timer ** 0.5)  # 緩やかな減衰
             # ランダム性を強化（ノイズのような動きを追加）
@@ -1893,179 +2130,158 @@ class SameGame:
         else:
             shake_x = 0
             shake_y = 0
-    
-        # Pyxel のカメラをセット
-        pyxel.camera(shake_x, shake_y)
 
-        # 画面をクリア
-        pyxel.cls(0)
+        # 結果を返す
+        return shake_x, shake_y
 
-        # トランジション更新
-        self.transition_effect.draw()
+    def draw_opening(self):
+        """開始画面のテキストを描画"""
+        game_title = translations["titles"]["game_title"][self.current_language]
+        for y, text, color in game_title:
+            self.draw_text(y, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
 
-        # ゲーム状態に応じたメッセージの描画
-        messages = translations["game_state_messages"]
-    
-        if self.state == GameState.OPENING:
-
-            """開始画面のテキストを描画"""
-            game_title = translations["titles"]["game_title"][self.current_language]
-            for y, text, color in game_title:
-                self.draw_text(y, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-    
-            """左揃えのテキストを描画"""
-            instruction_data = translations["instructions"]["intro"][self.current_language]
-            base_y = instruction_data["base_y"]
-            line_spacing = instruction_data["line_spacing"]
-            
-            left_aligned_texts = [
-                (base_y + index * line_spacing, line_data["line"], line_data["color"])
-                for index, line_data in enumerate(instruction_data["lines"])
-            ]
-            
-            for y, text, color in left_aligned_texts:
-                self.draw_text(y, text, color, align="left", x_offset=50, border_color=pyxel.COLOR_DARK_BLUE)
-
-            # 言語切り替えボタンの描画
-            is_hovered = self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
-#            self.language_button.draw(is_hovered)
-            self.language_button.draw(is_hovered, draw_text_func=self.draw_text, font=self.font_small)
-
-        elif self.state == GameState.DIFFICULTY_SELECTION:
-            # タイトルを描画
-            """難易度選択画面のタイトルを描画"""
-            difficulty_data = translations["titles"]["difficulty_selection"][self.current_language]
+        """左揃えのテキストを描画"""
+        instruction_data = translations["instructions"]["intro"][self.current_language]
+        base_y = instruction_data["base_y"]
+        line_spacing = instruction_data["line_spacing"]
         
-            # タイトルを描画
+        left_aligned_texts = [
+            (base_y + index * line_spacing, line_data["line"], line_data["color"])
+            for index, line_data in enumerate(instruction_data["lines"])
+        ]
+        
+        for y, text, color in left_aligned_texts:
+            self.draw_text(y, text, color, align="left", x_offset=50, border_color=pyxel.COLOR_DARK_BLUE)
+
+        # 言語切り替えボタンの描画
+        is_hovered = self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
+        self.language_button.draw(is_hovered, draw_text_func=self.draw_text, font=self.font_small)
+
+    def draw_difficulty_selection(self):
+        """難易度選択画面のタイトルを描画"""
+        difficulty_data = translations["titles"]["difficulty_selection"][self.current_language]
+    
+        self.draw_text(
+            difficulty_data["y"], 
+            difficulty_data["text"], 
+            difficulty_data["color"], 
+            align="center",
+            border_color=pyxel.COLOR_DARK_BLUE
+        )
+        
+        """難易度選択画面のボタンと説明を描画"""
+        difficulty_options = translations["difficulty_options"]
+        
+        for i, button in enumerate(self.difficulty_buttons):
+            # 現在の言語に対応するボタンラベルと説明を取得
+            option = difficulty_options[i]
+            label = option["label"][self.current_language]
+            description = option["description"][self.current_language]
+        
+            # ボタンのホバー状態を確認
+            is_hovered = button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
+        
+            # ボタンを描画
+            button.label = label  # ボタンにラベルをセット
+            button.draw(
+                is_hovered,
+                draw_text_func=self.draw_text,
+                font=self.font_small
+            )
+        
+            # 説明文をボタンの右側に描画
             self.draw_text(
-                difficulty_data["y"], 
-                difficulty_data["text"], 
-                difficulty_data["color"], 
-                align="center",
+                y=button.y + 2,
+                text=description,
+                color=pyxel.COLOR_WHITE,
+                align="left",
+                x_offset=button.x + button.width + 10,
+                font=self.font_small,
                 border_color=pyxel.COLOR_DARK_BLUE
             )
-            
-            """難易度選択画面のボタンと説明を描画"""
-            difficulty_options = translations["difficulty_options"]
-            
-            for i, button in enumerate(self.difficulty_buttons):
-                # 現在の言語に対応するボタンラベルと説明を取得
-                option = difficulty_options[i]
-                label = option["label"][self.current_language]
-                description = option["description"][self.current_language]
-            
-                # ボタンのホバー状態を確認
-                is_hovered = button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
-            
-                # ボタンを描画
-                button.label = label  # ボタンにラベルをセット
-                button.draw(
-                    is_hovered,
-                    draw_text_func=self.draw_text,
-                    font=self.font_small
-                )
-            
-                # 説明文をボタンの右側に描画
-                self.draw_text(
-                    y=button.y + 2,
-                    text=description,
-                    color=pyxel.COLOR_WHITE,
-                    align="left",
-                    x_offset=button.x + button.width + 10,
-                    font=self.font_small,
-                    border_color=pyxel.COLOR_DARK_BLUE
-                )
 
-        elif self.state == GameState.BOARD_GENERATION:
-            board_gen_msg = translations["game_state_messages"]["board_generation"]
-            text = board_gen_msg["message"][self.current_language]
-            color = board_gen_msg["color"]
-            self.draw_text(
-                WINDOW_HEIGHT // 2,
-                text,
-                color,
-                align="center",
-                border_color=pyxel.COLOR_DARK_BLUE,
-            )
+    def draw_board_generation(self):
+        board_gen_msg = translations["game_state_messages"]["board_generation"]
+        text = board_gen_msg["message"][self.current_language]
+        color = board_gen_msg["color"]
+        self.draw_text(
+            WINDOW_HEIGHT // 2,
+            text,
+            color,
+            align="center",
+            border_color=pyxel.COLOR_DARK_BLUE,
+        )
 
-        elif self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
-            # 盤面とボタン・ステータスを描画
-#            self.draw_buttons()
-            self.draw_game_buttons()
-            self.draw_difficulty_label()
-            self.draw_grid()
-            self.draw_score_and_time()
+    def draw_gameplay(self):
+        # 盤面とボタン・ステータスを描画
+        self.draw_game_buttons()
+        self.draw_difficulty_label()
+        self.draw_grid()
+        self.draw_score_and_time()
+
+    def draw_end_message(self):
+        self.draw_difficulty_label()
+        self.draw_grid()
+        self.draw_score_and_time()
+
+        # トランジションが終了した場合のみメッセージを描画
+        if self.show_message:
+#            # ゲーム状態に応じたメッセージ
+#            messages = translations["game_state_messages"]
+
+            if self.state == GameState.TIME_UP:
+                # タイムアップ画面の描画
+                time_up_msg = translations["game_state_messages"]["time_up"]
+                self.draw_text(WINDOW_HEIGHT // 2 - 20, time_up_msg["title"][self.current_language], pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+                self.draw_text(WINDOW_HEIGHT // 2, time_up_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+            
+            elif self.state == GameState.NO_MOVES:
+                # 手詰まり画面の描画
+                no_moves_msg = translations["game_state_messages"]["no_moves"]
+                self.draw_text(WINDOW_HEIGHT // 2 - 20, no_moves_msg["title"][self.current_language], pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+                self.draw_text(WINDOW_HEIGHT // 2, no_moves_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+            
+            elif self.state == GameState.GAME_CLEARED:
+                # ゲームクリア画面の描画
+                # 画面をクリア
+                pyxel.cls(pyxel.COLOR_WHITE)
+
+                cleared_msg = translations["game_state_messages"]["game_cleared"]
+                self.draw_text(WINDOW_HEIGHT // 2 - 40, cleared_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+                self.draw_text(WINDOW_HEIGHT // 2 - 20, cleared_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+                bonus_text = cleared_msg["bonus"][self.current_language].format(bonus=int(self.score * 0.5))
+                self.draw_text(WINDOW_HEIGHT // 2, bonus_text, pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+                self.draw_text(WINDOW_HEIGHT // 2 + 20, cleared_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+
+                self.draw_difficulty_label()
+                self.draw_score_and_time()
+
+    def draw_score_display(self):
+        # 画面をクリア
+        pyxel.cls(pyxel.COLOR_GRAY)
     
-        elif self.state in [GameState.TIME_UP, GameState.NO_MOVES, GameState.GAME_CLEARED]:
-#            self.draw_buttons()
-#            self.draw_game_buttons()
-            self.draw_difficulty_label()
-            self.draw_grid()
-            self.draw_score_and_time()
+        # パーティクルをリセット
+#        self.reset_particles()
 
-            
-            # トランジションが終了した場合のみメッセージを描画
-            if self.show_message:
-                if self.state == GameState.TIME_UP:
-                    # タイムアップ画面の描画
-                    time_up_msg = messages["time_up"]
-                    self.draw_text(WINDOW_HEIGHT // 2 - 20, time_up_msg["title"][self.current_language], pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-                    self.draw_text(WINDOW_HEIGHT // 2, time_up_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-                
-                elif self.state == GameState.NO_MOVES:
-                    # 手詰まり画面の描画
-                    no_moves_msg = messages["no_moves"]
-                    self.draw_text(WINDOW_HEIGHT // 2 - 20, no_moves_msg["title"][self.current_language], pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-                    self.draw_text(WINDOW_HEIGHT // 2, no_moves_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-                
-                elif self.state == GameState.GAME_CLEARED:
-                    # ゲームクリア画面の描画
-                    # 画面をクリア
-                    pyxel.cls(pyxel.COLOR_WHITE)
+        # スコアメッセージを描画
+        score_msg = translations["game_state_messages"]["score_display"]
+        self.draw_text(WINDOW_HEIGHT // 2 - 20, score_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+        self.draw_text(WINDOW_HEIGHT // 2, f"{int(self.score)}", pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+        self.draw_text(WINDOW_HEIGHT // 2 + 20, score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
 
-                    cleared_msg = messages["game_cleared"]
-                    self.draw_text(WINDOW_HEIGHT // 2 - 40, cleared_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-                    self.draw_text(WINDOW_HEIGHT // 2 - 20, cleared_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-                    bonus_text = cleared_msg["bonus"][self.current_language].format(bonus=int(self.score * 0.5))
-                    self.draw_text(WINDOW_HEIGHT // 2, bonus_text, pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-                    self.draw_text(WINDOW_HEIGHT // 2 + 20, cleared_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+    def draw_high_score_display(self):
+        # 画面をクリア
+        pyxel.cls(pyxel.COLOR_GRAY)
 
-                    self.draw_difficulty_label()
-                    self.draw_score_and_time()
-
-            
-        elif self.state == GameState.SCORE_DISPLAY:
-            # 画面をクリア
-            pyxel.cls(pyxel.COLOR_GRAY)
-        
-            # パーティクルをリセット
-            self.reset_particles()
-
-            # スコアメッセージを描画
-            score_msg = messages["score_display"]
-            self.draw_text(WINDOW_HEIGHT // 2 - 20, score_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-            self.draw_text(WINDOW_HEIGHT // 2, f"{int(self.score)}", pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-            self.draw_text(WINDOW_HEIGHT // 2 + 20, score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-        
-        elif self.state == GameState.HIGH_SCORE_DISPLAY:
-            # 画面をクリア
-            pyxel.cls(pyxel.COLOR_GRAY)
-
-            # ハイスコア表示画面の描画
-            high_score_msg = messages["high_score_display"]
-            self.draw_text(35, high_score_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-            for i, score in enumerate(self.high_scores):
-                rank = f"{i + 1:>2}"  # 順位を右詰めで整形
-                text = f"{rank}: {score:>6}"  # スコアを右詰めで整形
-                color = pyxel.COLOR_YELLOW if i == self.current_score_rank else pyxel.COLOR_WHITE
-                self.draw_text(60 + i * 12, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-            self.draw_text(200, high_score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-
-        # === パーティクル描画 ===
-        self.draw_particles()
-        # スコアポップアップの描画
-        for popup in self.score_popups:
-            popup.draw()
+        # ハイスコア表示画面の描画
+        high_score_msg = translations["game_state_messages"]["high_score_display"]
+        self.draw_text(35, high_score_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+        for i, score in enumerate(self.high_scores):
+            rank = f"{i + 1:>2}"  # 順位を右詰めで整形
+            text = f"{rank}: {score:>6}"  # スコアを右詰めで整形
+            color = pyxel.COLOR_YELLOW if i == self.current_score_rank else pyxel.COLOR_WHITE
+            self.draw_text(60 + i * 12, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+        self.draw_text(200, high_score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
 
     def draw_text(self, y, text, color, align="center", x_offset=0, font=None, border_color=None):
         """BDFフォントを使用してテキストを描画"""
