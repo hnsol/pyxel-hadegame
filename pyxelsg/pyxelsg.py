@@ -331,174 +331,203 @@ class ScorePopup:
     def is_alive(self):
         return self.age < self.lifetime
 
-#class TransitionEffect:
-#    def __init__(self):
-#        self.active = False
-#        self.timer = 0
-#        self.duration = 60
-#        self.effect_type = "warp"  # デフォルトのエフェクト
-#        self.particles = []
-#        self.center_x = pyxel.width // 2
-#        self.center_y = pyxel.height // 2
+#class Stars:
+#    def __init__(self, num_stars, bpm):
+#        self.num_stars = num_stars
+#        self.bpm = bpm
+##        self.stars = [(pyxel.rndi(0, pyxel.width), pyxel.rndi(0, pyxel.height)) for _ in range(num_stars)]
+#        self.initial_positions = [  # 初期位置を保持
+#            (pyxel.rndi(0, pyxel.width), pyxel.rndi(0, pyxel.height))
+#            for _ in range(num_stars)
+#        ]
+#        self.stars = self.initial_positions[:]
+#        self.frame_count = 0
+#        self.frames_per_beat = 30 * 60 / bpm
+#        self.transition_type = None
+#        self.transition_frame = 0
 #
-#    def start(self, effect_type="warp", duration=60):
-#        """エフェクトを開始"""
-#        self.active = True
-#        self.effect_type = effect_type
-#        self.timer = 0
-#        self.duration = duration
-#
-#        if effect_type == "warp":
-#            self.particles = [
-#                {
-#                    "x": random.randint(0, pyxel.width),
-#                    "y": random.randint(0, pyxel.height),
-#                    "speed": random.uniform(2, 6),
-#                    "angle": random.uniform(0, 360),
-#                    "color": pyxel.COLOR_WHITE,
-#                }
-#                for _ in range(100)
-#            ]
+#    def set_transition(self, transition_type):
+#        self.transition_type = transition_type
+#        self.transition_frame = 0
 #
 #    def update(self):
-#        """エフェクトの進行"""
-#        if not self.active:
-#            return
+#        self.frame_count += 1
+#        if self.transition_type is None:
+#            self._update_playing()
+#        else:
+#            self._update_transition()
 #
-#        self.timer += 1
+#    def _update_playing(self):
+##        """通常プレイ中の星の挙動"""
+##        scale = 1 + 0.5 * math.sin(2 * math.pi * self.frame_count / self.frames_per_beat)
+##        for x, y in self.stars:
+##            pyxel.circ(x, y, int(2 * scale), 7)
+#        """通常プレイ中の星の挙動（拡大縮小）"""
+##        # 拡大縮小のスケール計算
+##        scale = 1 + 0.2 * math.sin(2 * math.pi * self.frame_count / self.frames_per_beat)
+##    
+##        # 中心座標
+##        center_x, center_y = pyxel.width // 2, pyxel.height // 2
+##    
+##        # 星の位置を中心から拡大縮小
+##        for i, (x, y) in enumerate(self.stars):
+##            dx, dy = x - center_x, y - center_y  # 中心からの相対位置
+##            self.stars[i] = (center_x + dx * scale, center_y + dy * scale)
+#        # 拡大縮小のスケール計算（振幅を小さく）
+##        scale = 1 + 0.05 * math.sin(2 * math.pi * self.frame_count / self.frames_per_beat)
+#        scale = 1 + 0.01 * math.sin(2 * math.pi * self.frame_count / self.frames_per_beat)
+##        scale = 1 + 1 * math.sin(2 * math.pi * self.frame_count / self.frames_per_beat)
+##        print(f"Scale: {scale}")
 #
-#        if self.effect_type == "warp":
-#            self._update_warp()
+#        # 中心座標
+#        center_x, center_y = pyxel.width // 2, pyxel.height // 2
 #
-#        # エフェクト終了
-#        if self.timer >= self.duration:
-#            self.active = False
+#        # 初期位置を基準に拡大縮小
+#        for i, (initial_x, initial_y) in enumerate(self.initial_positions):
+#            dx, dy = initial_x - center_x, initial_y - center_y  # 中心からの相対位置
+##            self.stars[i] = (center_x + dx * scale, center_y + dy * scale)
+#            new_x = center_x + dx * scale
+#            new_y = center_y + dy * scale
+#            self.stars[i] = (int(new_x), int(new_y))  # 整数にキャスト
+#
+#    def _update_transition(self):
+#        """トランジション中の星の動き"""
+#        self.transition_frame += 1
+#        if self.transition_type == "timeout":
+#            for i, (x, y) in enumerate(self.stars):
+#                self.stars[i] = (x, y + 1)
+#        elif self.transition_type == "stalemate":
+#            center_x, center_y = pyxel.width // 2, pyxel.height // 2
+#            for i, (x, y) in enumerate(self.stars):
+#                nx = x + (center_x - x) * 0.05
+#                ny = y + (center_y - y) * 0.05
+#                self.stars[i] = (nx, ny)
+#        elif self.transition_type == "clear":
+#            pass  # 放射状の光のエフェクトなど
 #
 #    def draw(self):
-#        """エフェクトの描画"""
-#        if not self.active:
-#            return
+#        for x, y in self.stars:
+##            pyxel.circ(x, y, 2, 7)  # 星を描画
+##            pyxel.pset(x, y, pyxel.COLOR_WHITE)  # 星を描画
+#            pyxel.circ(x, y, 2, 7)  # 星を描画
 #
-#        if self.effect_type == "warp":
-#            self._draw_warp()
-#
-#    def _update_warp(self):
-#        """ワープエフェクトの更新処理"""
-#        for particle in self.particles:
-#            angle_rad = particle["angle"] * (3.14159 / 180)
-#            particle["x"] += particle["speed"] * pyxel.cos(angle_rad)
-#            particle["y"] += particle["speed"] * pyxel.sin(angle_rad)
-#
-#            # 画面外に出たらリセット
-#            if (
-#                particle["x"] < 0
-#                or particle["x"] > pyxel.width
-#                or particle["y"] < 0
-#                or particle["y"] > pyxel.height
-#            ):
-#                particle["x"] = self.center_x
-#                particle["y"] = self.center_y
-#                particle["speed"] = random.uniform(2, 6)
-#                particle["angle"] = random.uniform(0, 360)
-#
-#    def _draw_warp(self):
-#        """ワープエフェクトの描画処理"""
-#        # 放射状の粒子
-##        for particle in self.particles:
-##            pyxel.pset(int(particle["x"]), int(particle["y"]), particle["color"])
-#
-#        # 中央のホワイトアウト効果
-#        progress = self.timer / self.duration
-##        alpha = min(255, int(255 * progress))
-#        pyxel.cls(pyxel.COLOR_BLACK)
-##        pyxel.rectb(0, 0, pyxel.width, pyxel.height, alpha)
-#        # 放射状の粒子
-#        for particle in self.particles:
-#            pyxel.pset(int(particle["x"]), int(particle["y"]), particle["color"])
+#    def clear(self, num_stars=None):
+##        """星の状態をリセット"""
+##        if num_stars is not None:
+##            self.num_stars = num_stars  # 星の数を再設定
+##        self.stars = [
+##            (pyxel.rndi(0, pyxel.width), pyxel.rndi(0, pyxel.height))
+##            for _ in range(self.num_stars)
+##        ]
+##        self.transition_type = None
+##        self.transition_frame = 0
+#        """星の状態をリセット"""
+#        if num_stars is not None:
+#            self.num_stars = num_stars  # 星の数を再設定
+#        # 初期位置もリセット
+#        self.initial_positions = [
+#            (pyxel.rndi(0, pyxel.width), pyxel.rndi(0, pyxel.height))
+#            for _ in range(self.num_stars)
+#        ]
+#        self.stars = self.initial_positions[:]
+#        self.transition_type = None
+#        self.transition_frame = 0
+#        self.frame_count = 0  # フレームカウントをリセット
 
-#class TransitionEffect:
-#    def __init__(self):
-#        self.active = False
-#        self.timer = 0
-#        self.duration = 60
-#        self.effect_type = "warp"  # デフォルトのエフェクト
-#        self.particles = []
-#        self.center_x = pyxel.width // 2
-#        self.center_y = pyxel.height // 2
-#
-#    def start(self, effect_type="warp", duration=60):
-#        """エフェクトを開始"""
-#        self.active = True
-#        self.effect_type = effect_type
-#        self.timer = 0
-#        self.duration = duration
-#
-#        if effect_type == "warp":
-#            self.particles = [
-#                {
-#                    "x": random.randint(0, pyxel.width),
-#                    "y": random.randint(0, pyxel.height),
-#                    "target_x": self.center_x,
-#                    "target_y": self.center_y,
-#                    "speed": random.uniform(1, 5),
-#                    "color": pyxel.COLOR_WHITE,
-#                }
-#                for _ in range(200)
-#            ]
-#
-#    def update(self):
-#        """エフェクトの進行"""
-#        if not self.active:
-#            return
-#
-#        self.timer += 1
-#
-#        if self.effect_type == "warp":
-#            self._update_warp()
-#
-#        # エフェクト終了
-#        if self.timer >= self.duration:
-#            self.active = False
-#
-#    def draw(self):
-#        """エフェクトの描画"""
-#        if not self.active:
-#            return
-#
-#        if self.effect_type == "warp":
-#            self._draw_warp()
-#
-#    def _update_warp(self):
-#        """ワープエフェクトの更新処理"""
-#        for particle in self.particles:
-#            dx = particle["target_x"] - particle["x"]
-#            dy = particle["target_y"] - particle["y"]
-#            dist = (dx**2 + dy**2) ** 0.5
-#
-#            # 線を伸ばす速度
-#            step = particle["speed"]
-#
-#            if dist > step:
-#                # 中心に向かって進む
-#                particle["x"] += step * (dx / dist)
-#                particle["y"] += step * (dy / dist)
-#            else:
-#                # 中心に到達した場合
-#                particle["x"], particle["y"] = particle["target_x"], particle["target_y"]
-#
-#    def _draw_warp(self):
-#        """ワープエフェクトの描画処理"""
-#        pyxel.cls(pyxel.COLOR_BLACK)
-#
-#        # 放射状の粒子を線として描画
-#        for particle in self.particles:
-#            pyxel.line(
-#                particle["x"],
-#                particle["y"],
-#                self.center_x,
-#                self.center_y,
-#                particle["color"],
-#            )
+class Stars:
+    def __init__(self, num_stars, bpm):
+        self.num_stars = num_stars
+        self.bpm = bpm
+        self.initial_positions = [  # 初期位置を保持
+            (pyxel.rndi(0, pyxel.width), pyxel.rndi(0, pyxel.height))
+            for _ in range(num_stars)
+        ]
+        self.stars = self.initial_positions[:]
+        self.frame_count = 0
+        self.frames_per_beat = 30 * 60 / bpm  # 30 FPS を基準
+        self.transition_type = None
+        self.transition_frame = 0
+
+    def set_transition(self, transition_type):
+        self.transition_type = transition_type
+        self.transition_frame = 0
+
+    def update(self):
+        self.frame_count += 1
+        if self.transition_type is None:
+            self._update_playing()
+        else:
+            self._update_transition()
+
+    def _update_playing(self):
+        """通常プレイ中の星の挙動（拡大縮小）"""
+#        scale = 1 + 0.5 * math.sin(2 * math.pi * self.frame_count / self.frames_per_beat)  # 振幅を調整
+#        scale = 1 + 0.01 * math.sin(2 * math.pi * self.frame_count / self.frames_per_beat)  # 振幅を調整
+        scale = 1 - 0.01 * math.sin(2 * math.pi * self.frame_count / self.frames_per_beat)  # 振幅を調整
+#        print(f"Scale: {scale}")  # デバッグ用
+
+        # 中心座標
+        center_x, center_y = pyxel.width // 2, pyxel.height // 2
+
+        # 初期位置を基準に拡大縮小
+        for i, (initial_x, initial_y) in enumerate(self.initial_positions):
+            dx, dy = initial_x - center_x, initial_y - center_y  # 中心からの相対位置
+            new_x = center_x + dx * scale
+            new_y = center_y + dy * scale
+            self.stars[i] = (int(new_x), int(new_y))  # 整数にキャスト
+
+    def _update_transition(self):
+        """トランジション中の星の動き"""
+        self.transition_frame += 1
+        if self.transition_type == "timeout":
+            for i, (x, y) in enumerate(self.stars):
+                self.stars[i] = (x, y + 1)
+        elif self.transition_type == "stalemate":
+            center_x, center_y = pyxel.width // 2, pyxel.height // 2
+            for i, (x, y) in enumerate(self.stars):
+                nx = x + (center_x - x) * 0.05
+                ny = y + (center_y - y) * 0.05
+                self.stars[i] = (int(nx), int(ny))  # 整数にキャスト
+        elif self.transition_type == "clear":
+            pass  # 放射状の光のエフェクトなど
+
+    def draw(self):
+        for x, y in self.stars:
+#            pyxel.circ(x, y, 2, 7)  # 星を描画
+            pyxel.pset(x, y, pyxel.COLOR_WHITE)  # 星を描画
+
+    def clear(self, num_stars=None, bpm=None):
+        """星の状態をリセット
+        Args:
+            num_stars (int, optional): 再設定する星の数。指定しない場合は現在の数を維持。
+            bpm (float, optional): 新しい BPM。指定しない場合は現在の BPM を維持。
+        """
+        if num_stars is not None:
+            self.num_stars = num_stars  # 星の数を再設定
+
+        # 初期位置もリセット
+        self.initial_positions = [
+            (pyxel.rndi(0, pyxel.width), pyxel.rndi(0, pyxel.height))
+            for _ in range(self.num_stars)
+        ]
+        self.stars = self.initial_positions[:]
+
+        # BPM が指定されていれば更新
+        if bpm is not None:
+            self.bpm = bpm
+            self.frames_per_beat = 30 * 60 / bpm  # BPM に基づいてフレーム数を再計算
+            print(f"BPM set to: {self.bpm}")  # デバッグ用
+
+        self.transition_type = None
+        self.transition_frame = 0
+        self.frame_count = 0  # フレームカウントをリセット
+
+    def set_bpm(self, bpm):
+        """BPM を動的に変更するメソッド"""
+        self.bpm = bpm
+        self.frames_per_beat = 30 * 60 / bpm
+        print(f"BPM changed to: {self.bpm}")  # デバッグ用
+
 
 class TransitionEffect:
     def __init__(self):
@@ -532,7 +561,7 @@ class TransitionEffect:
                     "color": pyxel.COLOR_WHITE,
                 }
 #                for _ in range(100)
-                for _ in range(400)
+                for _ in range(100)
             ]
             for particle in self.particles:
                 particle["original_x"] = particle["x"]
@@ -811,6 +840,9 @@ class SameGame:
 
         # スコア表示設定
         self.score_popups = []
+
+        # 背景のstars設定
+        self.stars = Stars(num_stars=0, bpm=120)
 
         # トランジション設定
         self.transition_effect = TransitionEffect()
@@ -1324,6 +1356,9 @@ class SameGame:
         mx, my = pyxel.mouse_x, pyxel.mouse_y
         previous_state = self.state  # ステータスの変更を追跡
 
+        # stars更新
+        self.stars.update()
+
         # トランジション更新
         self.transition_effect.update()
         # トランジション終了後にメッセージ表示フラグをオンにする
@@ -1646,15 +1681,28 @@ class SameGame:
         bgm_state = bgm_mapping.get(self.state)
         if bgm_state:
             self.play_bgm(bgm_state)
-
-        if self.state in [GameState.TIME_UP, GameState.NO_MOVES]:
-#            self.transition_effect.start(effect_type="warp", duration=60, phase_delay=15)
-            self.transition_effect.start(effect_type="rays", duration=60, phase_delay=30)
+        
+        if self.state in [GameState.GAME_START]:
+            bpm = 28800 // self.GAME_STATE_BGM_PARAMS[self.state]["speed"]
+            self.stars.clear(num_stars=50, bpm=bpm)  # 必要な数の星を生成
+        elif self.state in [GameState.GAME_MID]:
+            new_bpm = 28800 // self.GAME_STATE_BGM_PARAMS[self.state]["speed"]
+            self.stars.set_bpm(new_bpm)
+        elif self.state in [GameState.GAME_END]:
+            new_bpm = 28800 // self.GAME_STATE_BGM_PARAMS[self.state]["speed"]
+            self.stars.set_bpm(new_bpm)
+        elif self.state in [GameState.TIME_UP, GameState.NO_MOVES]:
+            self.stars.clear(num_stars=0)  # 星をクリア
+            self.transition_effect.start(effect_type="warp", duration=60, phase_delay=15)
+#            self.transition_effect.start(effect_type="rays", duration=60, phase_delay=30)
             self.show_message = False  # メッセージを非表示にする
         elif self.state in [GameState.GAME_CLEARED]:
+            self.stars.clear(num_stars=0)  # 星をクリア
             self.transition_effect.start(effect_type="rays", duration=60, phase_delay=30)
             self.show_message = False  # メッセージを非表示にする
-
+        elif self.state in [GameState.SCORE_DISPLAY]:
+            self.stars.clear(num_stars=0)  # 星をクリア
+ 
     def update_high_scores(self):
         if self.score not in self.high_scores:
             self.high_scores.append(self.score)
@@ -2072,8 +2120,9 @@ class SameGame:
         shake_x, shake_y = self.calculate_shake_offset()
         pyxel.camera(shake_x, shake_y)
     
-        # 画面クリアとトランジション描画
+        # 画面クリア、stars、トランジション描画
         pyxel.cls(0)
+        self.stars.draw()
         self.transition_effect.draw()
     
         # ステートに基づいて適切な描画処理を呼び出す
