@@ -542,17 +542,21 @@ class TransitionEffect:
             self.particles = [
                 {
 #                    "center_x": self.center_x + random.uniform(-50, 50),  # 中心位置をランダムにずらす
-                    "center_x": self.center_x + random.uniform(-100, 100),  # 中心位置をランダムにずらす
-                    "center_y": self.center_y + random.uniform(-100, 100),
+#                    "center_x": self.center_x + random.uniform(-100, 100),  # 中心位置をランダムにずらす
+#                    "center_y": self.center_y + random.uniform(-100, 100),
+                    "center_x": self.center_x,
+                    "center_y": self.center_y,
                     "angle": random.uniform(0, 360),
                     "radius": 0,
 #                    "speed": random.uniform(2, 8),
-                    "speed": random.uniform(4, 8),
-                    "color": pyxel.COLOR_WHITE,
+                    "speed": random.uniform(4, 16),
+#                    "color": pyxel.COLOR_WHITE,
+                    "color": pyxel.COLOR_YELLOW if random.random() < 0.1 else pyxel.COLOR_WHITE,
 #                    "color": pyxel.COLOR_YELLOW,
+                    "rotation_speed": random.uniform(0.5, 3.0),
                 }
 #                for _ in range(50)
-                for _ in range(400)
+                for _ in range(100)
             ]
 
     def update(self):
@@ -625,15 +629,35 @@ class TransitionEffect:
                     particle["color"],
                 )
 
+#    def _update_rays(self):
+#        """放射状の光線エフェクトの更新処理"""
+#        for particle in self.particles:
+##            particle["radius"] += particle["speed"]
+#            # phase_delay の間は速度を半分に
+#            if self.timer < self.phase_delay:
+#                particle["radius"] += particle["speed"]
+#            else:
+#                particle["radius"] += particle["speed"] * 0.5
+
     def _update_rays(self):
         """放射状の光線エフェクトの更新処理"""
+        rotation_speed = 1  # 1度/フレームで反時計回りに回転
+
         for particle in self.particles:
-#            particle["radius"] += particle["speed"]
-            # phase_delay の間は速度を半分に
             if self.timer < self.phase_delay:
+                # フェーズ遅延中は線を伸ばす
                 particle["radius"] += particle["speed"]
             else:
-                particle["radius"] += particle["speed"] * 0.5
+#                # フェーズ遅延後は回転のみ
+#                particle["angle"] += rotation_speed
+#                if particle["angle"] >= 360:
+#                    particle["angle"] -= 360
+            # フェーズ遅延後は個別の回転速度で回転
+                particle["angle"] += particle["rotation_speed"]
+                if particle["angle"] >= 360:
+                    particle["angle"] -= 360
+                elif particle["angle"] < 0:
+                    particle["angle"] += 360
 
     def _draw_rays(self):
         """放射状の光線エフェクトの描画処理"""
@@ -643,18 +667,24 @@ class TransitionEffect:
 
             pyxel.line(self.center_x, self.center_y, x_end, y_end, particle["color"])
 
-#        # 中央から広がる白い円を描画
-#        # 半径はタイマーの進行に応じて増加
-#        max_radius = max(pyxel.width, pyxel.height)
-#        progress = self.timer / self.duration
+        # 中央から広がる白い円を描画
+        # 半径はタイマーの進行に応じて増加
+        max_radius = max(pyxel.width, pyxel.height)
+        progress = self.timer / self.duration
 #        current_radius = int(progress * max_radius)
-#    
-#        pyxel.circ(
-#            self.center_x,
-#            self.center_y,
-#            current_radius,
-#            pyxel.COLOR_WHITE
-#        )
+        # 加速的な増加: 進行度の2乗を使用
+        accelerated_progress = progress ** 2  # 0 <= accelerated_progress <= 1
+        current_radius = int(accelerated_progress * max_radius)
+
+        # 半径がmax_radiusを超えないように制限
+        current_radius = min(current_radius, max_radius)
+    
+        pyxel.circ(
+            self.center_x,
+            self.center_y,
+            current_radius,
+            pyxel.COLOR_WHITE
+        )
 
 
 class SameGame:
@@ -1618,10 +1648,11 @@ class SameGame:
             self.play_bgm(bgm_state)
 
         if self.state in [GameState.TIME_UP, GameState.NO_MOVES]:
-            self.transition_effect.start(effect_type="warp", duration=60, phase_delay=15)
+#            self.transition_effect.start(effect_type="warp", duration=60, phase_delay=15)
+            self.transition_effect.start(effect_type="rays", duration=60, phase_delay=30)
             self.show_message = False  # メッセージを非表示にする
         elif self.state in [GameState.GAME_CLEARED]:
-            self.transition_effect.start(effect_type="rays", duration=60, phase_delay=15)
+            self.transition_effect.start(effect_type="rays", duration=60, phase_delay=30)
             self.show_message = False  # メッセージを非表示にする
 
     def update_high_scores(self):
