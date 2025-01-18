@@ -402,35 +402,22 @@ class Stars:
                 # フェーズ1: 星から中央方向と外方向に線を徐々に伸ばす
                 if self.transition_frame <= 30:
                     extend_length = distance * (self.transition_frame / 30)  # 徐々に線を伸ばす
-#                    star["inner_line"] = extend_length * 0.3  # 中央側の線の長さ
-#                    star["outer_line"] = extend_length * 0.7  # 外側の線の長さ
-#                    star["inner_line"] = extend_length * 0.3  # 中央側の線の長さ
-#                    star["outer_line"] = extend_length * 0.5  # 外側の線の長さ
                     star["inner_line"] = extend_length * 0.2  # 中央側の線の長さ
                     star["outer_line"] = extend_length * 0.3  # 外側の線の長さ
     
                 # フェーズ2: 伸びた線が外方向にゆっくり移動
                 elif self.transition_frame <= 45:
-#                    star["inner_line"] += 1  # 中央側の線が少しずつ外に
-#                    star["outer_line"] += 1  # 外側の線も少しずつ外に
                     speed_factor = 1 + (distance / (pyxel.width // 2))  # 距離に応じて速度を調整
-#                    star["inner_line"] += 0.5 * speed_factor  # 中央側の線は遅い速度
-#                    star["outer_line"] += 2.0 * speed_factor  # 外側の線は速い速度
-                    star["outer_line"] += 1.0 * speed_factor  # 外側の線は速い速度
+#                    star["outer_line"] += 1.0 * speed_factor  # 外側の線は速い速度
+                    star["outer_line"] += 0.5 * speed_factor  # 外側の線は速い速度
 
                     # 線の始点も中央から外側に向かって移動
-#                    star["x"] += dx * 0.02 * speed_factor  # 始点の移動速度を調整
-#                    star["y"] += dy * 0.02 * speed_factor
                     star["x"] -= dx * 0.005 * speed_factor  # 始点の移動速度を調整
                     star["y"] -= dy * 0.005 * speed_factor
 
                 # フェーズ3: 線が急に速度を上げて移動
                 elif self.transition_frame <= 60:
                     speed_factor = 1 + (distance / (pyxel.width // 2))  # 距離に応じて速度を調整
-#                    star["inner_line"] += 3  # 中央側の線が急速に外に
-#                    star["outer_line"] += 3  # 外側の線も急速に外に
-#                    star["inner_line"] += 1.0  # 中央側も少し速く
-#                    star["outer_line"] += 4.0  # 外側をさらに速く移動
                     star["x"] -= dx * 0.02 * speed_factor  # 始点の移動速度を調整
                     star["y"] -= dy * 0.02 * speed_factor
 
@@ -442,8 +429,6 @@ class Stars:
 
     def draw(self):
         """星の描画"""
-#        for star in self.stars:
-#            pyxel.pset(int(star["x"]), int(star["y"]), pyxel.COLOR_WHITE)
         center_x, center_y = pyxel.width // 2, pyxel.height // 2
 
         if self.transition_type == "gather":
@@ -470,8 +455,6 @@ class Stars:
                 outer_y = start_y + unit_dy * star.get("outer_line", 0)
     
                 # 線を描画
-#                pyxel.line(int(start_x), int(start_y), int(inner_x), int(inner_y), pyxel.COLOR_WHITE)
-#                pyxel.line(int(start_x), int(start_y), int(outer_x), int(outer_y), pyxel.COLOR_LIGHT_BLUE)
                 pyxel.line(int(start_x), int(start_y), int(inner_x), int(inner_y), pyxel.COLOR_LIGHT_BLUE)
                 pyxel.line(int(start_x), int(start_y), int(outer_x), int(outer_y), pyxel.COLOR_WHITE)
     
@@ -507,192 +490,6 @@ class Stars:
         """トランジションがアクティブかどうか"""
         return self.effect_mode == "transition"
 
-#class TransitionEffect:
-#    def __init__(self):
-#        self.active = False
-#        self.timer = 0
-#        self.duration = 60
-#        self.phase_delay = 15  # 白い点を静止させる時間
-#        self.effect_type = "warp"
-#        self.particles = []
-#        self.center_x = pyxel.width // 2
-#        self.center_y = pyxel.height // 2
-#
-#    def start(self, effect_type="warp", duration=60, phase_delay=15):
-#        """エフェクトを開始"""
-#        self.active = True
-#        self.effect_type = effect_type
-#        self.timer = 0
-#        self.duration = duration
-#        self.phase_delay = phase_delay
-#
-#        if effect_type == "warp":
-#            self.particles = [
-#                {
-#                    "x": random.randint(0, pyxel.width),
-#                    "y": random.randint(0, pyxel.height),
-#                    "original_x": None,
-#                    "original_y": None,
-#                    "target_x": self.center_x,
-#                    "target_y": self.center_y,
-#                    "speed": random.uniform(1, 4),
-#                    "color": pyxel.COLOR_WHITE,
-#                }
-##                for _ in range(100)
-#                for _ in range(100)
-#            ]
-#            for particle in self.particles:
-#                particle["original_x"] = particle["x"]
-#                particle["original_y"] = particle["y"]
-#
-#        elif effect_type == "rays":
-#            self.particles = [
-#                {
-##                    "center_x": self.center_x + random.uniform(-50, 50),  # 中心位置をランダムにずらす
-##                    "center_x": self.center_x + random.uniform(-100, 100),  # 中心位置をランダムにずらす
-##                    "center_y": self.center_y + random.uniform(-100, 100),
-#                    "center_x": self.center_x,
-#                    "center_y": self.center_y,
-#                    "angle": random.uniform(0, 360),
-#                    "radius": 0,
-##                    "speed": random.uniform(2, 8),
-#                    "speed": random.uniform(4, 16),
-##                    "color": pyxel.COLOR_WHITE,
-#                    "color": pyxel.COLOR_YELLOW if random.random() < 0.1 else pyxel.COLOR_WHITE,
-##                    "color": pyxel.COLOR_YELLOW,
-#                    "rotation_speed": random.uniform(0.5, 3.0),
-#                }
-##                for _ in range(50)
-#                for _ in range(100)
-#            ]
-#
-#    def update(self):
-#        """エフェクトの進行"""
-#        if not self.active:
-#            return
-#
-#        self.timer += 1
-#
-#        if self.effect_type == "warp":
-#            self._update_warp()
-#        elif self.effect_type == "rays":
-#            self._update_rays()
-#
-#        # エフェクト終了
-#        if self.timer >= self.duration:
-#            self.active = False
-#
-#    def is_active(self):
-#        return self.active
-#
-#    def draw(self):
-#        """エフェクトの描画"""
-#        if not self.active:
-#            return
-#
-#        if self.effect_type == "warp":
-#            self._draw_warp()
-#        elif self.effect_type == "rays":
-#            self._draw_rays()
-#
-#    def _update_warp(self):
-#        """ワープエフェクトの更新処理"""
-#        if self.timer < self.phase_delay:
-#            # 静止フェーズ: 点はその場にとどまる
-#            return
-#
-#        # 動き出すフェーズ
-#        for particle in self.particles:
-#            dx = particle["target_x"] - particle["x"]
-#            dy = particle["target_y"] - particle["y"]
-#            dist = (dx**2 + dy**2) ** 0.5
-#
-#            # 線を伸ばす速度
-#            step = particle["speed"]
-#
-#            if dist > step:
-#                # 中心に向かって進む
-#                particle["x"] += step * (dx / dist)
-#                particle["y"] += step * (dy / dist)
-#            else:
-#                # 中心に到達した場合
-#                particle["x"], particle["y"] = particle["target_x"], particle["target_y"]
-#
-#    def _draw_warp(self):
-#        """ワープエフェクトの描画処理"""
-##        pyxel.cls(pyxel.COLOR_BLACK)
-#
-#        for particle in self.particles:
-#            # 静止フェーズ: 初期位置に白い点を描画
-#            if self.timer < self.phase_delay:
-#                pyxel.pset(int(particle["original_x"]), int(particle["original_y"]), particle["color"])
-#            else:
-#                # 放射状の線を描画
-#                pyxel.line(
-#                    int(particle["original_x"]),
-#                    int(particle["original_y"]),
-#                    int(particle["x"]),
-#                    int(particle["y"]),
-#                    particle["color"],
-#                )
-#
-##    def _update_rays(self):
-##        """放射状の光線エフェクトの更新処理"""
-##        for particle in self.particles:
-###            particle["radius"] += particle["speed"]
-##            # phase_delay の間は速度を半分に
-##            if self.timer < self.phase_delay:
-##                particle["radius"] += particle["speed"]
-##            else:
-##                particle["radius"] += particle["speed"] * 0.5
-#
-#    def _update_rays(self):
-#        """放射状の光線エフェクトの更新処理"""
-#        rotation_speed = 1  # 1度/フレームで反時計回りに回転
-#
-#        for particle in self.particles:
-#            if self.timer < self.phase_delay:
-#                # フェーズ遅延中は線を伸ばす
-#                particle["radius"] += particle["speed"]
-#            else:
-##                # フェーズ遅延後は回転のみ
-##                particle["angle"] += rotation_speed
-##                if particle["angle"] >= 360:
-##                    particle["angle"] -= 360
-#            # フェーズ遅延後は個別の回転速度で回転
-#                particle["angle"] += particle["rotation_speed"]
-#                if particle["angle"] >= 360:
-#                    particle["angle"] -= 360
-#                elif particle["angle"] < 0:
-#                    particle["angle"] += 360
-#
-#    def _draw_rays(self):
-#        """放射状の光線エフェクトの描画処理"""
-#        for particle in self.particles:
-#            x_end = int(self.center_x + particle["radius"] * pyxel.cos(particle["angle"]))
-#            y_end = int(self.center_y + particle["radius"] * pyxel.sin(particle["angle"]))
-#
-#            pyxel.line(self.center_x, self.center_y, x_end, y_end, particle["color"])
-#
-#        # 中央から広がる白い円を描画
-#        # 半径はタイマーの進行に応じて増加
-#        max_radius = max(pyxel.width, pyxel.height)
-#        progress = self.timer / self.duration
-##        current_radius = int(progress * max_radius)
-#        # 加速的な増加: 進行度の2乗を使用
-#        accelerated_progress = progress ** 2  # 0 <= accelerated_progress <= 1
-#        current_radius = int(accelerated_progress * max_radius)
-#
-#        # 半径がmax_radiusを超えないように制限
-#        current_radius = min(current_radius, max_radius)
-#    
-#        pyxel.circ(
-#            self.center_x,
-#            self.center_y,
-#            current_radius,
-#            pyxel.COLOR_WHITE
-#        )
-
 
 class SameGame:
 # 各ゲームステートごとのカスタムパラメータ
@@ -713,7 +510,7 @@ class SameGame:
         },
         GameState.GAME_MID: {
             "preset": 1,
-            "speed": 216,
+            "speed": 192,
             "transpose": 0,
             "instrumentation": 0,
             "chord": 0,
@@ -727,7 +524,7 @@ class SameGame:
         },
         GameState.GAME_END: {
             "preset": 1,
-            "speed": 192,
+            "speed": 360,
             "transpose": 0,
             "instrumentation": 0,
             "chord": 0,
@@ -1104,224 +901,6 @@ class SameGame:
         except Exception as e:
             print(f"[ERROR] Failed to set sound: {e}")
 
-#    def play_effect(self, blocks_to_remove):
-#        num_blocks = len(blocks_to_remove)
-#        
-#        # 音階：I - VII♭ のコード進行
-#        base_notes = [
-#            "C2", "E2", "G2",  # I (Cメジャー)
-#            "C3", "E3", "G3",
-#            "C4", "E4", "G4",
-#            "B-2", "D3", "F3",  # VII♭ (B♭メジャー)
-#            "B-3", "D4", "F4",
-#        ]
-#    
-#        # 音階を連鎖数に応じて高音域にする
-#        max_notes = min(len(base_notes), int(4 * (1.3 ** min(num_blocks, 10))))  # 最大10連鎖程度を上限
-#        selected_notes = random.sample(base_notes[:max_notes], min(8, max_notes))  # 最大8音をランダム選択
-#    
-#        # トーン設定：ノイズを多用してRez風の雰囲気を強調
-#        noise_ratio = min(0.7, 0.3 + num_blocks * 0.05)  # ノイズ割合（最大70%）
-#        pulse_ratio = 1 - noise_ratio  # パルスの割合
-#        tones = "".join([
-#            "p" if r < pulse_ratio else "n" if r < pulse_ratio + noise_ratio else "t"
-#            for r in [random.random() for _ in selected_notes]
-#        ])
-#    
-#        # ボリューム設定：最初は大きく、徐々に減衰
-#        base_volume = 6
-#        volumes = [
-#            base_volume - int(i / len(selected_notes) * 3) if tones[i] in "pn" else base_volume - 2
-#            for i in range(len(selected_notes))
-#        ]
-#        volumes = "".join([str(min(7, max(1, v))) for v in volumes])
-#    
-#        # 効果：フェードアウト、スライド、ノイズを動的に設定
-#        effects = "".join([
-#            "f" if i % 3 == 0 else "n" if i % 3 == 1 else "s"
-#            for i in range(len(selected_notes))
-#        ])
-#    
-#        # 再生速度：連鎖数が多いほど速くなる（エネルギー感を演出）
-#        speed = max(2, 10 - int(num_blocks ** 0.5))  # 大連鎖ほど速くなる
-#    
-#        # デバッグ情報
-#        print(f"[DEBUG] Selected Notes: {selected_notes}")
-#        print(f"[DEBUG] Tones: {tones}")
-#        print(f"[DEBUG] Volumes: {volumes}")
-#        print(f"[DEBUG] Effects: {effects}")
-#        print(f"[DEBUG] Speed: {speed}")
-#        
-#        # Pyxel サウンド設定
-#        try:
-#            pyxel.sounds[0].set(
-#                notes=" ".join(selected_notes),
-#                tones=tones,
-#                volumes=volumes,
-#                effects=effects,
-#                speed=speed,
-#            )
-#            pyxel.play(3, 0)  # チャンネル3で再生
-#        except Exception as e:
-#            print(f"[ERROR] Failed to set sound: {e}")
-
-
-#    def play_effect(self, blocks_to_remove):
-#        num_blocks = len(blocks_to_remove)
-#    
-#        # ロック音の設定
-#        lock_notes = ["C4", "E4", "G4", "B4"]
-#        lock_tones = "p" * len(lock_notes)  # パルス波のみ
-#        lock_volumes = "5555"  # 一定の音量
-#        lock_effects = "nfsn"  # フェードとスライドを少し
-#        lock_speed = 10  # ロック音は比較的ゆっくり
-#    
-#        # Pyxel サウンドでロック音を再生
-#        try:
-#            pyxel.sounds[1].set(
-#                notes=" ".join(lock_notes),
-#                tones=lock_tones,
-#                volumes=lock_volumes,
-#                effects=lock_effects,
-#                speed=lock_speed,
-#            )
-#            pyxel.play(2, 1)  # チャンネル2でロック音を再生
-#        except Exception as e:
-#            print(f"[ERROR] Failed to set lock sound: {e}")
-#    
-#        # 破壊音の設定
-#        destroy_notes = [
-#            "C1", "E1", "G1", "B1",  # 高音域
-#            "C2", "D2", "F2", "G2",  # 爆発的な音
-#        ]
-#        destroy_tones = "".join([
-#            "n" if i % 2 == 0 else "t"
-#            for i in range(len(destroy_notes))
-#        ])  # ノイズと三角波を交互に
-#        destroy_volumes = "".join([
-#            str(7 - (i // 2)) for i in range(len(destroy_notes))
-#        ])  # 音量を段階的に減衰
-#        destroy_effects = "".join([
-#            "s" if i % 3 == 0 else "f" if i % 3 == 1 else "n"
-#            for i in range(len(destroy_notes))
-#        ])  # スライド、フェード、ノイズを適用
-#        destroy_speed = max(2, 10 - int(num_blocks ** 0.5))  # 連鎖数に応じて速く
-#    
-#        # Pyxel サウンドで破壊音を再生
-#        try:
-#            pyxel.sounds[2].set(
-#                notes=" ".join(destroy_notes),
-#                tones=destroy_tones,
-#                volumes=destroy_volumes,
-#                effects=destroy_effects,
-#                speed=destroy_speed,
-#            )
-#            pyxel.play(3, 2)  # チャンネル3で破壊音を再生
-#        except Exception as e:
-#            print(f"[ERROR] Failed to set destroy sound: {e}")
-
-#    def play_effect(self, blocks_to_remove):
-#        num_blocks = len(blocks_to_remove)
-#    
-#        # **ロックオン音の設定**
-#        lock_notes = [
-#            "C4", "E4", "G4",  # 高音域のIメジャーコード
-#            "D4", "F4", "A4",  # 次の音に遷移（Dマイナー風）
-#            "E4", "G4", "B4",  # 再び高音域
-#        ]
-#        # 連鎖数に応じて音符を追加
-#        lock_notes = lock_notes[: min(len(lock_notes), num_blocks)]
-#        lock_tones = "p" * len(lock_notes)  # パルス波のみ
-#        lock_volumes = "7" * len(lock_notes)  # 最大音量で一定
-#        lock_effects = "s" * len(lock_notes)  # スライドで軽快感を演出
-#        lock_speed = max(4, 16 - int(num_blocks ** 0.5))  # ブロック数が多いほど速く
-#    
-#        # ロックオン音を再生
-#        try:
-#            pyxel.sounds[1].set(
-#                notes=" ".join(lock_notes),
-#                tones=lock_tones,
-#                volumes=lock_volumes,
-#                effects=lock_effects,
-#                speed=lock_speed,
-#            )
-#            pyxel.play(2, 1)  # チャンネル2でロックオン音を再生
-#        except Exception as e:
-#            print(f"[ERROR] Failed to set lock sound: {e}")
-#    
-#        # **爆発音の設定**
-#        destroy_notes = [
-#            "C3", "G2", "C2",  # 低音域で迫力を演出
-#            "R",                # 休符で間を作る
-#        ]
-#        destroy_tones = "nntn"  # ノイズと三角波で爆発感を表現
-#        destroy_volumes = "7766"  # 音量を少しずつ減衰
-#        destroy_effects = "sffs"  # スライドとフェードで余韻を演出
-#        destroy_speed = 8  # 爆発音はゆっくり
-#    
-#        # 爆発音を再生
-#        try:
-#            pyxel.sounds[2].set(
-#                notes=" ".join(destroy_notes),
-#                tones=destroy_tones,
-#                volumes=destroy_volumes,
-#                effects=destroy_effects,
-#                speed=destroy_speed,
-#            )
-##            pyxel.play(3, 2)  # チャンネル3で爆発音を再生
-#        except Exception as e:
-#            print(f"[ERROR] Failed to set destroy sound: {e}")
-
-#    def play_effect(self, blocks_to_remove):
-#        num_blocks = len(blocks_to_remove)
-#        
-#        # **ロックオン音の設定**
-#        lock_notes = []
-#        for _ in range(num_blocks):
-#            lock_notes.extend(["C4", "R", "E4", "R", "G4", "R"])  # 音符と休符を交互に配置
-#        
-#        # 最大音符数を制限（あまり長すぎないようにする）
-#        max_notes = min(len(lock_notes), 9)
-#        lock_notes = lock_notes[:max_notes]
-#        
-#        lock_tones = "".join(["p" if note != "R" else " " for note in lock_notes])  # 休符は空白
-#        lock_volumes = "".join(["7" if note != "R" else "0" for note in lock_notes])  # 休符は音量0
-#        lock_effects = "".join(["s" if note != "R" else "n" for note in lock_notes])  # スライド効果を適用
-#        lock_speed = 8  # ロックオン音は速め
-#    
-#        # ロックオン音を再生
-#        try:
-#            pyxel.sounds[1].set(
-#                notes=" ".join(lock_notes),
-#                tones=lock_tones,
-#                volumes=lock_volumes,
-#                effects=lock_effects,
-#                speed=lock_speed,
-#            )
-#            pyxel.play(2, 1)  # チャンネル2でロックオン音を再生
-#        except Exception as e:
-#            print(f"[ERROR] Failed to set lock sound: {e}")
-#        
-#        # **爆発音の設定**
-#        destroy_notes = ["C3", "R", "G2", "R", "C2"]  # 低音と休符で迫力を演出
-#        destroy_tones = "nntnn"  # ノイズと三角波で爆発感を表現
-#        destroy_volumes = "77660"  # 音量を減衰しつつ休符を挿入
-#        destroy_effects = "sfsff"  # スライドとフェードで余韻を追加
-#        destroy_speed = 10  # 爆発音は少しゆっくり
-#    
-#        # 爆発音を再生
-#        try:
-#            pyxel.sounds[2].set(
-#                notes=" ".join(destroy_notes),
-#                tones=destroy_tones,
-#                volumes=destroy_volumes,
-#                effects=destroy_effects,
-#                speed=destroy_speed,
-#            )
-#            pyxel.play(3, 2)  # チャンネル3で爆発音を再生
-#        except Exception as e:
-#            print(f"[ERROR] Failed to set destroy sound: {e}")
-
 
     def update(self):
         # A. 今のステートに応じて行うゲームロジック（難易度選択・スコア更新など）
@@ -1337,12 +916,6 @@ class SameGame:
 
         # stars更新
         self.stars.update()
-
-#        # トランジション更新
-#        self.transition_effect.update()
-#        # トランジション終了後にメッセージ表示フラグをオンにする
-#        if not self.transition_effect.is_active() and not self.show_message:
-#            self.show_message = True
 
         # トランジション終了後にメッセージ表示フラグをオンにする
         if not self.stars.is_transition_active() and not self.show_message:
@@ -1667,7 +1240,6 @@ class SameGame:
         
         if self.state in [GameState.GAME_START]:
             bpm = 28800 // self.GAME_STATE_BGM_PARAMS[self.state]["speed"]
-#            print(f"Setting stars for GAME_START with bpm={bpm}")
             self.stars.clear(num_stars=108, bpm=bpm)  # 必要な数の星を生成
         elif self.state in [GameState.GAME_MID]:
             new_bpm = 28800 // self.GAME_STATE_BGM_PARAMS[self.state]["speed"]
@@ -1676,12 +1248,9 @@ class SameGame:
             new_bpm = 28800 // self.GAME_STATE_BGM_PARAMS[self.state]["speed"]
             self.stars.set_bpm(new_bpm)
         elif self.state in [GameState.TIME_UP, GameState.NO_MOVES]:
-#            self.stars.clear(num_stars=0)  # 星をクリア
             self.stars.set_transition("fall")  # 例: "fall", "gather", "radiate"
-#            self.stars.set_transition("radiate")  # 例: "fall", "gather", "radiate"
             self.show_message = False  # メッセージを非表示にする
         elif self.state in [GameState.GAME_CLEARED]:
-#            self.stars.clear(num_stars=0)  # 星をクリア
             self.stars.clear(num_stars=216)  # 必要な数の星を生成
             self.stars.set_transition("radiate")
             self.show_message = False  # メッセージを非表示にする
@@ -1906,199 +1475,6 @@ class SameGame:
     def draw_particles(self):
         for p in self.particles:
             p.draw()
-
-
-#    def draw(self):
-#        # まずシェイクのオフセットを決定
-#        # シェイクタイマーが残っていればランダムにオフセット
-#        if self.shake_timer > 0:
-#            # 残りタイマーに基づいて非線形減衰を計算
-#            normalized_timer = self.shake_timer / 20  # 0〜1に正規化
-##            current_magnitude = max(1, self.shake_magnitude * (normalized_timer ** 2))  # 平方減衰
-##            shake_x = random.uniform(-current_magnitude, current_magnitude)
-##            shake_y = random.uniform(-current_magnitude, current_magnitude)
-#
-#            # 減衰を緩やかに（直線減衰や平方根を使用）
-#            current_magnitude = self.shake_magnitude * (normalized_timer ** 0.5)  # 緩やかな減衰
-#            # ランダム性を強化（ノイズのような動きを追加）
-#            shake_x = random.uniform(-current_magnitude, current_magnitude) + math.sin(pyxel.frame_count * 0.1) * current_magnitude * 0.2
-#            shake_y = random.uniform(-current_magnitude, current_magnitude) + math.cos(pyxel.frame_count * 0.1) * current_magnitude * 0.2
-#        else:
-#            shake_x = 0
-#            shake_y = 0
-#    
-#        # Pyxel のカメラをセット
-#        pyxel.camera(shake_x, shake_y)
-#
-#        # 画面をクリア
-#        pyxel.cls(0)
-#
-#        # トランジション更新
-#        self.transition_effect.draw()
-#
-#        # ゲーム状態に応じたメッセージの描画
-#        messages = translations["game_state_messages"]
-#    
-#        if self.state == GameState.OPENING:
-#
-#            """開始画面のテキストを描画"""
-#            game_title = translations["titles"]["game_title"][self.current_language]
-#            for y, text, color in game_title:
-#                self.draw_text(y, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-#    
-#            """左揃えのテキストを描画"""
-#            instruction_data = translations["instructions"]["intro"][self.current_language]
-#            base_y = instruction_data["base_y"]
-#            line_spacing = instruction_data["line_spacing"]
-#            
-#            left_aligned_texts = [
-#                (base_y + index * line_spacing, line_data["line"], line_data["color"])
-#                for index, line_data in enumerate(instruction_data["lines"])
-#            ]
-#            
-#            for y, text, color in left_aligned_texts:
-#                self.draw_text(y, text, color, align="left", x_offset=50, border_color=pyxel.COLOR_DARK_BLUE)
-#
-#            # 言語切り替えボタンの描画
-#            is_hovered = self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
-##            self.language_button.draw(is_hovered)
-#            self.language_button.draw(is_hovered, draw_text_func=self.draw_text, font=self.font_small)
-#
-#        elif self.state == GameState.DIFFICULTY_SELECTION:
-#            # タイトルを描画
-#            """難易度選択画面のタイトルを描画"""
-#            difficulty_data = translations["titles"]["difficulty_selection"][self.current_language]
-#        
-#            # タイトルを描画
-#            self.draw_text(
-#                difficulty_data["y"], 
-#                difficulty_data["text"], 
-#                difficulty_data["color"], 
-#                align="center",
-#                border_color=pyxel.COLOR_DARK_BLUE
-#            )
-#            
-#            """難易度選択画面のボタンと説明を描画"""
-#            difficulty_options = translations["difficulty_options"]
-#            
-#            for i, button in enumerate(self.difficulty_buttons):
-#                # 現在の言語に対応するボタンラベルと説明を取得
-#                option = difficulty_options[i]
-#                label = option["label"][self.current_language]
-#                description = option["description"][self.current_language]
-#            
-#                # ボタンのホバー状態を確認
-#                is_hovered = button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
-#            
-#                # ボタンを描画
-#                button.label = label  # ボタンにラベルをセット
-#                button.draw(
-#                    is_hovered,
-#                    draw_text_func=self.draw_text,
-#                    font=self.font_small
-#                )
-#            
-#                # 説明文をボタンの右側に描画
-#                self.draw_text(
-#                    y=button.y + 2,
-#                    text=description,
-#                    color=pyxel.COLOR_WHITE,
-#                    align="left",
-#                    x_offset=button.x + button.width + 10,
-#                    font=self.font_small,
-#                    border_color=pyxel.COLOR_DARK_BLUE
-#                )
-#
-#        elif self.state == GameState.BOARD_GENERATION:
-#            board_gen_msg = translations["game_state_messages"]["board_generation"]
-#            text = board_gen_msg["message"][self.current_language]
-#            color = board_gen_msg["color"]
-#            self.draw_text(
-#                WINDOW_HEIGHT // 2,
-#                text,
-#                color,
-#                align="center",
-#                border_color=pyxel.COLOR_DARK_BLUE,
-#            )
-#
-#        elif self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
-#            # 盤面とボタン・ステータスを描画
-##            self.draw_buttons()
-#            self.draw_game_buttons()
-#            self.draw_difficulty_label()
-#            self.draw_grid()
-#            self.draw_score_and_time()
-#    
-#        elif self.state in [GameState.TIME_UP, GameState.NO_MOVES, GameState.GAME_CLEARED]:
-##            self.draw_buttons()
-##            self.draw_game_buttons()
-#            self.draw_difficulty_label()
-#            self.draw_grid()
-#            self.draw_score_and_time()
-#
-#            
-#            # トランジションが終了した場合のみメッセージを描画
-#            if self.show_message:
-#                if self.state == GameState.TIME_UP:
-#                    # タイムアップ画面の描画
-#                    time_up_msg = messages["time_up"]
-#                    self.draw_text(WINDOW_HEIGHT // 2 - 20, time_up_msg["title"][self.current_language], pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-#                    self.draw_text(WINDOW_HEIGHT // 2, time_up_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-#                
-#                elif self.state == GameState.NO_MOVES:
-#                    # 手詰まり画面の描画
-#                    no_moves_msg = messages["no_moves"]
-#                    self.draw_text(WINDOW_HEIGHT // 2 - 20, no_moves_msg["title"][self.current_language], pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-#                    self.draw_text(WINDOW_HEIGHT // 2, no_moves_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-#                
-#                elif self.state == GameState.GAME_CLEARED:
-#                    # ゲームクリア画面の描画
-#                    # 画面をクリア
-#                    pyxel.cls(pyxel.COLOR_WHITE)
-#
-#                    cleared_msg = messages["game_cleared"]
-#                    self.draw_text(WINDOW_HEIGHT // 2 - 40, cleared_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-#                    self.draw_text(WINDOW_HEIGHT // 2 - 20, cleared_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-#                    bonus_text = cleared_msg["bonus"][self.current_language].format(bonus=int(self.score * 0.5))
-#                    self.draw_text(WINDOW_HEIGHT // 2, bonus_text, pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-#                    self.draw_text(WINDOW_HEIGHT // 2 + 20, cleared_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-#
-#                    self.draw_difficulty_label()
-#                    self.draw_score_and_time()
-#
-#            
-#        elif self.state == GameState.SCORE_DISPLAY:
-#            # 画面をクリア
-#            pyxel.cls(pyxel.COLOR_GRAY)
-#        
-#            # パーティクルをリセット
-#            self.reset_particles()
-#
-#            # スコアメッセージを描画
-#            score_msg = messages["score_display"]
-#            self.draw_text(WINDOW_HEIGHT // 2 - 20, score_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-#            self.draw_text(WINDOW_HEIGHT // 2, f"{int(self.score)}", pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-#            self.draw_text(WINDOW_HEIGHT // 2 + 20, score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-#        
-#        elif self.state == GameState.HIGH_SCORE_DISPLAY:
-#            # 画面をクリア
-#            pyxel.cls(pyxel.COLOR_GRAY)
-#
-#            # ハイスコア表示画面の描画
-#            high_score_msg = messages["high_score_display"]
-#            self.draw_text(35, high_score_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-#            for i, score in enumerate(self.high_scores):
-#                rank = f"{i + 1:>2}"  # 順位を右詰めで整形
-#                text = f"{rank}: {score:>6}"  # スコアを右詰めで整形
-#                color = pyxel.COLOR_YELLOW if i == self.current_score_rank else pyxel.COLOR_WHITE
-#                self.draw_text(60 + i * 12, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-#            self.draw_text(200, high_score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-#
-#        # === パーティクル描画 ===
-#        self.draw_particles()
-#        # スコアポップアップの描画
-#        for popup in self.score_popups:
-#            popup.draw()
 
     def draw(self):
         # シェイクのオフセット計算
