@@ -598,6 +598,48 @@ class SameGame:
         self.current_bgm = None
         self.load_bgms()
 
+        # サウンドスロットの初期設定
+        # 必要な属性をここで定義
+        self.selection_note = "g#4"        # 選択音の基本ノート
+        self.selection_tone = "p"          # 選択音のトーン
+        self.selection_volume = "5"        # 選択音のボリューム
+        self.selection_effect = "F"        # 選択音のエフェクト
+        self.selection_speed = 14          # 選択音のスピード
+#        self.selection_speed = 10          # 選択音のスピード
+
+        self.sfx_definitions = {
+            "hit4": {
+                "notes": "a2 d3 c#3",
+                "tones": "nnn",
+                "volumes": "655",
+                "effects": "nnf",
+                "speed": 8
+            },
+            "hit5": {
+                "notes": "f#3 f#3 a#3 f#3 f#3 a#3 f#3 f#3 a#3",
+                "tones": "nnnnnnnnn",
+                "volumes": "655655655",
+                "effects": "nnfnnfnnf",
+                "speed": 8
+            },
+            "breath1": {
+                "notes": "b3 b2 a#2 g#2 f2 d1 d1 d1 d1 d1 d1",
+                "tones": "nnnnnnnnnnn",
+                "volumes": "765765765765",
+                "effects": "ssnssnssnssn",
+                "speed": 6
+            },
+            "breath2": {
+                "notes": "g#2 c2 f1 d1 c1 d1 c1 d1 c1 d1 c1 d1 c1 d1 c1 d1 c1 d1 c1 d1 c1 d1 c1 d1",
+                "tones": "nnnnnnnnnnnnnnnnnnnnnn",
+                "volumes": "767676767676767676767676",
+                "effects": "ssssssssssssssssssssssss",
+                "speed": 3
+            }
+        }
+
+        self.setup_sounds()
+
         # 難易度設定
         self.difficulty_levels = {
             "easy": {"grid_rows": 5, "grid_cols": 5, "colors": 3, "time_limit": None, "score_multiplier": 1.0},
@@ -721,6 +763,63 @@ class SameGame:
             )
             pyxel.stop(ch)  # チャンネルごとに停止
         self.current_bgm = None  # 現在のBGM状態をリセット
+
+
+    def setup_sounds(self):
+        """
+        サウンドスロット58から63に選択音とその他の効果音を設定します。
+        """
+        # 選択音の設定（サウンドスロット58）
+        pyxel.sounds[58].set(
+            notes=self.selection_note,        # 例: "f4"
+            tones=self.selection_tone,        # 例: "p"
+            volumes=self.selection_volume,    # 例: "5"
+            effects=self.selection_effect,    # 例: "F"
+            speed=self.selection_speed         # 例: 14
+        )
+        
+        # 効果音の設定（サウンドスロット59〜63）
+        pyxel.sounds[59].set(
+            notes=self.sfx_definitions["hit4"]["notes"],
+            tones=self.sfx_definitions["hit4"]["tones"],
+            volumes=self.sfx_definitions["hit4"]["volumes"],
+            effects=self.sfx_definitions["hit4"]["effects"],
+            speed=self.sfx_definitions["hit4"]["speed"]
+        )
+        
+        pyxel.sounds[60].set(
+            notes=self.sfx_definitions["hit5"]["notes"],
+            tones=self.sfx_definitions["hit5"]["tones"],
+            volumes=self.sfx_definitions["hit5"]["volumes"],
+            effects=self.sfx_definitions["hit5"]["effects"],
+            speed=self.sfx_definitions["hit5"]["speed"]
+        )
+        
+        pyxel.sounds[61].set(
+            notes=self.sfx_definitions["breath1"]["notes"],
+            tones=self.sfx_definitions["breath1"]["tones"],
+            volumes=self.sfx_definitions["breath1"]["volumes"],
+            effects=self.sfx_definitions["breath1"]["effects"],
+            speed=self.sfx_definitions["breath1"]["speed"]
+        )
+        
+        pyxel.sounds[62].set(
+            notes=self.sfx_definitions["breath2"]["notes"],
+            tones=self.sfx_definitions["breath2"]["tones"],
+            volumes=self.sfx_definitions["breath2"]["volumes"],
+            effects=self.sfx_definitions["breath2"]["effects"],
+            speed=self.sfx_definitions["breath2"]["speed"]
+        )
+        
+        # サウンドスロット63は追加の効果音用に予約
+        pyxel.sounds[63].set(
+            notes="",  # 必要に応じて設定
+            tones="",
+            volumes="",
+            effects="",
+            speed=1
+        )
+
 
     def update_difficulty_settings(self):
         """現在の難易度設定を反映"""
@@ -851,72 +950,69 @@ class SameGame:
                 border_color=pyxel.COLOR_DARK_BLUE
             )
 
-
     def play_effect(self, blocks_to_remove):
+        """
+        消したブロック数に応じて、選択音と他のサウンドを結合してチャンネル0で再生します。
+        """
         num_blocks = len(blocks_to_remove)
-    
-        # I - VII♭ のコード進行に基づく音階
-        base_notes = [
-            "C2", "E2", "G2",  # I (Cメジャー)
-            "C3", "E3", "G3",
-            "C4", "E4", "G4",
-            "B-2", "D3", "F3",  # VII♭ (B♭メジャー)
-            "B-3", "D4", "F4",
-        ]
+        num_blocks = min(num_blocks, 16)  # Pyxelのサウンドノート制限に合わせる
+        
+        # 選択音のサウンドスロット
+        selection_sound_slot = 58  # 選択音はサウンドスロット58に設定
+        
+        # 消したブロック数に応じて再生するセカンダリサウンドを選択
+        if num_blocks <= 4:
+            secondary_sound_slot = 59  # hit4
+        elif num_blocks <= 8:
+            secondary_sound_slot = 60  # hit5
+        elif num_blocks <= 12:
+            secondary_sound_slot = 61  # breath1
+        else:
+            secondary_sound_slot = 62  # breath2
+        
+        # セカンダリサウンドが有効か確認
+        if secondary_sound_slot not in [59, 60, 61, 62]:
+            print(f"[ERROR] 無効なセカンダリサウンドスロット: {secondary_sound_slot}")
+            return
+        
+        # 消したブロック数に応じた選択音のノートを生成
+        # ここでは、基本ノート（self.selection_note）をブロック数分繰り返す
+        # 例: self.selection_note = "c4", num_blocks = 3 なら "c4 c4 c4"
+        selection_notes = " ".join([self.selection_note] * int(num_blocks * 0.5 + 1))
 
-        # 連鎖数が多いほど高音域を使う
-        max_notes = min(len(base_notes), int(3 * (1.2 ** num_blocks)))
-        selected_notes = base_notes[:max_notes]
-    
-        # 音をランダムに選択または順に鳴らす
-        notes = selected_notes if random.random() < 0.5 else random.sample(selected_notes, len(selected_notes))
-    
-        # トーンを連鎖数に応じて調整
-        noise_ratio = min(0.5, 0.2 + num_blocks * 0.05)  # ノイズ割合（最大50%）
-        pulse_ratio = 1 - noise_ratio  # パルスの割合
-        tones = "".join([
-            "p" if r < pulse_ratio else "n" if r < pulse_ratio + noise_ratio else "t"
-            for r in [random.random() for _ in notes]
-        ])
-    
-        # ボリューム設定：強弱を付けつつ大きめに
-        base_volume = 5
-        volumes = [
-            base_volume + int((i / len(notes)) * 2) if tones[i] in "pt" else base_volume - 1
-            for i in range(len(notes))
-        ]
-        volumes = "".join([str(min(7, max(1, int(v)))) for v in volumes])
-    
-        # 効果を上昇感があるように設定
-        effects = "".join([
-            "f" if i % 3 == 0 else "n" if i % 3 == 1 else "s"  # フェード、ノイズ、スライド
-            for i in range(len(notes))
-        ])
-    
-        # 速度を連鎖数に応じて遅くする
-        speed = min(8, 2 + int(num_blocks ** 0.8))
-    
-        # デバッグ情報
-#        print(f"[DEBUG] base_notes: {base_notes}")
-#        print(f"[DEBUG] max_notes: {max_notes}")
-#        print(f"[DEBUG] Notes: {' '.join(notes)}")
-#        print(f"[DEBUG] Tones: {tones}")
-#        print(f"[DEBUG] Volumes: {volumes}")
-#        print(f"[DEBUG] Effects: {effects}")
-#        print(f"[DEBUG] Speed: {speed}")
-    
-        # Pyxel サウンド設定
+        # 消したブロック数に応じてspeedを計算
+        # 例: base_speed = 14, speed_decrement_per_block = 0.1
+        # num_blocksが増えるほどspeedが減少し、再生が速くなる
+        base_speed = self.selection_speed  # 既存のスピード
+#        speed_decrement_per_block = 0.2    # ブロック数あたりの減少量
+        speed_decrement_per_block = 1    # ブロック数あたりの減少量
+        calculated_speed = max(4, base_speed - (speed_decrement_per_block * num_blocks))
+        calculated_speed = int(calculated_speed)  # Pyxelではspeedは整数
+
+#        print(f"[DEBUG] Calculated Speed: {calculated_speed} for {num_blocks} blocks removed")
+
+        # サウンドスロット58を更新
         try:
-            pyxel.sounds[0].set(
-                notes=" ".join(notes),
-                tones=tones,
-                volumes=volumes,
-                effects=effects,
-                speed=speed,
+            pyxel.sounds[selection_sound_slot].set(
+                notes=selection_notes,             # 動的に生成したノート
+                tones=self.selection_tone,         # 既存のトーン
+                volumes=self.selection_volume,     # 既存のボリューム
+                effects=self.selection_effect,     # 既存のエフェクト
+#                speed=self.selection_speed          # 既存のスピード
+                speed=calculated_speed               # 動的に設定されたスピード
             )
-            pyxel.play(3, 0)
         except Exception as e:
-            print(f"[ERROR] Failed to set sound: {e}")
+            print(f"[ERROR] 選択音の設定に失敗しました: {e}")
+            return
+        
+        # サウンド番号のリストを作成
+        sounds_to_play = [selection_sound_slot, secondary_sound_slot]
+        
+        # サウンドスロット58と59〜62をリストにしてプレイ
+        try:
+            pyxel.play(0, sounds_to_play, loop=False, resume=False)
+        except Exception as e:
+            print(f"[ERROR] サウンドの再生に失敗しました: {e}")
 
 
     def update(self):
