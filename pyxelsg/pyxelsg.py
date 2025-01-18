@@ -528,12 +528,111 @@ class ScorePopup:
 #        self.frames_per_beat = 30 * 60 / bpm
 #        print(f"BPM changed to: {self.bpm}")  # デバッグ用
 
+#class Stars:
+#    def __init__(self, num_stars, bpm):
+#        self.num_stars = num_stars
+#        self.bpm = bpm
+##        self.initial_positions = [
+##            (pyxel.rndi(0, pyxel.width), pyxel.rndi(0, pyxel.height))
+##            for _ in range(num_stars)
+##        ]
+###        self.stars = self.initial_positions[:]
+##        self.stars = [{"x": x, "y": y, "vy": 0} for x, y in self.initial_positions]
+#        self.initial_positions = [
+#            {"x": pyxel.rndi(0, pyxel.width), "y": pyxel.rndi(0, pyxel.height), "vy": 0}
+#            for _ in range(num_stars)
+#        ]
+#        self.stars = self.initial_positions[:]
+#        self.frame_count = 0
+#        self.frames_per_beat = 30 * 60 / bpm
+#        self.effect_mode = "playing"  # "playing" または "transition"
+#        self.transition_type = None
+#        self.transition_frame = 0
+#        self.gravity = 0.2  # 重力加速度
+#
+#    def set_transition(self, transition_type):
+#        self.effect_mode = "transition"
+#        self.transition_type = transition_type
+#        self.transition_frame = 0
+#
+#    def update(self):
+#        self.frame_count += 1
+#        if self.effect_mode == "playing":
+#            self._update_playing()
+#        elif self.effect_mode == "transition":
+#            self._update_transition()
+#
+#    def _update_playing(self):
+#        scale = 1 - 0.01 * math.sin(2 * math.pi * self.frame_count / self.frames_per_beat)
+#        center_x, center_y = pyxel.width // 2, pyxel.height // 2
+#        for i, (initial_x, initial_y) in enumerate(self.initial_positions):
+#            dx, dy = initial_x - center_x, initial_y - center_y
+#            new_x = center_x + dx * scale
+#            new_y = center_y + dy * scale
+#            self.stars[i] = (int(new_x), int(new_y))
+#
+#    def _update_transition(self):
+#        self.transition_frame += 1
+#        if self.transition_type == "fall":
+##            for i, (x, y) in enumerate(self.stars):
+##                self.stars[i] = (x, y + 2)  # 落下速度を調整
+#            # 重力加速度を適用
+#            for star in self.stars:
+#                star["vy"] += self.gravity  # 加速度を適用
+#                star["y"] += star["vy"]    # 速度を適用して位置を更新
+#
+#        elif self.transition_type == "gather":
+#            center_x, center_y = pyxel.width // 2, pyxel.height // 2
+#            for i, (x, y) in enumerate(self.stars):
+#                dx = center_x - x
+#                dy = center_y - y
+#                self.stars[i] = (x + dx * 0.05, y + dy * 0.05)
+#
+#        elif self.transition_type == "radiate":
+#            center_x, center_y = pyxel.width // 2, pyxel.height // 2
+#            for i, (x, y) in enumerate(self.stars):
+#                angle = math.atan2(y - center_y, x - center_x)
+#                self.stars[i] = (x + math.cos(angle) * 2, y + math.sin(angle) * 2)
+#        # トランジションの終了条件を設定
+#        if self.transition_frame >= 60:
+#            self.effect_mode = "playing"
+#            self.transition_type = None
+#            self.transition_frame = 0
+#
+#    def draw(self):
+##        for x, y in self.stars:
+##            pyxel.pset(int(x), int(y), pyxel.COLOR_WHITE)
+#        for star in self.stars:
+#            pyxel.pset(int(star["x"]), int(star["y"]), pyxel.COLOR_WHITE)
+#
+#    def clear(self, num_stars=None, bpm=None):
+#        if num_stars is not None:
+#            self.num_stars = num_stars
+#        self.initial_positions = [
+#            (pyxel.rndi(0, pyxel.width), pyxel.rndi(0, pyxel.height))
+#            for _ in range(self.num_stars)
+#        ]
+#        self.stars = self.initial_positions[:]
+#        if bpm is not None:
+#            self.bpm = bpm
+#            self.frames_per_beat = 30 * 60 / bpm
+#        self.effect_mode = "playing"
+#        self.transition_type = None
+#        self.transition_frame = 0
+#
+#    def set_bpm(self, bpm):
+#        self.bpm = bpm
+#        self.frames_per_beat = 30 * 60 / bpm
+#
+#    def is_transition_active(self):
+#        return self.effect_mode == "transition"
+
 class Stars:
     def __init__(self, num_stars, bpm):
         self.num_stars = num_stars
         self.bpm = bpm
         self.initial_positions = [
-            (pyxel.rndi(0, pyxel.width), pyxel.rndi(0, pyxel.height))
+            {"x": pyxel.rndi(0, pyxel.width), "y": pyxel.rndi(0, pyxel.height), "vy": 0}
             for _ in range(num_stars)
         ]
         self.stars = self.initial_positions[:]
@@ -542,13 +641,16 @@ class Stars:
         self.effect_mode = "playing"  # "playing" または "transition"
         self.transition_type = None
         self.transition_frame = 0
+        self.gravity = 0.2  # 重力加速度
 
     def set_transition(self, transition_type):
+        """トランジション開始設定"""
         self.effect_mode = "transition"
         self.transition_type = transition_type
         self.transition_frame = 0
 
     def update(self):
+        """更新処理"""
         self.frame_count += 1
         if self.effect_mode == "playing":
             self._update_playing()
@@ -556,30 +658,49 @@ class Stars:
             self._update_transition()
 
     def _update_playing(self):
+        """通常プレイ中の動き"""
         scale = 1 - 0.01 * math.sin(2 * math.pi * self.frame_count / self.frames_per_beat)
         center_x, center_y = pyxel.width // 2, pyxel.height // 2
-        for i, (initial_x, initial_y) in enumerate(self.initial_positions):
-            dx, dy = initial_x - center_x, initial_y - center_y
+        for i, initial in enumerate(self.initial_positions):
+            dx, dy = initial["x"] - center_x, initial["y"] - center_y
             new_x = center_x + dx * scale
             new_y = center_y + dy * scale
-            self.stars[i] = (int(new_x), int(new_y))
+            self.stars[i]["x"] = new_x
+            self.stars[i]["y"] = new_y
 
     def _update_transition(self):
+        """トランジション時の動き"""
         self.transition_frame += 1
+        center_x, center_y = pyxel.width // 2, pyxel.height // 2  # 常にここで定義
+
         if self.transition_type == "fall":
-            for i, (x, y) in enumerate(self.stars):
-                self.stars[i] = (x, y + 2)  # 落下速度を調整
+            # 重力加速度を適用
+            for star in self.stars:
+                star["vy"] += self.gravity  # 加速度を適用
+                star["y"] += star["vy"]    # 速度を適用して位置を更新
+
+#        elif self.transition_type == "gather":
+#            center_x, center_y = pyxel.width // 2, pyxel.height // 2
+#            for star in self.stars:
+#                dx = center_x - star["x"]
+#                dy = center_y - star["y"]
+#                star["x"] += dx * 0.05
+#                star["y"] += dy * 0.05
         elif self.transition_type == "gather":
-            center_x, center_y = pyxel.width // 2, pyxel.height // 2
-            for i, (x, y) in enumerate(self.stars):
-                dx = center_x - x
-                dy = center_y - y
-                self.stars[i] = (x + dx * 0.05, y + dy * 0.05)
+            for star in self.stars:
+                dx = center_x - star["x"]
+                dy = center_y - star["y"]
+                # 星を中央に向かって進ませる速度を増加
+                star["x"] += dx * 0.05
+                star["y"] += dy * 0.05
+
         elif self.transition_type == "radiate":
             center_x, center_y = pyxel.width // 2, pyxel.height // 2
-            for i, (x, y) in enumerate(self.stars):
-                angle = math.atan2(y - center_y, x - center_x)
-                self.stars[i] = (x + math.cos(angle) * 2, y + math.sin(angle) * 2)
+            for star in self.stars:
+                angle = math.atan2(star["y"] - center_y, star["x"] - center_x)
+                star["x"] += math.cos(angle) * 2
+                star["y"] += math.sin(angle) * 2
+
         # トランジションの終了条件を設定
         if self.transition_frame >= 60:
             self.effect_mode = "playing"
@@ -587,14 +708,26 @@ class Stars:
             self.transition_frame = 0
 
     def draw(self):
-        for x, y in self.stars:
-            pyxel.pset(int(x), int(y), pyxel.COLOR_WHITE)
+        """星の描画"""
+#        for star in self.stars:
+#            pyxel.pset(int(star["x"]), int(star["y"]), pyxel.COLOR_WHITE)
+        center_x, center_y = pyxel.width // 2, pyxel.height // 2
+
+        if self.transition_type == "gather":
+            # ワープエフェクトとして線を描画
+            for star in self.stars:
+                pyxel.line(int(star["x"]), int(star["y"]), center_x, center_y, pyxel.COLOR_WHITE)
+        else:
+            # 通常の星描画
+            for star in self.stars:
+                pyxel.pset(int(star["x"]), int(star["y"]), pyxel.COLOR_WHITE)
 
     def clear(self, num_stars=None, bpm=None):
+        """星をリセット"""
         if num_stars is not None:
             self.num_stars = num_stars
         self.initial_positions = [
-            (pyxel.rndi(0, pyxel.width), pyxel.rndi(0, pyxel.height))
+            {"x": pyxel.rndi(0, pyxel.width), "y": pyxel.rndi(0, pyxel.height), "vy": 0}
             for _ in range(self.num_stars)
         ]
         self.stars = self.initial_positions[:]
@@ -606,12 +739,13 @@ class Stars:
         self.transition_frame = 0
 
     def set_bpm(self, bpm):
+        """BPMを設定"""
         self.bpm = bpm
         self.frames_per_beat = 30 * 60 / bpm
 
     def is_transition_active(self):
+        """トランジションがアクティブかどうか"""
         return self.effect_mode == "transition"
-
 
 #class TransitionEffect:
 #    def __init__(self):
@@ -1773,7 +1907,7 @@ class SameGame:
         
         if self.state in [GameState.GAME_START]:
             bpm = 28800 // self.GAME_STATE_BGM_PARAMS[self.state]["speed"]
-            self.stars.clear(num_stars=50, bpm=bpm)  # 必要な数の星を生成
+            self.stars.clear(num_stars=108, bpm=bpm)  # 必要な数の星を生成
         elif self.state in [GameState.GAME_MID]:
             new_bpm = 28800 // self.GAME_STATE_BGM_PARAMS[self.state]["speed"]
             self.stars.set_bpm(new_bpm)
@@ -1781,14 +1915,12 @@ class SameGame:
             new_bpm = 28800 // self.GAME_STATE_BGM_PARAMS[self.state]["speed"]
             self.stars.set_bpm(new_bpm)
         elif self.state in [GameState.TIME_UP, GameState.NO_MOVES]:
-            self.stars.clear(num_stars=0)  # 星をクリア
-#            self.transition_effect.start(effect_type="warp", duration=60, phase_delay=15)
-#            self.transition_effect.start(effect_type="rays", duration=60, phase_delay=30)
-            self.stars.set_transition("fall")  # 例: "fall", "gather", "radiate"
+#            self.stars.clear(num_stars=0)  # 星をクリア
+#            self.stars.set_transition("fall")  # 例: "fall", "gather", "radiate"
+            self.stars.set_transition("gather")  # 例: "fall", "gather", "radiate"
             self.show_message = False  # メッセージを非表示にする
         elif self.state in [GameState.GAME_CLEARED]:
-            self.stars.clear(num_stars=0)  # 星をクリア
-#            self.transition_effect.start(effect_type="rays", duration=60, phase_delay=30)
+#            self.stars.clear(num_stars=0)  # 星をクリア
             self.stars.set_transition("radiate")
             self.show_message = False  # メッセージを非表示にする
         elif self.state in [GameState.SCORE_DISPLAY]:
