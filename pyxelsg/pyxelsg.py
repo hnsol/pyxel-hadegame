@@ -650,6 +650,7 @@ class Stars:
         self.transition_frame = 0
 
     def update(self):
+#        print(f"Updating stars: effect_mode={self.effect_mode}")
         """更新処理"""
         self.frame_count += 1
         if self.effect_mode == "playing":
@@ -775,12 +776,13 @@ class Stars:
                 pyxel.line(int(start_x), int(start_y), int(inner_x), int(inner_y), pyxel.COLOR_LIGHT_BLUE)
                 pyxel.line(int(start_x), int(start_y), int(outer_x), int(outer_y), pyxel.COLOR_WHITE)
     
-            else:
-                # 通常の星描画
-                for star in self.stars:
-                    pyxel.pset(int(star["x"]), int(star["y"]), pyxel.COLOR_WHITE)
+        else:
+            # 通常の星描画
+            for star in self.stars:
+                pyxel.pset(int(star["x"]), int(star["y"]), pyxel.COLOR_WHITE)
 
     def clear(self, num_stars=None, bpm=None):
+#        print(f"Clearing stars: num_stars={num_stars}, bpm={bpm}")
         """星をリセット"""
         if num_stars is not None:
             self.num_stars = num_stars
@@ -795,6 +797,7 @@ class Stars:
         self.effect_mode = "playing"
         self.transition_type = None
         self.transition_frame = 0
+#        print(f"Effect mode after clear: {self.effect_mode}")
 
     def set_bpm(self, bpm):
         """BPMを設定"""
@@ -1965,6 +1968,7 @@ class SameGame:
         
         if self.state in [GameState.GAME_START]:
             bpm = 28800 // self.GAME_STATE_BGM_PARAMS[self.state]["speed"]
+#            print(f"Setting stars for GAME_START with bpm={bpm}")
             self.stars.clear(num_stars=108, bpm=bpm)  # 必要な数の星を生成
         elif self.state in [GameState.GAME_MID]:
             new_bpm = 28800 // self.GAME_STATE_BGM_PARAMS[self.state]["speed"]
@@ -1974,11 +1978,12 @@ class SameGame:
             self.stars.set_bpm(new_bpm)
         elif self.state in [GameState.TIME_UP, GameState.NO_MOVES]:
 #            self.stars.clear(num_stars=0)  # 星をクリア
-#            self.stars.set_transition("fall")  # 例: "fall", "gather", "radiate"
-            self.stars.set_transition("radiate")  # 例: "fall", "gather", "radiate"
+            self.stars.set_transition("fall")  # 例: "fall", "gather", "radiate"
+#            self.stars.set_transition("radiate")  # 例: "fall", "gather", "radiate"
             self.show_message = False  # メッセージを非表示にする
         elif self.state in [GameState.GAME_CLEARED]:
 #            self.stars.clear(num_stars=0)  # 星をクリア
+            self.stars.clear(num_stars=216)  # 必要な数の星を生成
             self.stars.set_transition("radiate")
             self.show_message = False  # メッセージを非表示にする
         elif self.state in [GameState.SCORE_DISPLAY]:
