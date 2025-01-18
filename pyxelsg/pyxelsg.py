@@ -1050,14 +1050,14 @@ class SameGame:
         elif self.state == GameState.TIME_UP:
             if self.current_bgm != GameState.TIME_UP:
                 self.play_bgm(GameState.TIME_UP)
-            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and not self.stars.is_transition_active():
                 self.update_high_scores()
                 self.state = GameState.SCORE_DISPLAY
     
         elif self.state == GameState.NO_MOVES:
             if self.current_bgm != GameState.NO_MOVES:
                 self.play_bgm(GameState.NO_MOVES)
-            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and not self.stars.is_transition_active():
                 self.update_high_scores()
                 self.state = GameState.SCORE_DISPLAY
     
@@ -1072,7 +1072,7 @@ class SameGame:
                 self.bonus_added = True  # フラグを立てる
 #                print(f"Bonus Score Added: {bonus_score}")  # デバッグ用
 
-            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and not self.stars.is_transition_active():
                 self.update_high_scores()
                 self.state = GameState.SCORE_DISPLAY
 
