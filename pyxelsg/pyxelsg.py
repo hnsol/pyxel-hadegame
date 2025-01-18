@@ -346,7 +346,10 @@ class Stars:
         self.effect_mode = "playing"  # "playing" または "transition"
         self.transition_type = None
         self.transition_frame = 0
-        self.gravity = 0.2  # 重力加速度
+#        self.gravity = 0.2  # 重力加速度
+        self.gravity = 0.15  # 重力加速度
+        self.circle_effect_active = False  # 円エフェクトのフラグ
+        self.circle_radius = 0            # 現在の円の半径
 
     def set_transition(self, transition_type):
         """トランジション開始設定"""
@@ -421,15 +424,29 @@ class Stars:
                     star["x"] -= dx * 0.02 * speed_factor  # 始点の移動速度を調整
                     star["y"] -= dy * 0.02 * speed_factor
 
+            # 51フレーム目から60フレーム目まで円を描く
+            if 50 < self.transition_frame <= 60:
+                self.circle_effect_active = True
+                max_radius = pyxel.height // 2
+    #                    self.circle_radius = int((self.transition_frame - 40) / 20 * max_radius)
+                t = (self.transition_frame - 50) / 10  # 正規化（0から1）
+                self.circle_radius = int(max_radius * (t ** 2))  # 二次関数で加速度的に増加
+            else:
+                self.circle_effect_active = False
+
         # トランジションの終了条件を設定
         if self.transition_frame >= 60:
             self.effect_mode = "playing"
             self.transition_type = None
             self.transition_frame = 0
+            self.circle_effect_active = False
 
     def draw(self):
         """星の描画"""
         center_x, center_y = pyxel.width // 2, pyxel.height // 2
+
+        if self.circle_effect_active:
+            pyxel.circ(center_x, center_y, self.circle_radius, pyxel.COLOR_WHITE)
 
         if self.transition_type == "gather":
             # ワープエフェクトとして線を描画
