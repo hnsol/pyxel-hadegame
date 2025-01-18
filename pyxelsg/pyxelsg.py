@@ -679,13 +679,6 @@ class Stars:
                 star["vy"] += self.gravity  # 加速度を適用
                 star["y"] += star["vy"]    # 速度を適用して位置を更新
 
-#        elif self.transition_type == "gather":
-#            center_x, center_y = pyxel.width // 2, pyxel.height // 2
-#            for star in self.stars:
-#                dx = center_x - star["x"]
-#                dy = center_y - star["y"]
-#                star["x"] += dx * 0.05
-#                star["y"] += dy * 0.05
         elif self.transition_type == "gather":
             for star in self.stars:
                 dx = center_x - star["x"]
@@ -694,12 +687,52 @@ class Stars:
                 star["x"] += dx * 0.05
                 star["y"] += dy * 0.05
 
+#        elif self.transition_type == "radiate":
+#            center_x, center_y = pyxel.width // 2, pyxel.height // 2
+#            for star in self.stars:
+#                angle = math.atan2(star["y"] - center_y, star["x"] - center_x)
+#                star["x"] += math.cos(angle) * 2
+#                star["y"] += math.sin(angle) * 2
+
         elif self.transition_type == "radiate":
-            center_x, center_y = pyxel.width // 2, pyxel.height // 2
             for star in self.stars:
-                angle = math.atan2(star["y"] - center_y, star["x"] - center_x)
-                star["x"] += math.cos(angle) * 2
-                star["y"] += math.sin(angle) * 2
+                dx = center_x - star["x"]
+                dy = center_y - star["y"]
+                distance = math.sqrt(dx**2 + dy**2)
+    
+                # フェーズ1: 星から中央方向と外方向に線を徐々に伸ばす
+                if self.transition_frame <= 30:
+                    extend_length = distance * (self.transition_frame / 30)  # 徐々に線を伸ばす
+#                    star["inner_line"] = extend_length * 0.3  # 中央側の線の長さ
+#                    star["outer_line"] = extend_length * 0.7  # 外側の線の長さ
+#                    star["inner_line"] = extend_length * 0.3  # 中央側の線の長さ
+#                    star["outer_line"] = extend_length * 0.5  # 外側の線の長さ
+                    star["inner_line"] = extend_length * 0.2  # 中央側の線の長さ
+                    star["outer_line"] = extend_length * 0.4  # 外側の線の長さ
+    
+                # フェーズ2: 伸びた線が外方向にゆっくり移動
+                elif self.transition_frame <= 45:
+#                    star["inner_line"] += 1  # 中央側の線が少しずつ外に
+#                    star["outer_line"] += 1  # 外側の線も少しずつ外に
+                    speed_factor = 1 + (distance / (pyxel.width // 2))  # 距離に応じて速度を調整
+#                    star["inner_line"] += 0.5 * speed_factor  # 中央側の線は遅い速度
+                    star["outer_line"] += 2.0 * speed_factor  # 外側の線は速い速度
+
+                    # 線の始点も中央から外側に向かって移動
+#                    star["x"] += dx * 0.02 * speed_factor  # 始点の移動速度を調整
+#                    star["y"] += dy * 0.02 * speed_factor
+                    star["x"] -= dx * 0.005 * speed_factor  # 始点の移動速度を調整
+                    star["y"] -= dy * 0.005 * speed_factor
+
+                # フェーズ3: 線が急に速度を上げて移動
+                elif self.transition_frame <= 60:
+                    speed_factor = 1 + (distance / (pyxel.width // 2))  # 距離に応じて速度を調整
+#                    star["inner_line"] += 3  # 中央側の線が急速に外に
+#                    star["outer_line"] += 3  # 外側の線も急速に外に
+#                    star["inner_line"] += 1.0  # 中央側も少し速く
+#                    star["outer_line"] += 4.0  # 外側をさらに速く移動
+                    star["x"] -= dx * 0.02 * speed_factor  # 始点の移動速度を調整
+                    star["y"] -= dy * 0.02 * speed_factor
 
         # トランジションの終了条件を設定
         if self.transition_frame >= 60:
@@ -717,10 +750,35 @@ class Stars:
             # ワープエフェクトとして線を描画
             for star in self.stars:
                 pyxel.line(int(star["x"]), int(star["y"]), center_x, center_y, pyxel.COLOR_WHITE)
-        else:
-            # 通常の星描画
+
+        elif self.transition_type == "radiate":
             for star in self.stars:
-                pyxel.pset(int(star["x"]), int(star["y"]), pyxel.COLOR_WHITE)
+                dx = star["x"] - center_x
+                dy = star["y"] - center_y
+                distance = math.sqrt(dx**2 + dy**2)
+                unit_dx, unit_dy = dx / distance, dy / distance  # 単位ベクトル計算
+    
+                # 星の現在位置
+                start_x, start_y = star["x"], star["y"]
+    
+                # 中央方向に伸びる線の終点
+                inner_x = start_x - unit_dx * star.get("inner_line", 0)
+                inner_y = start_y - unit_dy * star.get("inner_line", 0)
+    
+                # 外方向に伸びる線の終点
+                outer_x = start_x + unit_dx * star.get("outer_line", 0)
+                outer_y = start_y + unit_dy * star.get("outer_line", 0)
+    
+                # 線を描画
+#                pyxel.line(int(start_x), int(start_y), int(inner_x), int(inner_y), pyxel.COLOR_WHITE)
+#                pyxel.line(int(start_x), int(start_y), int(outer_x), int(outer_y), pyxel.COLOR_LIGHT_BLUE)
+                pyxel.line(int(start_x), int(start_y), int(inner_x), int(inner_y), pyxel.COLOR_LIGHT_BLUE)
+                pyxel.line(int(start_x), int(start_y), int(outer_x), int(outer_y), pyxel.COLOR_WHITE)
+    
+            else:
+                # 通常の星描画
+                for star in self.stars:
+                    pyxel.pset(int(star["x"]), int(star["y"]), pyxel.COLOR_WHITE)
 
     def clear(self, num_stars=None, bpm=None):
         """星をリセット"""
@@ -1917,7 +1975,7 @@ class SameGame:
         elif self.state in [GameState.TIME_UP, GameState.NO_MOVES]:
 #            self.stars.clear(num_stars=0)  # 星をクリア
 #            self.stars.set_transition("fall")  # 例: "fall", "gather", "radiate"
-            self.stars.set_transition("gather")  # 例: "fall", "gather", "radiate"
+            self.stars.set_transition("radiate")  # 例: "fall", "gather", "radiate"
             self.show_message = False  # メッセージを非表示にする
         elif self.state in [GameState.GAME_CLEARED]:
 #            self.stars.clear(num_stars=0)  # 星をクリア
