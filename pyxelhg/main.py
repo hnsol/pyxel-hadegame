@@ -18,7 +18,7 @@ from bgm import BGMGenerator
 # 定数の設定
 WINDOW_WIDTH = 256
 WINDOW_HEIGHT = 240
-WINDOW_TITLE = "Pyxel SameGame"
+WINDOW_TITLE = "Pyxel HadeGame"
 
 BUTTON_WIDTH = 75
 BUTTON_HEIGHT = 15
@@ -402,13 +402,18 @@ class Stars:
                 dy = center_y - star["y"]
                 distance = math.sqrt(dx**2 + dy**2)
     
-                # フェーズ1: 星から中央方向と外方向に線を徐々に伸ばす
-                if self.transition_frame <= 30:
-                    extend_length = distance * (self.transition_frame / 30)  # 徐々に線を伸ばす
+                # フェーズ1: 静止した星を表示
+                if self.transition_frame <= 15:
+                    pass
+
+                # フェーズ2: 星から中央方向と外方向に線を徐々に伸ばす
+                elif self.transition_frame <= 30:
+#                    extend_length = distance * (self.transition_frame / 30) # 徐々に線を伸ばす
+                    extend_length = distance * ((self.transition_frame - 15) / 15) ** 2  # 徐々に線を伸ばす
                     star["inner_line"] = extend_length * 0.2  # 中央側の線の長さ
                     star["outer_line"] = extend_length * 0.3  # 外側の線の長さ
     
-                # フェーズ2: 伸びた線が外方向にゆっくり移動
+                # フェーズ3: 伸びた線が外方向にゆっくり移動
                 elif self.transition_frame <= 45:
                     speed_factor = 1 + (distance / (pyxel.width // 2))  # 距離に応じて速度を調整
 #                    star["outer_line"] += 1.0 * speed_factor  # 外側の線は速い速度
@@ -418,19 +423,21 @@ class Stars:
                     star["x"] -= dx * 0.005 * speed_factor  # 始点の移動速度を調整
                     star["y"] -= dy * 0.005 * speed_factor
 
-                # フェーズ3: 線が急に速度を上げて移動
+                # フェーズ4: 線が急に速度を上げて移動
                 elif self.transition_frame <= 60:
                     speed_factor = 1 + (distance / (pyxel.width // 2))  # 距離に応じて速度を調整
                     star["x"] -= dx * 0.02 * speed_factor  # 始点の移動速度を調整
                     star["y"] -= dy * 0.02 * speed_factor
 
             # 51フレーム目から60フレーム目まで円を描く
-            if 50 < self.transition_frame <= 60:
+#            if 50 < self.transition_frame <= 60:
+            if 30 < self.transition_frame <= 60:
                 self.circle_effect_active = True
                 max_radius = pyxel.height // 2
     #                    self.circle_radius = int((self.transition_frame - 40) / 20 * max_radius)
-                t = (self.transition_frame - 50) / 10  # 正規化（0から1）
-                self.circle_radius = int(max_radius * (t ** 2))  # 二次関数で加速度的に増加
+#                t = (self.transition_frame - 50) / 10  # 正規化（0から1）
+                t = (self.transition_frame - 30) / 30  # 正規化（0から1）
+                self.circle_radius = int(max_radius * (t ** 3))  # 二次関数で加速度的に増加
             else:
                 self.circle_effect_active = False
 
@@ -446,7 +453,8 @@ class Stars:
         center_x, center_y = pyxel.width // 2, pyxel.height // 2
 
         if self.circle_effect_active:
-            pyxel.circ(center_x, center_y, self.circle_radius, pyxel.COLOR_WHITE)
+#            pyxel.circ(center_x, center_y, self.circle_radius, pyxel.COLOR_WHITE)
+            pyxel.circ(center_x, center_y, self.circle_radius, pyxel.COLOR_LIGHT_BLUE)
 
         if self.transition_type == "gather":
             # ワープエフェクトとして線を描画
