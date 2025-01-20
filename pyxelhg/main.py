@@ -34,19 +34,30 @@ translations = {
     "titles": {
         "game_title": {
             "ja": [
-                (40, "さめがめ にようこそ", pyxel.COLOR_WHITE),
-                (180, "クリックして開始", pyxel.COLOR_WHITE)
+#                (40, "ハデがめ", pyxel.COLOR_WHITE),
+#                (60, "破諦我明", pyxel.COLOR_WHITE),
+#                (180, "クリックで開始", pyxel.COLOR_WHITE)
+#                (40, "ハデがめ", pyxel.COLOR_LIME, pyxel.COLOR_GREEN),
+#                (60, "破諦我明", pyxel.COLOR_LIME, pyxel.COLOR_GREEN),
+#                (180, "クリックで開始", pyxel.COLOR_LIME, pyxel.COLOR_GREEN)
+                (40, "ハデがめ", pyxel.COLOR_GREEN, pyxel.COLOR_NAVY),
+#                (60, "破諦我明", pyxel.COLOR_LIME, pyxel.COLOR_DARK_BLUE),
+                (180, "クリックで開始", pyxel.COLOR_GREEN, pyxel.COLOR_NAVY)
             ],
             "en": [
-                (40, "Welcome to SameGame", pyxel.COLOR_WHITE),
-                (180, "Click to Start", pyxel.COLOR_WHITE)
+#                (40, "Welcome to HadeGame: Hallowed Demolition Game", pyxel.COLOR_WHITE),
+#                (180, "Click to Start", pyxel.COLOR_WHITE)
+#                (40, "Welcome to HadeGame: Hallowed Demolition Game", pyxel.COLOR_WHITE),
+#                (180, "Click to Start", pyxel.COLOR_WHITE)
+                (40, "Hade (Hallowed Demolition) Game", pyxel.COLOR_GREEN, pyxel.COLOR_NAVY),
+                (180, "Click to Start", pyxel.COLOR_GREEN, pyxel.COLOR_NAVY)
             ]
         },
         "difficulty_selection": {
 #            "ja": "難易度を選んでください",
 #            "en": "Select Difficulty"
-            "ja": {"y": 40, "text": "難易度を選んでください", "color": pyxel.COLOR_YELLOW},
-            "en": {"y": 40, "text": "Select Difficulty", "color": pyxel.COLOR_YELLOW}
+            "ja": {"y": 40, "text": "難易度を選んでください", "color": pyxel.COLOR_ORANGE},
+            "en": {"y": 40, "text": "Select Difficulty", "color": pyxel.COLOR_ORANGE}
         }
     },
     "instructions": {
@@ -55,22 +66,26 @@ translations = {
                 "base_y": 80,
                 "line_spacing": 20,
                 "lines": [
-                    {"line": "あそびかた:", "color": pyxel.COLOR_YELLOW},
-                    {"line": "1. つながっているブロックを消せます", "color": pyxel.COLOR_WHITE},
-                    {"line": "2. 多くのブロックを消すと高得点", "color": pyxel.COLOR_WHITE},
-                    {"line": "3. 全てのブロックを消せるかな？", "color": pyxel.COLOR_WHITE},
+#                    {"line": "あそびかた:", "color": pyxel.COLOR_YELLOW},
+#                    {"line": "1. つながっているブロックを消せます", "color": pyxel.COLOR_WHITE},
+#                    {"line": "2. 多くのブロックを消すと高得点", "color": pyxel.COLOR_WHITE},
+#                    {"line": "3. 全てのブロックを消せるかな？", "color": pyxel.COLOR_WHITE},
 #                    {"line": "4. むずかしいほど高得点！", "color": pyxel.COLOR_WHITE},
 #                    {"line": "5. 消せるブロックがなくなったらおわり", "color": pyxel.COLOR_WHITE}
+                    {"line": "あそびかた:", "color": pyxel.COLOR_ORANGE},
+                    {"line": "1. つながっているブロックを消せます", "color": pyxel.COLOR_GREEN},
+                    {"line": "2. 多くのブロックを消すと高得点", "color": pyxel.COLOR_GREEN},
+                    {"line": "3. 全てのブロックを消せるかな？", "color": pyxel.COLOR_GREEN},
                 ]
             },
             "en": {
                 "base_y": 80,
                 "line_spacing": 20,
                 "lines": [
-                    {"line": "How to Play:", "color": pyxel.COLOR_YELLOW},
-                    {"line": "1. Click blocks to remove them.", "color": pyxel.COLOR_WHITE},
-                    {"line": "2. Remove more blocks for higher scores.", "color": pyxel.COLOR_WHITE},
-                    {"line": "3. Try to clear all blocks!", "color": pyxel.COLOR_WHITE},
+                    {"line": "How to Play:", "color": pyxel.COLOR_ORANGE},
+                    {"line": "1. Click blocks to remove them.", "color": pyxel.COLOR_LIME},
+                    {"line": "2. Remove more blocks for higher scores.", "color": pyxel.COLOR_LIME},
+                    {"line": "3. Try to clear all blocks!", "color": pyxel.COLOR_LIME},
 #                    {"line": "4. Higher difficulty means higher scores!", "color": pyxel.COLOR_WHITE},
 #                    {"line": "5. No moves left? Game over.", "color": pyxel.COLOR_WHITE}
                 ]
@@ -103,7 +118,7 @@ translations = {
         "game_cleared": {
             "title": {"ja": "おおお！すごいですね！！！", "en": "Congratulations!"},
             "subtitle": {"ja": "すべてのブロックを消しました！", "en": "You cleared the game!"},
-            "bonus": {"ja": "ボーナス: {bonus}", "en": "Bonus: {bonus}"},
+            "bonus": {"ja": "クリアボーナス: +{bonus}", "en": "Clear Bonus: +{bonus}"},
             "action": {"ja": "クリックして続行", "en": "Click to Continue"}
         },
         "score_display": {
@@ -161,7 +176,8 @@ class Button:
 
     def draw(self, is_hovered, draw_text_func, font):
         # ボタンの塗りつぶし
-        color = pyxel.COLOR_LIGHT_BLUE if is_hovered else pyxel.COLOR_GRAY
+#        color = pyxel.COLOR_LIGHT_BLUE if is_hovered else pyxel.COLOR_GRAY
+        color = pyxel.COLOR_LIME if is_hovered else pyxel.COLOR_DARK_BLUE
         pyxel.rect(self.x, self.y, self.width, self.height, color)
 
         # ボタンラベルの描画
@@ -173,11 +189,12 @@ class Button:
             draw_text_func(
                 y=text_y,
                 text=self.label,
-                color=pyxel.COLOR_WHITE,
+#                color=pyxel.COLOR_WHITE,
+                color=pyxel.COLOR_GREEN,
                 align="left",        # 中央揃えっぽくしたければ 'left' + x_offset を工夫
                 x_offset=text_x,
                 font=font,
-                border_color=pyxel.COLOR_DARK_BLUE
+                border_color=pyxel.COLOR_NAVY
             )
 
 class Block:
@@ -1631,23 +1648,26 @@ class SameGame:
         for popup in self.score_popups:
             popup.draw()
 
-    def draw_opening(self):
-        game_title = translations["titles"]["game_title"][self.current_language]
-        for y, text, color in game_title:
-            self.draw_text(y, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-    
-        instruction_data = translations["instructions"]["intro"][self.current_language]
-        base_y = instruction_data["base_y"]
-        line_spacing = instruction_data["line_spacing"]
-    
-        for index, line_data in enumerate(instruction_data["lines"]):
-            y = base_y + index * line_spacing
-            text = line_data["line"]
-            color = line_data["color"]
-            self.draw_text(y, text, color, align="left", x_offset=50, border_color=pyxel.COLOR_DARK_BLUE)
-    
-        is_hovered = self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
-        self.language_button.draw(is_hovered, draw_text_func=self.draw_text, font=self.font_small)
+#    def draw_opening(self):
+#        game_title = translations["titles"]["game_title"][self.current_language]
+#        for y, text, color in game_title:
+#            self.draw_text(y, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+##            self.draw_text(y, text, color, align="center", border_color=pyxel.COLOR_GRAY)
+#            print("[debug do]", y, text, color, pyxel.COLOR_DARK_BLUE)
+#
+#        instruction_data = translations["instructions"]["intro"][self.current_language]
+#        base_y = instruction_data["base_y"]
+#        line_spacing = instruction_data["line_spacing"]
+#    
+#        for index, line_data in enumerate(instruction_data["lines"]):
+#            y = base_y + index * line_spacing
+#            text = line_data["line"]
+#            color = line_data["color"]
+##            self.draw_text(y, text, color, align="left", x_offset=50, border_color=pyxel.COLOR_DARK_BLUE)
+#            self.draw_text(y, text, color, align="left", x_offset=50, border_color=pyxel.COLOR_WHITE)
+#    
+#        is_hovered = self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
+#        self.language_button.draw(is_hovered, draw_text_func=self.draw_text, font=self.font_small)
 
     def calculate_shake_offset(self):
         if self.shake_timer > 0:
@@ -1668,8 +1688,9 @@ class SameGame:
     def draw_opening(self):
         """開始画面のテキストを描画"""
         game_title = translations["titles"]["game_title"][self.current_language]
-        for y, text, color in game_title:
-            self.draw_text(y, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+        for y, text, color, border_color in game_title:
+#            self.draw_text(y, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+            self.draw_text(y, text, color, align="center", border_color=border_color)
 
         """左揃えのテキストを描画"""
         instruction_data = translations["instructions"]["intro"][self.current_language]
@@ -1682,7 +1703,7 @@ class SameGame:
         ]
         
         for y, text, color in left_aligned_texts:
-            self.draw_text(y, text, color, align="left", x_offset=50, border_color=pyxel.COLOR_DARK_BLUE)
+            self.draw_text(y, text, color, align="left", x_offset=50, border_color=pyxel.COLOR_NAVY)
 
         # 言語切り替えボタンの描画
         is_hovered = self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
@@ -1697,7 +1718,7 @@ class SameGame:
             difficulty_data["text"], 
             difficulty_data["color"], 
             align="center",
-            border_color=pyxel.COLOR_DARK_BLUE
+            border_color=pyxel.COLOR_NAVY
         )
         
         """難易度選択画面のボタンと説明を描画"""
@@ -1724,11 +1745,11 @@ class SameGame:
             self.draw_text(
                 y=button.y + 2,
                 text=description,
-                color=pyxel.COLOR_WHITE,
+                color=pyxel.COLOR_GREEN,
                 align="left",
                 x_offset=button.x + button.width + 10,
                 font=self.font_small,
-                border_color=pyxel.COLOR_DARK_BLUE
+                border_color=pyxel.COLOR_NAVY
             )
 
     def draw_board_generation(self):
@@ -1818,6 +1839,7 @@ class SameGame:
         """BDFフォントを使用してテキストを描画"""
         font = font or self.font_small  # デフォルトで self.font_small を使用
         text_width = font.text_width(text)  # フォントの幅を計算（適切に変更可能）
+#        print("[debug]", text, color, border_color)
         
         if align == "center":
             x = (WINDOW_WIDTH - text_width) // 2
@@ -1835,6 +1857,7 @@ class SameGame:
                         pyxel.text(x + dx, y + dy, text, border_color, font)
 
         pyxel.text(x, y, text, color, font)
+#        print("[debug]", text, color, border_color)
 
     def draw_grid(self):
         cell_size, grid_x_start, grid_y_start = self.get_grid_layout()
