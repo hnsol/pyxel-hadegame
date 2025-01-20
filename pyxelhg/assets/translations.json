@@ -6,13 +6,14 @@
     "titles_game_title": {
         "ja": [
             {
+                "align": "center",
                 "y": 40,
-                "x": 40,
                 "text": "HaDe Game / ハデがめ",
                 "color": "WHITE",
                 "frame_color": "NAVY"
             },
             {
+                "align": "center",
                 "y": 180,
                 "text": "クリックで開始",
                 "color": "WHITE",
@@ -21,13 +22,14 @@
         ],
         "en": [
             {
+                "align": "center",
                 "y": 40,
-                "x": 40,
                 "text": "HaDe (Hallowed Demolition) Game",
                 "color": "WHITE",
                 "frame_color": "NAVY"
             },
             {
+                "align": "center",
                 "y": 180,
                 "text": "Click to Start",
                 "color": "WHITE",
