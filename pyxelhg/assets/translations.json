@@ -16,7 +16,7 @@
                 "align": "center",
                 "y": 180,
                 "text": "クリックで開始",
-                "color": "WHITE",
+                "color": "YELLOW",
                 "frame_color": "NAVY"
             }
         ],
@@ -32,8 +32,63 @@
                 "align": "center",
                 "y": 180,
                 "text": "Click to Start",
-                "color": "WHITE",
+                "color": "YELLOW",
                 "frame_color": "NAVY"
+            }
+        ]
+    },
+    "instructions_intro_lines": {
+        "ja": [
+            {
+                "align": "left",
+                "x_offset": 64,
+                "y": 90,
+                "text": "・つながっているブロックを消せ",
+                "color": "WHITE"
+            },
+            {
+                "align": "left",
+                "x_offset": 64,
+                "y": 110,
+                "text": "・いちどにたくさん消すと高得点",
+                "color": "WHITE"
+            },
+            {
+                "align": "left",
+                "x_offset": 64,
+                "y": 130,
+                "text": "・すべてのブロックを消せるか！？",
+                "color": "WHITE"
+            }
+        ],
+        "en": [
+            {
+                "align": "left",
+                "x_offset": 50,
+                "y": 80,
+                "text": "How to Play:",
+                "color": "YELLOW"
+            },
+            {
+                "align": "left",
+                "x_offset": 50,
+                "y": 100,
+                "text": "- Click blocks to remove them.",
+                "color": "WHITE"
+            },
+            {
+                "align": "left",
+                "x_offset": 50,
+                "y": 120,
+                "text": "- Remove more blocks for higher scores.",
+                "color": "WHITE"
+            },
+            {
+                "align": "left",
+                "x_offset": 50,
+                "y": 140,
+                "text": "- Try to clear all blocks!",
+                "color": "WHITE"
             }
         ]
     },
@@ -48,44 +103,6 @@
             "text": "Select Difficulty",
             "color": "ORANGE"
         }
-    },
-    "instructions_intro_lines": {
-        "ja": [
-            {
-                "line": "あそびかた:",
-                "color": "YELLOW"
-            },
-            {
-                "line": "1. つながっているブロックを消せます",
-                "color": "WHITE"
-            },
-            {
-                "line": "2. 多くのブロックを消すと高得点",
-                "color": "WHITE"
-            },
-            {
-                "line": "3. 全てのブロックを消せるかな？",
-                "color": "WHITE"
-            }
-        ],
-        "en": [
-            {
-                "line": "How to Play:",
-                "color": "YELLOW"
-            },
-            {
-                "line": "1. Click blocks to remove them.",
-                "color": "WHITE"
-            },
-            {
-                "line": "2. Remove more blocks for higher scores.",
-                "color": "WHITE"
-            },
-            {
-                "line": "3. Try to clear all blocks!",
-                "color": "WHITE"
-            }
-        ]
     },
     "difficulty_options": {
         "ja": [

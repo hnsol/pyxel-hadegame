@@ -1696,47 +1696,30 @@ class SameGame:
 
     def draw_opening(self):
         """開始画面のテキストを描画"""
-#        game_title = translations["titles"]["game_title"][self.current_language]
-#        for y, text, color, border_color in game_title:
-#        game_title = self.get_translations(lang=self.current_language, key="game_title")
-
-#        game_title = self.ext_translations["titles_game_title"][self.current_language]
-#        print(f"[DEBUG]: game_title= {game_title}")
-#        
-#        # 関数を呼び出して色を変換
-#        converted_game_title = self.convert_colors(game_title, COLOR_MAP)
-#        print(f"[DEBUG]: Converted game_title= {converted_game_title}")
-#
-#        for item in converted_game_title:
-##            x = item.get('x', 0)  # デフォルト値として 0 を設定
-#            x_offset = item.get('x_offset', 0)  # デフォルト値として 0 を設定
-#            y = item.get('y', 0)
-#            text = item.get('text', "")
-#            align = item.get('align', "left")
-#            color = item.get('color', pyxel.COLOR_WHITE)
-#            border_color = item.get('frame_color', pyxel.COLOR_NAVY)
-#
-##            self.draw_text(y, text, color, align="center", border_color=border_color)
-#            self.draw_text(y, text, color, border_color=border_color, align=align, x_offset=x_offset)
-
         self.draw_translated_text("titles_game_title", self.current_language)
 
         """左揃えのテキストを描画"""
-        instruction_data = translations["instructions"]["intro"][self.current_language]
-        base_y = instruction_data["base_y"]
-        line_spacing = instruction_data["line_spacing"]
-        
-        left_aligned_texts = [
-            (base_y + index * line_spacing, line_data["line"], line_data["color"])
-            for index, line_data in enumerate(instruction_data["lines"])
-        ]
-        
-        for y, text, color in left_aligned_texts:
-            self.draw_text(y, text, color, align="left", x_offset=50, border_color=pyxel.COLOR_NAVY)
+        self.draw_translated_text("instructions_intro_lines", self.current_language)
+#        instruction_data = translations["instructions"]["intro"][self.current_language]
+#        base_y = instruction_data["base_y"]
+#        line_spacing = instruction_data["line_spacing"]
+#        
+#        left_aligned_texts = [
+#            (base_y + index * line_spacing, line_data["line"], line_data["color"])
+#            for index, line_data in enumerate(instruction_data["lines"])
+#        ]
+#        
+#        for y, text, color in left_aligned_texts:
+#            self.draw_text(y, text, color, align="left", x_offset=50, border_color=pyxel.COLOR_NAVY)
 
         # 言語切り替えボタンの描画
-        is_hovered = self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
-        self.language_button.draw(is_hovered, draw_text_func=self.draw_text, font=self.font_small)
+#        is_hovered = self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
+#        self.language_button.draw(is_hovered, draw_text_func=self.draw_text, font=self.font_small)
+        self.language_button.draw(
+            self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y),
+            draw_text_func=self.draw_text,
+            font=self.font_small
+        )
 
     def draw_difficulty_selection(self):
         """難易度選択画面のタイトルを描画"""
@@ -1889,11 +1872,11 @@ class SameGame:
     def draw_translated_text(self, key, language):
         # ストリングキーと言語に基づいてタイトルを取得
         game_title = self.ext_translations[key][language]
-        print(f"[DEBUG]: game_title= {game_title}")
+#        print(f"[DEBUG]: game_title= {game_title}")
         
         # 色変換関数を呼び出し
         converted_game_title = self.convert_colors(game_title, COLOR_MAP)
-        print(f"[DEBUG]: Converted game_title= {converted_game_title}")
+#        print(f"[DEBUG]: Converted game_title= {converted_game_title}")
         
         # 変換されたデータを基にテキストを描画
         for item in converted_game_title:
@@ -1901,12 +1884,14 @@ class SameGame:
             text = item.get('text', "")
             color = item.get('color', pyxel.COLOR_WHITE)
             border_color = item.get('frame_color', pyxel.COLOR_NAVY)
-            align = item.get('align', "left")
+            align = item.get('align', "center")
             x_offset = item.get('x_offset', 0)
             font = item.get('font', None)
     
             # 描画関数を呼び出し
-            self.draw_text(y, text, color, border_color=border_color, align=align, x_offset=x_offset)
+            self.draw_text(
+                y, text, color, border_color=border_color,
+                align=align, x_offset=x_offset)
 
     def draw_text(self, y, text, color, align="center", x_offset=0, font=None, border_color=None):
         """BDFフォントを使用してテキストを描画"""
@@ -1927,7 +1912,6 @@ class SameGame:
             for dx in range(-1, 2):
                 for dy in range(-1, 2):
                     if dx != 0 or dy != 0:  # 中心位置 (0, 0) はスキップ
-                        print(f"{x, y, text, border_color, font}")
                         pyxel.text(x + dx, y + dy, text, border_color, font)
 
         pyxel.text(x, y, text, color, font)
