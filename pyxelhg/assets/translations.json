@@ -1,0 +1,230 @@
+{
+    "language_button": {
+        "ja": "EN",
+        "en": "JA"
+    },
+    "titles_game_title": {
+        "ja": [
+            {
+                "y": 40,
+                "x": 40,
+                "text": "HaDe Game / ハデがめ",
+                "color": "WHITE",
+                "frame_color": "NAVY"
+            },
+            {
+                "y": 180,
+                "text": "クリックで開始",
+                "color": "WHITE",
+                "frame_color": "NAVY"
+            }
+        ],
+        "en": [
+            {
+                "y": 40,
+                "x": 40,
+                "text": "HaDe (Hallowed Demolition) Game",
+                "color": "WHITE",
+                "frame_color": "NAVY"
+            },
+            {
+                "y": 180,
+                "text": "Click to Start",
+                "color": "WHITE",
+                "frame_color": "NAVY"
+            }
+        ]
+    },
+    "titles_difficulty_selection": {
+        "ja": {
+            "y": 40,
+            "text": "難易度を選んでください",
+            "color": "ORANGE"
+        },
+        "en": {
+            "y": 40,
+            "text": "Select Difficulty",
+            "color": "ORANGE"
+        }
+    },
+    "instructions_intro_lines": {
+        "ja": [
+            {
+                "line": "あそびかた:",
+                "color": "YELLOW"
+            },
+            {
+                "line": "1. つながっているブロックを消せます",
+                "color": "WHITE"
+            },
+            {
+                "line": "2. 多くのブロックを消すと高得点",
+                "color": "WHITE"
+            },
+            {
+                "line": "3. 全てのブロックを消せるかな？",
+                "color": "WHITE"
+            }
+        ],
+        "en": [
+            {
+                "line": "How to Play:",
+                "color": "YELLOW"
+            },
+            {
+                "line": "1. Click blocks to remove them.",
+                "color": "WHITE"
+            },
+            {
+                "line": "2. Remove more blocks for higher scores.",
+                "color": "WHITE"
+            },
+            {
+                "line": "3. Try to clear all blocks!",
+                "color": "WHITE"
+            }
+        ]
+    },
+    "difficulty_options": {
+        "ja": [
+            {
+                "key": "easy",
+                "label": "かんたん",
+                "description": "小さいばんめん、少ない色"
+            },
+            {
+                "key": "normal",
+                "label": "ふつう",
+                "description": "中ぐらいのばんめん、やや多い色"
+            },
+            {
+                "key": "hard",
+                "label": "むずかしい",
+                "description": "制限時間あり、多い色"
+            },
+            {
+                "key": "very_hard",
+                "label": "めちゃむず",
+                "description": "短い制限時間、大きなばんめん"
+            },
+            {
+                "key": "expert",
+                "label": "たつじん",
+                "description": "とても短い時間、最大ばんめん"
+            }
+        ],
+        "en": [
+            {
+                "key": "easy",
+                "label": "Easy",
+                "description": "Small grid, few colors"
+            },
+            {
+                "key": "normal",
+                "label": "Normal",
+                "description": "Medium-sized grid, more colors"
+            },
+            {
+                "key": "hard",
+                "label": "Hard",
+                "description": "Timed play, many colors"
+            },
+            {
+                "key": "very_hard",
+                "label": "Very Hard",
+                "description": "Short time limit, large grid"
+            },
+            {
+                "key": "expert",
+                "label": "Expert",
+                "description": "Largest grid, shortest time limit"
+            }
+        ]
+    },
+    "game_state_messages_board_generation": {
+        "ja": {
+            "message": "ばんめんを生成ちゅう...",
+            "color": "YELLOW"
+        },
+        "en": {
+            "message": "Generating Board...",
+            "color": "YELLOW"
+        }
+    },
+    "game_state_messages_time_up": {
+        "ja": {
+            "title": "タイムアップ！",
+            "subtitle": "次はスコアが伸びそうですね。"
+        },
+        "en": {
+            "title": "Time's Up!",
+            "subtitle": "Try again to improve your score."
+        }
+    },
+    "game_state_messages_no_moves": {
+        "ja": {
+            "title": "ああっ！おしい！",
+            "subtitle": "次はきっといける！"
+        },
+        "en": {
+            "title": "No Moves Available!",
+            "subtitle": "Better luck next time!"
+        }
+    },
+    "game_state_messages_game_cleared": {
+        "ja": {
+            "title": "おおお！すごいですね！！！",
+            "subtitle": "すべてのブロックを消しました！",
+            "bonus": "クリアボーナス: +{bonus}",
+            "action": "クリックして続行"
+        },
+        "en": {
+            "title": "Congratulations!",
+            "subtitle": "You cleared the game!",
+            "bonus": "Clear Bonus: +{bonus}",
+            "action": "Click to Continue"
+        }
+    },
+    "game_state_messages_score_display": {
+        "ja": {
+            "title": "今回の スコア",
+            "action": "クリックして つづける"
+        },
+        "en": {
+            "title": "Your Score",
+            "action": "Click to Continue"
+        }
+    },
+    "game_state_messages_high_score_display": {
+        "ja": {
+            "title": "トップ 10スコア",
+            "action": "クリックして もどる"
+        },
+        "en": {
+            "title": "Top 10 High Scores",
+            "action": "Click to Return"
+        }
+    },
+    "score_and_time": {
+        "ja": {
+            "score_label": "スコア:",
+            "time_label": "タイム:",
+            "time_no_limit": "--"
+        },
+        "en": {
+            "score_label": "Score:",
+            "time_label": "Time:",
+            "time_no_limit": "--"
+        }
+    },
+    "button_labels": {
+        "ja": {
+            "retry": "やりなおす",
+            "quit": "ギブアップ"
+        },
+        "en": {
+            "retry": "Retry",
+            "quit": "Quit"
+        }
+    }
+}

@@ -5,12 +5,12 @@
 # license: MIT
 # version: 0.9
 
-import pyxel
 import os
 import json
 import math
 import random
 import copy
+import pyxel
 from enum import Enum
 from board_generator import BoardGenerator
 from bgm import BGMGenerator
@@ -29,28 +29,44 @@ STATUS_AREA_HEIGHT = 30   # 表示エリアの高さ
 COLORS = [1, 4, 3, 6, 2]  # 色覚多様性対応 rev02
 DEFAULT_TOP_SCORES = [50000, 25000, 7500, 5000, 2500, 750, 500, 250, 75, 50]  # デフォルトのトップ10スコア
 
+# 色定数の定義
+COLOR_MAP = {
+    "BLACK": pyxel.COLOR_BLACK,          # 0
+    "NAVY": pyxel.COLOR_NAVY,            # 1
+    "PURPLE": pyxel.COLOR_PURPLE,        # 2
+    "GREEN": pyxel.COLOR_GREEN,          # 3
+    "BROWN": pyxel.COLOR_BROWN,          # 4
+    "DARK_BLUE": pyxel.COLOR_DARK_BLUE,  # 5
+    "LIGHT_BLUE": pyxel.COLOR_LIGHT_BLUE, # 6
+    "WHITE": pyxel.COLOR_WHITE,          # 7
+    "RED": pyxel.COLOR_RED,              # 8
+    "ORANGE": pyxel.COLOR_ORANGE,        # 9
+    "YELLOW": pyxel.COLOR_YELLOW,        # 10
+    "LIME": pyxel.COLOR_LIME,            # 11
+    "CYAN": pyxel.COLOR_CYAN,            # 12
+    "GRAY": pyxel.COLOR_GRAY,            # 13
+    "PINK": pyxel.COLOR_PINK,            # 14
+    "PEACH": pyxel.COLOR_PEACH           # 15
+}
+
+
+
 translations = {
     "language_button": {"ja": "EN", "en": "JA"},  # 言語切り替えボタンのラベル
     "titles": {
         "game_title": {
             "ja": [
-#                (40, "ハデがめ", pyxel.COLOR_WHITE),
-#                (60, "破諦我明", pyxel.COLOR_WHITE),
-#                (180, "クリックで開始", pyxel.COLOR_WHITE)
-#                (40, "ハデがめ", pyxel.COLOR_LIME, pyxel.COLOR_GREEN),
-#                (60, "破諦我明", pyxel.COLOR_LIME, pyxel.COLOR_GREEN),
-#                (180, "クリックで開始", pyxel.COLOR_LIME, pyxel.COLOR_GREEN)
-                (40, "ハデがめ", pyxel.COLOR_GREEN, pyxel.COLOR_NAVY),
+#                (40, "ハデがめ", pyxel.COLOR_GREEN, pyxel.COLOR_NAVY),
 #                (60, "破諦我明", pyxel.COLOR_LIME, pyxel.COLOR_DARK_BLUE),
-                (180, "クリックで開始", pyxel.COLOR_GREEN, pyxel.COLOR_NAVY)
+#                (180, "クリックで開始", pyxel.COLOR_GREEN, pyxel.COLOR_NAVY)
+                (40, "HaDe Game / ハデがめ", pyxel.COLOR_WHITE, pyxel.COLOR_NAVY),
+                (180, "クリックで開始", pyxel.COLOR_WHITE, pyxel.COLOR_NAVY)
             ],
             "en": [
-#                (40, "Welcome to HadeGame: Hallowed Demolition Game", pyxel.COLOR_WHITE),
-#                (180, "Click to Start", pyxel.COLOR_WHITE)
-#                (40, "Welcome to HadeGame: Hallowed Demolition Game", pyxel.COLOR_WHITE),
-#                (180, "Click to Start", pyxel.COLOR_WHITE)
-                (40, "Hade (Hallowed Demolition) Game", pyxel.COLOR_GREEN, pyxel.COLOR_NAVY),
-                (180, "Click to Start", pyxel.COLOR_GREEN, pyxel.COLOR_NAVY)
+#                (40, "Hade (Hallowed Demolition) Game", pyxel.COLOR_GREEN, pyxel.COLOR_NAVY),
+#                (180, "Click to Start", pyxel.COLOR_GREEN, pyxel.COLOR_NAVY)
+                (40, "HaDe (Hallowed Demolition) Game", pyxel.COLOR_WHITE, pyxel.COLOR_NAVY),
+                (180, "Click to Start", pyxel.COLOR_WHITE, pyxel.COLOR_NAVY)
             ]
         },
         "difficulty_selection": {
@@ -66,28 +82,28 @@ translations = {
                 "base_y": 80,
                 "line_spacing": 20,
                 "lines": [
-#                    {"line": "あそびかた:", "color": pyxel.COLOR_YELLOW},
-#                    {"line": "1. つながっているブロックを消せます", "color": pyxel.COLOR_WHITE},
-#                    {"line": "2. 多くのブロックを消すと高得点", "color": pyxel.COLOR_WHITE},
-#                    {"line": "3. 全てのブロックを消せるかな？", "color": pyxel.COLOR_WHITE},
-#                    {"line": "4. むずかしいほど高得点！", "color": pyxel.COLOR_WHITE},
-#                    {"line": "5. 消せるブロックがなくなったらおわり", "color": pyxel.COLOR_WHITE}
-                    {"line": "あそびかた:", "color": pyxel.COLOR_ORANGE},
-                    {"line": "1. つながっているブロックを消せます", "color": pyxel.COLOR_GREEN},
-                    {"line": "2. 多くのブロックを消すと高得点", "color": pyxel.COLOR_GREEN},
-                    {"line": "3. 全てのブロックを消せるかな？", "color": pyxel.COLOR_GREEN},
+#                    {"line": "あそびかた:", "color": pyxel.COLOR_ORANGE},
+#                    {"line": "1. つながっているブロックを消せます", "color": pyxel.COLOR_GREEN},
+#                    {"line": "2. 多くのブロックを消すと高得点", "color": pyxel.COLOR_GREEN},
+#                    {"line": "3. 全てのブロックを消せるかな？", "color": pyxel.COLOR_GREEN},
+                    {"line": "あそびかた:", "color": pyxel.COLOR_YELLOW},
+                    {"line": "1. つながっているブロックを消せます", "color": pyxel.COLOR_WHITE},
+                    {"line": "2. 多くのブロックを消すと高得点", "color": pyxel.COLOR_WHITE},
+                    {"line": "3. 全てのブロックを消せるかな？", "color": pyxel.COLOR_WHITE},
                 ]
             },
             "en": {
                 "base_y": 80,
                 "line_spacing": 20,
                 "lines": [
-                    {"line": "How to Play:", "color": pyxel.COLOR_ORANGE},
-                    {"line": "1. Click blocks to remove them.", "color": pyxel.COLOR_LIME},
-                    {"line": "2. Remove more blocks for higher scores.", "color": pyxel.COLOR_LIME},
-                    {"line": "3. Try to clear all blocks!", "color": pyxel.COLOR_LIME},
-#                    {"line": "4. Higher difficulty means higher scores!", "color": pyxel.COLOR_WHITE},
-#                    {"line": "5. No moves left? Game over.", "color": pyxel.COLOR_WHITE}
+#                    {"line": "How to Play:", "color": pyxel.COLOR_ORANGE},
+#                    {"line": "1. Click blocks to remove them.", "color": pyxel.COLOR_LIME},
+#                    {"line": "2. Remove more blocks for higher scores.", "color": pyxel.COLOR_LIME},
+#                    {"line": "3. Try to clear all blocks!", "color": pyxel.COLOR_LIME},
+                    {"line": "How to Play:", "color": pyxel.COLOR_YELLOW},
+                    {"line": "1. Click blocks to remove them.", "color": pyxel.COLOR_WHITE},
+                    {"line": "2. Remove more blocks for higher scores.", "color": pyxel.COLOR_WHITE},
+                    {"line": "3. Try to clear all blocks!", "color": pyxel.COLOR_WHITE},
                 ]
             }
         }
@@ -607,6 +623,9 @@ class SameGame:
             print(f"Error loading font: {e}")
             exit(1)
 
+        # translations.json をロード
+        self.ext_translations = self.load_json('assets/translations.json')
+
         # BGM設定
         self.bgm = BGMGenerator()
         self.bgm_files = {
@@ -725,6 +744,17 @@ class SameGame:
         if not os.path.exists(absolute_path):
             raise FileNotFoundError(f"Font file not found: {absolute_path}")
         return pyxel.Font(absolute_path)
+
+    def load_json(self, relative_path) -> dict:
+        """JSONファイルを絶対パスで読み込む"""
+        absolute_path = os.path.join(self.base_path, relative_path)
+        if not os.path.exists(absolute_path):
+            raise FileNotFoundError(f"JSON file not found: {absolute_path}")
+        try:
+            with open(absolute_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Invalid JSON format in {absolute_path}: {e}")
 
     def load_bgms(self):
         for state, file_path in self.bgm_files.items():
@@ -1648,27 +1678,6 @@ class SameGame:
         for popup in self.score_popups:
             popup.draw()
 
-#    def draw_opening(self):
-#        game_title = translations["titles"]["game_title"][self.current_language]
-#        for y, text, color in game_title:
-#            self.draw_text(y, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-##            self.draw_text(y, text, color, align="center", border_color=pyxel.COLOR_GRAY)
-#            print("[debug do]", y, text, color, pyxel.COLOR_DARK_BLUE)
-#
-#        instruction_data = translations["instructions"]["intro"][self.current_language]
-#        base_y = instruction_data["base_y"]
-#        line_spacing = instruction_data["line_spacing"]
-#    
-#        for index, line_data in enumerate(instruction_data["lines"]):
-#            y = base_y + index * line_spacing
-#            text = line_data["line"]
-#            color = line_data["color"]
-##            self.draw_text(y, text, color, align="left", x_offset=50, border_color=pyxel.COLOR_DARK_BLUE)
-#            self.draw_text(y, text, color, align="left", x_offset=50, border_color=pyxel.COLOR_WHITE)
-#    
-#        is_hovered = self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
-#        self.language_button.draw(is_hovered, draw_text_func=self.draw_text, font=self.font_small)
-
     def calculate_shake_offset(self):
         if self.shake_timer > 0:
             # 残りタイマーに基づいて非線形減衰を計算
@@ -1687,9 +1696,24 @@ class SameGame:
 
     def draw_opening(self):
         """開始画面のテキストを描画"""
-        game_title = translations["titles"]["game_title"][self.current_language]
-        for y, text, color, border_color in game_title:
-#            self.draw_text(y, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+#        game_title = translations["titles"]["game_title"][self.current_language]
+#        for y, text, color, border_color in game_title:
+#        game_title = self.get_translations(lang=self.current_language, key="game_title")
+
+        game_title = self.ext_translations["titles_game_title"][self.current_language]
+        print(f"[DEBUG]: game_title= {game_title}")
+        
+        # 関数を呼び出して色を変換
+        converted_game_title = self.convert_colors(game_title, COLOR_MAP)
+        print(f"[DEBUG]: Converted game_title= {converted_game_title}")
+
+        for item in converted_game_title:
+            x = item.get('x', 0)  # デフォルト値として 0 を設定
+            y = item.get('y', 0)
+            text = item.get('text', "")
+            color = item.get('color', pyxel.COLOR_WHITE)
+            border_color = item.get('frame_color', pyxel.COLOR_NAVY)
+
             self.draw_text(y, text, color, align="center", border_color=border_color)
 
         """左揃えのテキストを描画"""
@@ -1835,6 +1859,42 @@ class SameGame:
             self.draw_text(60 + i * 12, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
         self.draw_text(200, high_score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
 
+    def convert_colors(self, game_title, color_map):
+        """
+        game_title 内の color および frame_color を color_map を使用して変換する関数。
+    
+        :param game_title: リスト形式の翻訳データ
+        :param color_map: 色名と Pyxel 色定数のマッピング辞書
+        :return: 変換後の game_title
+        """
+#        for item in game_title:
+#            # color フィールドの変換
+#            color_value = item.get("color", None)
+#            if isinstance(color_value, str):  # 文字列の場合のみ変換
+#                color_name = color_value.replace("pyxel.", "").upper()  # "pyxel." を除去して大文字に変換
+#                item["color"] = color_map.get(color_name, pyxel.COLOR_WHITE)  # COLOR_MAP で変換
+#    
+#            # frame_color フィールドの変換
+#            frame_color_value = item.get("frame_color", None)
+#            if isinstance(frame_color_value, str):  # 文字列の場合のみ変換
+#                frame_color_name = frame_color_value.replace("pyxel.", "").upper()  # "pyxel." を除去して大文字に変換
+#                item["frame_color"] = color_map.get(frame_color_name, pyxel.COLOR_WHITE)  # COLOR_MAP で変換
+#
+#        return game_title
+
+        for item in game_title:
+            # color フィールドの変換
+            color_value = item.get("color", None)
+            if isinstance(color_value, str):  # 文字列の場合のみ変換
+                item["color"] = color_map.get(color_value.upper(), pyxel.COLOR_WHITE)  # COLOR_MAP で変換
+    
+            # frame_color フィールドの変換
+            frame_color_value = item.get("frame_color", None)
+            if isinstance(frame_color_value, str):  # 文字列の場合のみ変換
+                item["frame_color"] = color_map.get(frame_color_value.upper(), pyxel.COLOR_WHITE)  # COLOR_MAP で変換
+    
+        return game_title
+
     def draw_text(self, y, text, color, align="center", x_offset=0, font=None, border_color=None):
         """BDFフォントを使用してテキストを描画"""
         font = font or self.font_small  # デフォルトで self.font_small を使用
@@ -1854,6 +1914,7 @@ class SameGame:
             for dx in range(-1, 2):
                 for dy in range(-1, 2):
                     if dx != 0 or dy != 0:  # 中心位置 (0, 0) はスキップ
+                        print(f"{x, y, text, border_color, font}")
                         pyxel.text(x + dx, y + dy, text, border_color, font)
 
         pyxel.text(x, y, text, color, font)
