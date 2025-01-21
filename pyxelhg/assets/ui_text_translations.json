@@ -215,15 +215,23 @@
             }
         ]
     },
-    "game_state_messages_board_generation": {
-        "ja": {
-            "message": "ばんめんを生成ちゅう...",
-            "color": "YELLOW"
-        },
-        "en": {
-            "message": "Generating Board...",
-            "color": "YELLOW"
-        }
+    "board_generation": {
+        "ja": [
+            {
+                "align": "center",
+                "y": 120,
+                "text": "ダークサイドがうず巻き、形をなしておる……",
+                "color": "YELLOW"
+            }
+        ],
+        "en": [
+            {
+                "align": "center",
+                "y": 120,
+                "text": "The dark side swirls, taking shape it is...",
+                "color": "YELLOW"
+            }
+        ]
     },
     "game_state_messages_time_up": {
         "ja": {
@@ -281,24 +289,24 @@
     },
     "score_and_time": {
         "ja": {
-            "score_label": "スコア:",
+            "score_label": "フォースパワー:",
             "time_label": "タイム:",
             "time_no_limit": "--"
         },
         "en": {
-            "score_label": "Score:",
+            "score_label": "Force Power:",
             "time_label": "Time:",
             "time_no_limit": "--"
         }
     },
     "button_labels": {
         "ja": {
-            "retry": "やりなおす",
-            "quit": "ギブアップ"
+            "retry": "さいしょから",
+            "quit": "あきらめる"
         },
         "en": {
-            "retry": "Retry",
-            "quit": "Quit"
+            "retry": "Restart",
+            "quit": "Surrender"
         }
     }
 }
