@@ -10,14 +10,14 @@
                 "y": 40,
                 "text": "HaDe Game / ハデがめ",
                 "color": "WHITE",
-                "frame_color": "NAVY"
+                "border_color": "NAVY"
             },
             {
                 "align": "center",
                 "y": 180,
                 "text": "クリックで開始",
                 "color": "YELLOW",
-                "frame_color": "NAVY"
+                "border_color": "NAVY"
             }
         ],
         "en": [
@@ -26,14 +26,14 @@
                 "y": 40,
                 "text": "HaDe (Hallowed Demolition) Game",
                 "color": "WHITE",
-                "frame_color": "NAVY"
+                "border_color": "NAVY"
             },
             {
                 "align": "center",
                 "y": 180,
                 "text": "Click to Start",
                 "color": "YELLOW",
-                "frame_color": "NAVY"
+                "border_color": "NAVY"
             }
         ]
     },
@@ -93,16 +93,22 @@
         ]
     },
     "titles_difficulty_selection": {
-        "ja": {
-            "y": 40,
-            "text": "難易度を選んでください",
-            "color": "ORANGE"
-        },
-        "en": {
-            "y": 40,
-            "text": "Select Difficulty",
-            "color": "ORANGE"
-        }
+        "ja": [
+            {
+                "align": "center",
+                "y": 40,
+                "text": "難易度を選んでください",
+                "color": "YELLOW"
+            }
+        ],
+        "en": [
+            {
+                "align": "center",
+                "y": 40,
+                "text": "Select Difficulty",
+                "color": "YELLOW"
+            }
+        ]
     },
     "difficulty_options": {
         "ja": [
