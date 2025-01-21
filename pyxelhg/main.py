@@ -18,7 +18,7 @@ from bgm import BGMGenerator
 # 定数の設定
 WINDOW_WIDTH = 256
 WINDOW_HEIGHT = 240
-WINDOW_TITLE = "Pyxel HadeGame"
+WINDOW_TITLE = "HaDe Game"
 
 BUTTON_WIDTH = 75
 BUTTON_HEIGHT = 15
@@ -48,123 +48,6 @@ COLOR_MAP = {
     "PINK": pyxel.COLOR_PINK,            # 14
     "PEACH": pyxel.COLOR_PEACH           # 15
 }
-
-
-
-#translations = {
-#    "language_button": {"ja": "EN", "en": "JA"},  # 言語切り替えボタンのラベル
-#    "titles": {
-#        "game_title": {
-#            "ja": [
-##                (40, "ハデがめ", pyxel.COLOR_GREEN, pyxel.COLOR_NAVY),
-##                (60, "破諦我明", pyxel.COLOR_LIME, pyxel.COLOR_DARK_BLUE),
-##                (180, "クリックで開始", pyxel.COLOR_GREEN, pyxel.COLOR_NAVY)
-#                (40, "HaDe Game / ハデがめ", pyxel.COLOR_WHITE, pyxel.COLOR_NAVY),
-#                (180, "クリックで開始", pyxel.COLOR_WHITE, pyxel.COLOR_NAVY)
-#            ],
-#            "en": [
-##                (40, "Hade (Hallowed Demolition) Game", pyxel.COLOR_GREEN, pyxel.COLOR_NAVY),
-##                (180, "Click to Start", pyxel.COLOR_GREEN, pyxel.COLOR_NAVY)
-#                (40, "HaDe (Hallowed Demolition) Game", pyxel.COLOR_WHITE, pyxel.COLOR_NAVY),
-#                (180, "Click to Start", pyxel.COLOR_WHITE, pyxel.COLOR_NAVY)
-#            ]
-#        },
-#        "difficulty_selection": {
-##            "ja": "難易度を選んでください",
-##            "en": "Select Difficulty"
-#            "ja": {"y": 40, "text": "難易度を選んでください", "color": pyxel.COLOR_ORANGE},
-#            "en": {"y": 40, "text": "Select Difficulty", "color": pyxel.COLOR_ORANGE}
-#        }
-#    },
-#    "instructions": {
-#        "intro": {
-#            "ja": {
-#                "base_y": 80,
-#                "line_spacing": 20,
-#                "lines": [
-##                    {"line": "あそびかた:", "color": pyxel.COLOR_ORANGE},
-##                    {"line": "1. つながっているブロックを消せます", "color": pyxel.COLOR_GREEN},
-##                    {"line": "2. 多くのブロックを消すと高得点", "color": pyxel.COLOR_GREEN},
-##                    {"line": "3. 全てのブロックを消せるかな？", "color": pyxel.COLOR_GREEN},
-#                    {"line": "あそびかた:", "color": pyxel.COLOR_YELLOW},
-#                    {"line": "1. つながっているブロックを消せます", "color": pyxel.COLOR_WHITE},
-#                    {"line": "2. 多くのブロックを消すと高得点", "color": pyxel.COLOR_WHITE},
-#                    {"line": "3. 全てのブロックを消せるかな？", "color": pyxel.COLOR_WHITE},
-#                ]
-#            },
-#            "en": {
-#                "base_y": 80,
-#                "line_spacing": 20,
-#                "lines": [
-##                    {"line": "How to Play:", "color": pyxel.COLOR_ORANGE},
-##                    {"line": "1. Click blocks to remove them.", "color": pyxel.COLOR_LIME},
-##                    {"line": "2. Remove more blocks for higher scores.", "color": pyxel.COLOR_LIME},
-##                    {"line": "3. Try to clear all blocks!", "color": pyxel.COLOR_LIME},
-#                    {"line": "How to Play:", "color": pyxel.COLOR_YELLOW},
-#                    {"line": "1. Click blocks to remove them.", "color": pyxel.COLOR_WHITE},
-#                    {"line": "2. Remove more blocks for higher scores.", "color": pyxel.COLOR_WHITE},
-#                    {"line": "3. Try to clear all blocks!", "color": pyxel.COLOR_WHITE},
-#                ]
-#            }
-#        }
-#    },
-#    "difficulty_options": [
-#        {"key": "easy", "label": {"ja": "かんたん", "en": "Easy"}, "description": {"ja": "小さいばんめん、少ない色", "en": "Small grid, few colors"}},
-#        {"key": "normal", "label": {"ja": "ふつう", "en": "Normal"}, "description": {"ja": "中ぐらいのばんめん、やや多い色", "en": "Medium-sized grid, more colors"}},
-#        {"key": "hard", "label": {"ja": "むずかしい", "en": "Hard"}, "description": {"ja": "制限時間あり、多い色", "en": "Timed play, many colors"}},
-#        {"key": "very_hard", "label": {"ja": "めちゃむず", "en": "Very Hard"}, "description": {"ja": "短い制限時間、大きなばんめん", "en": "Short time limit, large grid"}},
-#        {"key": "expert", "label": {"ja": "たつじん", "en": "Expert"}, "description": {"ja": "とても短い時間、最大ばんめん", "en": "Largest grid, shortest time limit"}}
-#    ],
-#    "game_state_messages": {
-#        "board_generation": {
-#            "message": {
-#                "ja": "ばんめんを生成ちゅう...",
-#                "en": "Generating Board..."
-#            },
-#            "color": pyxel.COLOR_YELLOW
-#        },
-#        "time_up": {
-#            "title": {"ja": "タイムアップ！", "en": "Time's Up!"},
-#            "subtitle": {"ja": "次はスコアが伸びそうですね。", "en": "Try again to improve your score."}
-#        },
-#        "no_moves": {
-#            "title": {"ja": "ああっ！おしい！", "en": "No Moves Available!"},
-#            "subtitle": {"ja": "次はきっといける！", "en": "Better luck next time!"}
-#        },
-#        "game_cleared": {
-#            "title": {"ja": "おおお！すごいですね！！！", "en": "Congratulations!"},
-#            "subtitle": {"ja": "すべてのブロックを消しました！", "en": "You cleared the game!"},
-#            "bonus": {"ja": "クリアボーナス: +{bonus}", "en": "Clear Bonus: +{bonus}"},
-#            "action": {"ja": "クリックして続行", "en": "Click to Continue"}
-#        },
-#        "score_display": {
-#            "title": {"ja": "今回の スコア", "en": "Your Score"},
-#            "action": {"ja": "クリックして つづける", "en": "Click to Continue"}
-#        },
-#        "high_score_display": {
-#            "title": {"ja": "トップ 10スコア", "en": "Top 10 High Scores"},
-#            "action": {"ja": "クリックして もどる", "en": "Click to Return"}
-#        }
-#    },
-#    "score_and_time": {
-#        "score_label": {
-#            "ja": "スコア:",
-#            "en": "Score:"
-#        },
-#        "time_label": {
-#            "ja": "タイム:",
-#            "en": "Time:"
-#        },
-#        "time_no_limit": {
-#            "ja": "--",
-#            "en": "--"
-#        }
-#    },
-#    "button_labels": {
-##        "retry": {"ja": "やりなおす", "en": "Retry"},
-##        "quit": {"ja": "ギブアップ", "en": "Quit"}
-#    }
-#}
 
 class GameState(Enum):
     OPENING = "opening"
@@ -696,8 +579,7 @@ class SameGame:
             "normal": {"grid_rows": 6, "grid_cols": 8, "colors": 4, "time_limit": None, "score_multiplier": 1.2},
             "hard": {"grid_rows": 9, "grid_cols": 12, "colors": 5, "time_limit": 108, "score_multiplier": 1.5},
             "very_hard": {"grid_rows": 10, "grid_cols": 15, "colors": 5, "time_limit": 54, "score_multiplier": 2.0},
-#            "expert": {"grid_rows": 12, "grid_cols": 18, "colors": 5, "time_limit": 27, "score_multiplier": 3.0},
-            "expert": {"grid_rows": 12, "grid_cols": 18, "colors": 5, "time_limit": 2, "score_multiplier": 3.0},
+            "expert": {"grid_rows": 12, "grid_cols": 18, "colors": 5, "time_limit": 27, "score_multiplier": 3.0},
         }
         self.current_difficulty = "easy"
         self.update_difficulty_settings()

@@ -8,14 +8,14 @@
             {
                 "align": "center",
                 "y": 40,
-                "text": "HaDe Game - はでがめ",
+                "text": "はでがめ - HaDe Game",
                 "color": "WHITE",
                 "border_color": "NAVY"
             },
             {
                 "align": "center",
                 "y": 180,
-                "text": "クリックして進むのだ",
+                "text": "クリックするのじゃ。",
                 "color": "YELLOW",
                 "border_color": "NAVY"
             }
@@ -50,7 +50,7 @@
                 "align": "left",
                 "x_offset": 64,
                 "y": 110,
-                "text": "・まとめて消せば、フォースは強まる。",
+                "text": "・まとめて消せばフォースは強まる。",
                 "color": "WHITE"
             },
             {
@@ -298,7 +298,7 @@
             {
                 "align": "center",
                 "y": 70,
-                "text": "やったわ！暗黒面が……",
+                "text": "やったわ！ダークサイドが…",
                 "color": "WHITE"
             },
             {
@@ -346,7 +346,7 @@
             {
                 "align": "center",
                 "y": 80,
-                "text": "かくとくフォースパワー",
+                "text": "かくとくフォース",
                 "color": "WHITE"
             },
             {
@@ -360,7 +360,7 @@
             {
                 "align": "center",
                 "y": 80,
-                "text": "Gained Force Power",
+                "text": "Gained Force",
                 "color": "WHITE"
             },
             {
@@ -376,7 +376,7 @@
             {
                 "align": "center",
                 "y": 35,
-                "text": "トップ 10 フォースパワー",
+                "text": "トップ 10 フォース",
                 "color": "WHITE"
             },
             {
@@ -390,7 +390,7 @@
             {
                 "align": "center",
                 "y": 35,
-                "text": "Top 10 Gained Force Power",
+                "text": "Top 10 Gained Force",
                 "color": "WHITE"
             },
             {
@@ -403,12 +403,12 @@
     },
     "score_and_time": {
         "ja": {
-            "score_label": "フォースパワー:",
+            "score_label": "フォース:",
             "time_label": "タイム:",
             "time_no_limit": "--"
         },
         "en": {
-            "score_label": "Force Power:",
+            "score_label": "Force:",
             "time_label": "Time:",
             "time_no_limit": "--"
         }
