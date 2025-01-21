@@ -8,7 +8,7 @@
             {
                 "align": "center",
                 "y": 40,
-                "text": "HaDe Game / ハデがめ",
+                "text": "HaDe Game - はでがめ",
                 "color": "WHITE",
                 "border_color": "NAVY"
             },
@@ -268,13 +268,13 @@
             {
                 "align": "center",
                 "y": 80,
-                "text": "それが全力か？あわれだな。",
+                "text": "それが全力か？ あわれだな……",
                 "color": "RED"
             },
             {
                 "align": "center",
                 "y": 120,
-                "text": "あと少し！フォースと希望がみかたじゃ！",
+                "text": "もう少し！フォースと希望がみかたじゃ！",
                 "color": "YELLOW"
             }
         ],

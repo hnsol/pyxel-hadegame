@@ -51,7 +51,7 @@ COLOR_MAP = {
 
 
 
-translations = {
+#translations = {
 #    "language_button": {"ja": "EN", "en": "JA"},  # 言語切り替えボタンのラベル
 #    "titles": {
 #        "game_title": {
@@ -115,7 +115,7 @@ translations = {
 #        {"key": "very_hard", "label": {"ja": "めちゃむず", "en": "Very Hard"}, "description": {"ja": "短い制限時間、大きなばんめん", "en": "Short time limit, large grid"}},
 #        {"key": "expert", "label": {"ja": "たつじん", "en": "Expert"}, "description": {"ja": "とても短い時間、最大ばんめん", "en": "Largest grid, shortest time limit"}}
 #    ],
-    "game_state_messages": {
+#    "game_state_messages": {
 #        "board_generation": {
 #            "message": {
 #                "ja": "ばんめんを生成ちゅう...",
@@ -131,12 +131,12 @@ translations = {
 #            "title": {"ja": "ああっ！おしい！", "en": "No Moves Available!"},
 #            "subtitle": {"ja": "次はきっといける！", "en": "Better luck next time!"}
 #        },
-        "game_cleared": {
-            "title": {"ja": "おおお！すごいですね！！！", "en": "Congratulations!"},
-            "subtitle": {"ja": "すべてのブロックを消しました！", "en": "You cleared the game!"},
-            "bonus": {"ja": "クリアボーナス: +{bonus}", "en": "Clear Bonus: +{bonus}"},
-            "action": {"ja": "クリックして続行", "en": "Click to Continue"}
-        },
+#        "game_cleared": {
+#            "title": {"ja": "おおお！すごいですね！！！", "en": "Congratulations!"},
+#            "subtitle": {"ja": "すべてのブロックを消しました！", "en": "You cleared the game!"},
+#            "bonus": {"ja": "クリアボーナス: +{bonus}", "en": "Clear Bonus: +{bonus}"},
+#            "action": {"ja": "クリックして続行", "en": "Click to Continue"}
+#        },
 #        "score_display": {
 #            "title": {"ja": "今回の スコア", "en": "Your Score"},
 #            "action": {"ja": "クリックして つづける", "en": "Click to Continue"}
@@ -145,7 +145,7 @@ translations = {
 #            "title": {"ja": "トップ 10スコア", "en": "Top 10 High Scores"},
 #            "action": {"ja": "クリックして もどる", "en": "Click to Return"}
 #        }
-    },
+#    },
 #    "score_and_time": {
 #        "score_label": {
 #            "ja": "スコア:",
@@ -160,11 +160,11 @@ translations = {
 #            "en": "--"
 #        }
 #    },
-    "button_labels": {
-#        "retry": {"ja": "やりなおす", "en": "Retry"},
-#        "quit": {"ja": "ギブアップ", "en": "Quit"}
-    }
-}
+#    "button_labels": {
+##        "retry": {"ja": "やりなおす", "en": "Retry"},
+##        "quit": {"ja": "ギブアップ", "en": "Quit"}
+#    }
+#}
 
 class GameState(Enum):
     OPENING = "opening"
@@ -381,7 +381,8 @@ class Stars:
         self.transition_type = None
         self.transition_frame = 0
 #        self.gravity = 0.2  # 重力加速度
-        self.gravity = 0.15  # 重力加速度
+#        self.gravity = 0.15  # 重力加速度
+        self.gravity = 0.6  # 重力加速度
         self.circle_effect_active = False  # 円エフェクトのフラグ
         self.circle_radius = 0            # 現在の円の半径
 
@@ -413,7 +414,9 @@ class Stars:
 
     def _update_transition(self):
         """トランジション時の動き"""
-        self.transition_frame += 1
+#        self.transition_frame += 1
+        frame_increment = 2 if self.transition_type == "fall" else 1  # fallは2倍速
+        self.transition_frame += frame_increment
         center_x, center_y = pyxel.width // 2, pyxel.height // 2  # 常にここで定義
 
         if self.transition_type == "fall":
@@ -618,8 +621,8 @@ class SameGame:
         # フォント読み込み
         try:
             self.font_small = self.load_font("assets/fonts/k8x12.bdf")
-            self.font_medium = self.load_font("assets/fonts/umplus_j10r.bdf")
-            self.font_large = self.load_font("assets/fonts/umplus_j12r.bdf")
+            self.font_medium = self.load_font("assets/fonts/h14.bdf")
+            self.font_large = self.load_font("assets/fonts/h24.bdf")
         except FileNotFoundError as e:
             print(f"Error loading font: {e}")
             exit(1)
