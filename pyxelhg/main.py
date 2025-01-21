@@ -346,7 +346,8 @@ class ScorePopup:
         self.age += 1
 
     def draw(self):
-        text = f"+{self.score}"
+#        text = f"+{self.score}"
+        text = f"+{int(self.score):,}"  # 3桁区切りでフォーマット
         text_width = self.font.text_width(text)  # 使用するフォントでテキスト幅を計算
         x = int(self.x - text_width / 2)  # テキスト幅を考慮した中心位置
         y = int(self.y)
@@ -1800,11 +1801,6 @@ class SameGame:
                 pyxel.cls(pyxel.COLOR_WHITE)
 
                 self.draw_translated_text("messages_game_cleared", self.current_language)
-#                cleared_msg = translations["game_state_messages"]["game_cleared"]
-#                self.draw_text(WINDOW_HEIGHT // 2 - 40, cleared_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-#                self.draw_text(WINDOW_HEIGHT // 2 - 20, cleared_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-#                bonus_text = cleared_msg["bonus"][self.current_language].format(bonus=int(self.score * 0.75))
-#                print(f"[DEBUG]: ui_text_translations={self.ui_text_translations}")
 
                 # ボーナステキストをリストから検索して取得
                 bonus_entry = next(
@@ -1812,12 +1808,8 @@ class SameGame:
                     None
                 )
                 if bonus_entry:
-#                    bonus_text = bonus_entry["bonus"].format(bonus=int(self.score * 0.75))
                     bonus_text = bonus_entry["bonus"].format(bonus=f"{int(self.score * 0.75):,}")
                     self.draw_text(WINDOW_HEIGHT // 2, bonus_text, pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_NAVY)
-#                bonus_text = self.ui_text_translations["messages_game_cleared"][self.current_language]["bonus"].format(bonus=int(self.score * 0.75))
-#                self.draw_text(WINDOW_HEIGHT // 2, bonus_text, pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-#                self.draw_text(WINDOW_HEIGHT // 2 + 20, cleared_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
 
                 self.draw_difficulty_label()
                 self.draw_score_and_time()
@@ -1831,7 +1823,8 @@ class SameGame:
 
         # スコアメッセージを描画
         self.draw_translated_text("messages_score_display", self.current_language)
-        self.draw_text(WINDOW_HEIGHT // 2 - 10, f"{int(self.score)}", pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_NAVY)
+#        self.draw_text(WINDOW_HEIGHT // 2 - 10, f"{int(self.score)}", pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_NAVY)
+        self.draw_text(WINDOW_HEIGHT // 2 - 10, f"{int(self.score):,}", pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_NAVY)
 
     def draw_high_score_display(self):
         # 画面をクリア
@@ -1841,7 +1834,8 @@ class SameGame:
         self.draw_translated_text("messages_high_score_display", self.current_language)
         for i, score in enumerate(self.high_scores):
             rank = f"{i + 1:>2}"  # 順位を右詰めで整形
-            text = f"{rank}: {score:>6}"  # スコアを右詰めで整形
+#            text = f"{rank}: {score:>6}"  # スコアを右詰めで整形
+            text = f"{rank}: {score:>10,}"  # スコアを右詰めかつ3桁区切りで整形
             color = pyxel.COLOR_RED if i == self.current_score_rank else pyxel.COLOR_WHITE
             self.draw_text(60 + i * 12, text, color, align="center", border_color=pyxel.COLOR_NAVY)
 
@@ -1969,7 +1963,8 @@ class SameGame:
         """
         # スコア表示
         score_label = self.ui_text_translations["score_and_time"][self.current_language]["score_label"]
-        score_value = f"{int(self.score)}"
+#        score_value = f"{int(self.score)}"
+        score_value = f"{int(self.score):,}"  # 3桁区切りにフォーマット
         self.draw_text(
             y=WINDOW_HEIGHT - STATUS_AREA_HEIGHT + 5,
             text=f"{score_label} {score_value}",

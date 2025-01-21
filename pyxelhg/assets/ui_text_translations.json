@@ -268,13 +268,13 @@
             {
                 "align": "center",
                 "y": 80,
-                "text": "そこまでだ。限界をおもいしれ！",
+                "text": "それが全力か？あわれだな。",
                 "color": "RED"
             },
             {
                 "align": "center",
                 "y": 120,
-                "text": "あと少しじゃ。希望はいつもある！",
+                "text": "あと少し！フォースと希望がみかたじゃ！",
                 "color": "YELLOW"
             }
         ],
@@ -282,7 +282,7 @@
             {
                 "align": "center",
                 "y": 80,
-                "text": "This is the end. Feel your limits!",
+                "text": "Is that your best? Pathetic.",
                 "color": "RED"
             },
             {
