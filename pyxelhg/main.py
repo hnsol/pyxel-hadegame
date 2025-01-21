@@ -624,7 +624,8 @@ class SameGame:
             exit(1)
 
         # translations.json をロード
-        self.ext_translations = self.load_json('assets/translations.json')
+#        self.ext_translations = self.load_json('assets/translations.json')
+        self.ui_text_translations = self.load_json('assets/ui_text_translations.json')
 
         # BGM設定
         self.bgm = BGMGenerator()
@@ -1871,7 +1872,7 @@ class SameGame:
 
     def draw_translated_text(self, key, language):
         # ストリングキーと言語に基づいてタイトルを取得
-        game_title = self.ext_translations[key][language]
+        game_title = self.ui_text_translations[key][language]
 #        print(f"[DEBUG]: game_title= {game_title}")
         
         # 色変換関数を呼び出し
