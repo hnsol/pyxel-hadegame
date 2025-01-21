@@ -1787,15 +1787,15 @@ class SameGame:
 
             if self.state == GameState.TIME_UP:
                 # タイムアップ画面の描画
-                time_up_msg = translations["game_state_messages"]["time_up"]
-                self.draw_text(WINDOW_HEIGHT // 2 - 20, time_up_msg["title"][self.current_language], pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-                self.draw_text(WINDOW_HEIGHT // 2, time_up_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+                self.draw_translated_text("messages_time_up", self.current_language)
+
+#                time_up_msg = translations["game_state_messages"]["time_up"]
+#                self.draw_text(WINDOW_HEIGHT // 2 - 20, time_up_msg["title"][self.current_language], pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+#                self.draw_text(WINDOW_HEIGHT // 2, time_up_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
             
             elif self.state == GameState.NO_MOVES:
                 # 手詰まり画面の描画
-                no_moves_msg = translations["game_state_messages"]["no_moves"]
-                self.draw_text(WINDOW_HEIGHT // 2 - 20, no_moves_msg["title"][self.current_language], pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-                self.draw_text(WINDOW_HEIGHT // 2, no_moves_msg["subtitle"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+                self.draw_translated_text("messages_no_moves", self.current_language)
             
             elif self.state == GameState.GAME_CLEARED:
                 # ゲームクリア画面の描画
@@ -1820,24 +1820,20 @@ class SameGame:
 #        self.reset_particles()
 
         # スコアメッセージを描画
-        score_msg = translations["game_state_messages"]["score_display"]
-        self.draw_text(WINDOW_HEIGHT // 2 - 20, score_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-        self.draw_text(WINDOW_HEIGHT // 2, f"{int(self.score)}", pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-        self.draw_text(WINDOW_HEIGHT // 2 + 20, score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+        self.draw_translated_text("messages_score_display", self.current_language)
+        self.draw_text(WINDOW_HEIGHT // 2, f"{int(self.score)}", pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_NAVY)
 
     def draw_high_score_display(self):
         # 画面をクリア
         pyxel.cls(pyxel.COLOR_GRAY)
 
         # ハイスコア表示画面の描画
-        high_score_msg = translations["game_state_messages"]["high_score_display"]
-        self.draw_text(35, high_score_msg["title"][self.current_language], pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+        self.draw_translated_text("messages_high_score_display", self.current_language)
         for i, score in enumerate(self.high_scores):
             rank = f"{i + 1:>2}"  # 順位を右詰めで整形
             text = f"{rank}: {score:>6}"  # スコアを右詰めで整形
-            color = pyxel.COLOR_YELLOW if i == self.current_score_rank else pyxel.COLOR_WHITE
-            self.draw_text(60 + i * 12, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-        self.draw_text(200, high_score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
+            color = pyxel.COLOR_RED if i == self.current_score_rank else pyxel.COLOR_WHITE
+            self.draw_text(60 + i * 12, text, color, align="center", border_color=pyxel.COLOR_NAVY)
 
     def draw_translated_text(self, key, language):
         # ストリングキーと言語に基づいてタイトルを取得
