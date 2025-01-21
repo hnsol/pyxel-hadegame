@@ -146,23 +146,23 @@ translations = {
             "action": {"ja": "クリックして もどる", "en": "Click to Return"}
         }
     },
-    "score_and_time": {
-        "score_label": {
-            "ja": "スコア:",
-            "en": "Score:"
-        },
-        "time_label": {
-            "ja": "タイム:",
-            "en": "Time:"
-        },
-        "time_no_limit": {
-            "ja": "--",
-            "en": "--"
-        }
-    },
+#    "score_and_time": {
+#        "score_label": {
+#            "ja": "スコア:",
+#            "en": "Score:"
+#        },
+#        "time_label": {
+#            "ja": "タイム:",
+#            "en": "Time:"
+#        },
+#        "time_no_limit": {
+#            "ja": "--",
+#            "en": "--"
+#        }
+#    },
     "button_labels": {
-        "retry": {"ja": "やりなおす", "en": "Retry"},
-        "quit": {"ja": "ギブアップ", "en": "Quit"}
+#        "retry": {"ja": "やりなおす", "en": "Retry"},
+#        "quit": {"ja": "ギブアップ", "en": "Quit"}
     }
 }
 
@@ -1925,19 +1925,41 @@ class SameGame:
         return cell_size, grid_x_start, grid_y_start
 
     def draw_difficulty_label(self):
-        difficulty_options = translations["difficulty_options"]
-        difficulty_levels = [
-            {"key": option["key"], "label": option["label"][self.current_language]}
-            for option in difficulty_options
-        ]
-        difficulty_keys = [level["key"] for level in difficulty_levels]
-        
-        current_difficulty_label = None
-        for key, level in zip(difficulty_keys, difficulty_levels):
-            if key == self.current_difficulty:
-                current_difficulty_label = level["label"]
-                break
-        
+#        difficulty_options = translations["difficulty_options"]
+#        difficulty_levels = [
+#            {"key": option["key"], "label": option["label"][self.current_language]}
+#            for option in difficulty_options
+#        ]
+#        difficulty_keys = [level["key"] for level in difficulty_levels]
+#        
+#        current_difficulty_label = None
+#        for key, level in zip(difficulty_keys, difficulty_levels):
+#            if key == self.current_difficulty:
+#                current_difficulty_label = level["label"]
+#                break
+
+
+#        if current_difficulty_label:
+#            difficulty_text_x = WINDOW_WIDTH - 60
+#            difficulty_text_y = (BUTTON_AREA_HEIGHT - 14) // 2
+#            self.draw_text(
+#                difficulty_text_y,
+#                current_difficulty_label,
+#                pyxel.COLOR_WHITE,
+#                align="right",
+#                x_offset=10,
+#                border_color=pyxel.COLOR_DARK_BLUE
+#            )
+
+#        current_difficulty_label = self.ui_text_translations["difficulty_options"][self.current_language]["label"]
+
+        # 現在の言語に対応する難易度オプションを取得
+        difficulty_data = self.ui_text_translations["difficulty_options"][self.current_language]
+        # current_difficulty に一致する項目を検索して label を取得
+        for item in difficulty_data:
+            if item["key"] == self.current_difficulty:
+                current_difficulty_label = item["label"]
+
         if current_difficulty_label:
             difficulty_text_x = WINDOW_WIDTH - 60
             difficulty_text_y = (BUTTON_AREA_HEIGHT - 14) // 2
@@ -1955,7 +1977,6 @@ class SameGame:
         画面下部にスコアと時間を描画
         """
         # スコア表示
-#        score_label = translations["score_and_time"]["score_label"][self.current_language]
         score_label = self.ui_text_translations["score_and_time"][self.current_language]["score_label"]
         score_value = f"{int(self.score)}"
         self.draw_text(
@@ -1971,12 +1992,9 @@ class SameGame:
         # タイマー表示
         if self.time_limit:
             remaining_time = max(0, self.time_limit - (pyxel.frame_count - self.start_time) // 30)
-#            time_label = translations["score_and_time"]["time_label"][self.current_language]
             time_label = self.ui_text_translations["score_and_time"][self.current_language]["time_label"]
             time_value = f"{remaining_time}s"
         else:
-#            time_label = translations["score_and_time"]["time_label"][self.current_language]
-#            time_value = translations["score_and_time"]["time_no_limit"][self.current_language]
             time_label = self.ui_text_translations["score_and_time"][self.current_language]["time_label"]
             time_value = self.ui_text_translations["score_and_time"][self.current_language]["time_no_limit"]
     
