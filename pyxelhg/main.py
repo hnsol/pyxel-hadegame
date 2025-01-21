@@ -624,11 +624,9 @@ class SameGame:
             exit(1)
 
         # translations.json をロード
-#        self.ext_translations = self.load_json('assets/translations.json')
         self.ui_text_translations = self.load_json('assets/ui_text_translations.json')
-#        self.ui_text_translations = self.replace_colors(self.ui_text_translations, COLOR_MAP)
         self.ui_text_translations = self.replace_colors_recursive(self.ui_text_translations, COLOR_MAP)
-        print(f"[DEBUG]: ui_text_translations= {self.ui_text_translations}")
+#        print(f"[DEBUG]: ui_text_translations= {self.ui_text_translations}")
 
         # BGM設定
         self.bgm = BGMGenerator()
@@ -941,7 +939,6 @@ class SameGame:
 
     def create_difficulty_buttons(self):
         # 現在の言語で難易度情報を取得
-#        difficulty_levels = translations[self.current_language]["difficulty_levels"]
         difficulty_levels = [
             {
                 "key": option["key"],
@@ -1757,25 +1754,21 @@ class SameGame:
     def draw_difficulty_selection(self):
         """難易度選択画面のタイトルを描画"""
         self.draw_translated_text("titles_difficulty_selection", self.current_language)
-#        difficulty_data = translations["titles"]["difficulty_selection"][self.current_language]
-#    
-#        self.draw_text(
-#            difficulty_data["y"], 
-#            difficulty_data["text"], 
-#            difficulty_data["color"], 
-#            align="center",
-#            border_color=pyxel.COLOR_NAVY
-#        )
-
         
         """難易度選択画面のボタンと説明を描画"""
-        difficulty_options = translations["difficulty_options"]
+#        difficulty_options = translations["difficulty_options"]
+#        print(f"[DEBUG]: difficulty_options= {difficulty_options}")
+        difficulty_options = self.ui_text_translations["difficulty_options"][self.current_language]
+        print(f"[DEBUG]: difficulty_options= {difficulty_options}")
         
         for i, button in enumerate(self.difficulty_buttons):
+            print(f"[DEBUG]: i, button= {i} {button}")
             # 現在の言語に対応するボタンラベルと説明を取得
             option = difficulty_options[i]
-            label = option["label"][self.current_language]
-            description = option["description"][self.current_language]
+#            label = option["label"][self.current_language]
+##            description = option["description"][self.current_language]
+#            description = option[self.current_language]["description"]
+            label = option["label"]
         
             # ボタンのホバー状態を確認
             is_hovered = button.is_hovered(pyxel.mouse_x, pyxel.mouse_y)
@@ -1789,6 +1782,7 @@ class SameGame:
             )
         
             # 説明文をボタンの右側に描画
+            description = option["description"]
             self.draw_text(
                 y=button.y + 2,
                 text=description,
@@ -1798,6 +1792,9 @@ class SameGame:
                 font=self.font_small,
                 border_color=pyxel.COLOR_NAVY
             )
+
+#            # 説明文をボタンの右側に描画
+#            self.draw_translated_text("titles_difficulty_selection", self.current_language)
 
     def draw_board_generation(self):
         board_gen_msg = translations["game_state_messages"]["board_generation"]
@@ -1881,28 +1878,6 @@ class SameGame:
             color = pyxel.COLOR_YELLOW if i == self.current_score_rank else pyxel.COLOR_WHITE
             self.draw_text(60 + i * 12, text, color, align="center", border_color=pyxel.COLOR_DARK_BLUE)
         self.draw_text(200, high_score_msg["action"][self.current_language], pyxel.COLOR_WHITE, align="center", border_color=pyxel.COLOR_DARK_BLUE)
-
-#    def convert_colors(self, game_title, color_map):
-#        """
-#        game_title 内の color および border_color を color_map を使用して変換する関数。
-#    
-#        :param game_title: リスト形式の翻訳データ
-#        :param color_map: 色名と Pyxel 色定数のマッピング辞書
-#        :return: 変換後の game_title
-#        """
-#
-#        for item in game_title:
-#            # color フィールドの変換
-#            color_value = item.get("color", None)
-#            if isinstance(color_value, str):  # 文字列の場合のみ変換
-#                item["color"] = color_map.get(color_value.upper(), pyxel.COLOR_WHITE)  # COLOR_MAP で変換
-#    
-#            # border_color フィールドの変換
-#            border_color_value = item.get("border_color", None)
-#            if isinstance(border_color_value, str):  # 文字列の場合のみ変換
-#                item["border_color"] = color_map.get(border_color_value.upper(), pyxel.COLOR_WHITE)  # COLOR_MAP で変換
-#    
-#        return game_title
 
     def draw_translated_text(self, key, language):
         # ストリングキーと言語に基づいてタイトルを取得
