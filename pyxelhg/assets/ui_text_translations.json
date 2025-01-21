@@ -237,28 +237,28 @@
         "ja": [
             {
                 "align": "center",
-                "y": 100,
-                "text": "タイムアップ！",
+                "y": 80,
+                "text": "時間ぎれ？否、おまえが弱いのだ！",
                 "color": "RED"
             },
             {
                 "align": "center",
                 "y": 120,
-                "text": "次はスコアが伸びそうですね。",
+                "text": "時間をみかたにするのじゃ。そりゃ、もういちど！",
                 "color": "YELLOW"
             }
         ],
         "en": [
             {
                 "align": "center",
-                "y": 100,
-                "text": "Time's Up!",
+                "y": 80,
+                "text": "Out of time? No, it’s you who is weak!",
                 "color": "RED"
             },
             {
                 "align": "center",
                 "y": 120,
-                "text": "Try again to improve your score.",
+                "text": "Make time your ally. Now, once more!",
                 "color": "YELLOW"
             }
         ]
@@ -297,28 +297,46 @@
         "ja": [
             {
                 "align": "center",
-                "y": 80,
-                "text": "さすがじゃ！",
-                "color": "YELLOW"
+                "y": 70,
+                "text": "やったわ！暗黒面が……",
+                "color": "WHITE"
             },
             {
                 "align": "center",
-                "y": 120,
-                "text": "ぼんのうは消え去った！",
+                "y": 90,
+                "text": "引いていく！……兄さん？！",
+                "color": "WHITE"
+            },
+            {
+                "bonus": "フォースの覚醒: +{bonus}"
+            },
+            {
+                "align": "center",
+                "y": 160,
+                "text": "うむ、うむ！悪くないぞ！",
                 "color": "YELLOW"
             }
         ],
         "en": [
             {
                 "align": "center",
-                "y": 80,
-                "text": "This is the end. Feel your limits!",
-                "color": "RED"
+                "y": 70,
+                "text": "I did it! The dark side is...",
+                "color": "WHITE"
             },
             {
                 "align": "center",
-                "y": 120,
-                "text": "Hope and the Force are always with you!",
+                "y": 90,
+                "text": "fading! ... You, brother?!",
+                "color": "WHITE"
+            },
+            {
+                "bonus": "Power Awakened: +{bonus}"
+            },
+            {
+                "align": "center",
+                "y": 160,
+                "text": "Hmm, hmm! Not bad, it is!",
                 "color": "YELLOW"
             }
         ]
@@ -327,7 +345,7 @@
         "ja": [
             {
                 "align": "center",
-                "y": 100,
+                "y": 80,
                 "text": "かくとくフォースパワー",
                 "color": "WHITE"
             },
@@ -341,7 +359,7 @@
         "en": [
             {
                 "align": "center",
-                "y": 100,
+                "y": 80,
                 "text": "Gained Force Power",
                 "color": "WHITE"
             },
@@ -364,7 +382,7 @@
             {
                 "align": "center",
                 "y": 200,
-                "text": "次の攻げきにそなえよ！",
+                "text": "つぎの攻げきにそなえよ！",
                 "color": "YELLOW"
             }
         ],
