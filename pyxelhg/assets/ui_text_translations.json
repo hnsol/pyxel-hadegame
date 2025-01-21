@@ -15,7 +15,7 @@
             {
                 "align": "center",
                 "y": 180,
-                "text": "クリックで開始",
+                "text": "クリックして進むのだ",
                 "color": "YELLOW",
                 "border_color": "NAVY"
             }
@@ -31,7 +31,7 @@
             {
                 "align": "center",
                 "y": 180,
-                "text": "Click to Start",
+                "text": "Click, and proceed you will.",
                 "color": "YELLOW",
                 "border_color": "NAVY"
             }
@@ -43,21 +43,21 @@
                 "align": "left",
                 "x_offset": 64,
                 "y": 90,
-                "text": "・つながっているブロックを消せ",
+                "text": "・つながるブロックを消すのだ。",
                 "color": "WHITE"
             },
             {
                 "align": "left",
                 "x_offset": 64,
                 "y": 110,
-                "text": "・いちどにたくさん消すと高得点",
+                "text": "・まとめて消せば、フォースは強まる。",
                 "color": "WHITE"
             },
             {
                 "align": "left",
                 "x_offset": 64,
                 "y": 130,
-                "text": "・すべてのブロックを消せるか！？",
+                "text": "・すべてのブロックを消し去れ！",
                 "color": "WHITE"
             }
         ],
@@ -65,29 +65,22 @@
             {
                 "align": "left",
                 "x_offset": 50,
-                "y": 80,
-                "text": "How to Play:",
-                "color": "YELLOW"
-            },
-            {
-                "align": "left",
-                "x_offset": 50,
-                "y": 100,
-                "text": "- Click blocks to remove them.",
+                "y": 90,
+                "text": "- Connected blocks, clear them you will.",
                 "color": "WHITE"
             },
             {
                 "align": "left",
                 "x_offset": 50,
-                "y": 120,
-                "text": "- Remove more blocks for higher scores.",
+                "y": 110,
+                "text": "- Clear many at once, stronger the Force.",
                 "color": "WHITE"
             },
             {
                 "align": "left",
                 "x_offset": 50,
-                "y": 140,
-                "text": "- Try to clear all blocks!",
+                "y": 130,
+                "text": "- All blocks, cleared they shall be.",
                 "color": "WHITE"
             }
         ]
@@ -97,7 +90,7 @@
             {
                 "align": "center",
                 "y": 40,
-                "text": "難易度を選んでください",
+                "text": "どんなに困難でも、フォースはつねに在る。",
                 "color": "YELLOW"
             }
         ],
@@ -105,7 +98,7 @@
             {
                 "align": "center",
                 "y": 40,
-                "text": "Select Difficulty",
+                "text": "However hard, the Force is there.",
                 "color": "YELLOW"
             }
         ]
@@ -114,55 +107,45 @@
         "ja": [
             {
                 "key": "easy",
-                "label": "かんたん",
-                "description": "小さいばんめん、少ない色"
+                "label": "★"
             },
             {
                 "key": "normal",
-                "label": "ふつう",
-                "description": "中ぐらいのばんめん、やや多い色"
+                "label": "★ ★"
             },
             {
                 "key": "hard",
-                "label": "むずかしい",
-                "description": "制限時間あり、多い色"
+                "label": "★ ★ ★"
             },
             {
                 "key": "very_hard",
-                "label": "めちゃむず",
-                "description": "短い制限時間、大きなばんめん"
+                "label": "★ ★ ★ ★"
             },
             {
                 "key": "expert",
-                "label": "たつじん",
-                "description": "とても短い時間、最大ばんめん"
+                "label": "★ ★ ★ ★ ★"
             }
         ],
         "en": [
             {
                 "key": "easy",
-                "label": "Easy",
-                "description": "Small grid, few colors"
+                "label": "★"
             },
             {
                 "key": "normal",
-                "label": "Normal",
-                "description": "Medium-sized grid, more colors"
+                "label": "★ ★"
             },
             {
                 "key": "hard",
-                "label": "Hard",
-                "description": "Timed play, many colors"
+                "label": "★ ★ ★"
             },
             {
                 "key": "very_hard",
-                "label": "Very Hard",
-                "description": "Short time limit, large grid"
+                "label": "★ ★ ★ ★"
             },
             {
                 "key": "expert",
-                "label": "Expert",
-                "description": "Largest grid, shortest time limit"
+                "label": "★ ★ ★ ★ ★"
             }
         ]
     },
@@ -172,31 +155,31 @@
                 "align": "left",
                 "x_offset": 115,
                 "y": 72,
-                "text": "小さいばんめん、少ない色"
+                "text": "ブロック少、色少"
             },
             {
                 "align": "left",
                 "x_offset": 115,
                 "y": 97,
-                "text": "中ぐらいのばんめん、やや多い色"
+                "text": "ブロックやや多、色やや多"
             },
             {
                 "align": "left",
                 "x_offset": 115,
                 "y": 122,
-                "text": "制限時間あり、多い色"
+                "text": "108ブロック、色多、制限時間あり"
             },
             {
                 "align": "left",
                 "x_offset": 115,
                 "y": 147,
-                "text": "短い制限時間、大きなばんめん"
+                "text": "ブロック多、制限時間やや短い"
             },
             {
                 "align": "left",
                 "x_offset": 115,
                 "y": 172,
-                "text": "とても短い時間、最大ばんめん"
+                "text": "ブロックとても多、制限時間短い"
             }
         ],
         "en": [
@@ -204,31 +187,31 @@
                 "align": "left",
                 "x_offset": 115,
                 "y": 72,
-                "text": "Small grid, few colors"
+                "text": "Few blocks, few colors"
             },
             {
                 "align": "left",
                 "x_offset": 115,
                 "y": 97,
-                "text": "Medium-sized grid, more colors"
+                "text": "Some blocks, some colors"
             },
             {
                 "align": "left",
                 "x_offset": 115,
                 "y": 122,
-                "text": "Timed play, many colors"
+                "text": "108 blocks, time limit"
             },
             {
                 "align": "left",
                 "x_offset": 115,
                 "y": 147,
-                "text": "Short time limit, large grid"
+                "text": "Many blocks, shorter time"
             },
             {
                 "align": "left",
                 "x_offset": 115,
                 "y": 172,
-                "text": "Largest grid, shortest time limit"
+                "text": "Lots of blocks, very short time"
             }
         ]
     },

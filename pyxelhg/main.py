@@ -193,7 +193,7 @@ class Button:
     def draw(self, is_hovered, draw_text_func, font):
         # ボタンの塗りつぶし
 #        color = pyxel.COLOR_LIGHT_BLUE if is_hovered else pyxel.COLOR_GRAY
-        color = pyxel.COLOR_LIME if is_hovered else pyxel.COLOR_DARK_BLUE
+        color = pyxel.COLOR_YELLOW if is_hovered else pyxel.COLOR_DARK_BLUE
         pyxel.rect(self.x, self.y, self.width, self.height, color)
 
         # ボタンラベルの描画
@@ -205,7 +205,7 @@ class Button:
             draw_text_func(
                 y=text_y,
                 text=self.label,
-                color=pyxel.COLOR_GREEN,
+                color=pyxel.COLOR_YELLOW,
                 align="left",        # 中央揃えっぽくしたければ 'left' + x_offset を工夫
                 x_offset=text_x,
                 font=font,
@@ -1775,17 +1775,6 @@ class SameGame:
                 font=self.font_small
             )
         
-            # 説明文をボタンの右側に描画
-#            description = option["description"]
-#            self.draw_text(
-#                y=button.y + 2,
-#                text=description,
-#                color=pyxel.COLOR_GREEN,
-#                align="left",
-#                x_offset=button.x + button.width + 10,
-#                font=self.font_small,
-#                border_color=pyxel.COLOR_NAVY
-#            )
 
         # 説明文をボタンの右側に描画
         self.draw_translated_text("difficulty_text", self.current_language)
@@ -1876,7 +1865,7 @@ class SameGame:
     def draw_translated_text(self, key, language):
         # ストリングキーと言語に基づいてタイトルを取得
         ui_text = self.ui_text_translations[key][language]
-        print(f"[DEBUG]: ui_text= {ui_text}")
+#        print(f"[DEBUG]: ui_text= {ui_text}")
         
         # 色変換関数を呼び出し
 #        converted_ui_text = self.convert_colors(ui_text, COLOR_MAP)
