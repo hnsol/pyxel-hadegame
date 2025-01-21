@@ -108,13 +108,13 @@ translations = {
 #            }
 #        }
 #    },
-    "difficulty_options": [
-        {"key": "easy", "label": {"ja": "かんたん", "en": "Easy"}, "description": {"ja": "小さいばんめん、少ない色", "en": "Small grid, few colors"}},
-        {"key": "normal", "label": {"ja": "ふつう", "en": "Normal"}, "description": {"ja": "中ぐらいのばんめん、やや多い色", "en": "Medium-sized grid, more colors"}},
-        {"key": "hard", "label": {"ja": "むずかしい", "en": "Hard"}, "description": {"ja": "制限時間あり、多い色", "en": "Timed play, many colors"}},
-        {"key": "very_hard", "label": {"ja": "めちゃむず", "en": "Very Hard"}, "description": {"ja": "短い制限時間、大きなばんめん", "en": "Short time limit, large grid"}},
-        {"key": "expert", "label": {"ja": "たつじん", "en": "Expert"}, "description": {"ja": "とても短い時間、最大ばんめん", "en": "Largest grid, shortest time limit"}}
-    ],
+#    "difficulty_options": [
+#        {"key": "easy", "label": {"ja": "かんたん", "en": "Easy"}, "description": {"ja": "小さいばんめん、少ない色", "en": "Small grid, few colors"}},
+#        {"key": "normal", "label": {"ja": "ふつう", "en": "Normal"}, "description": {"ja": "中ぐらいのばんめん、やや多い色", "en": "Medium-sized grid, more colors"}},
+#        {"key": "hard", "label": {"ja": "むずかしい", "en": "Hard"}, "description": {"ja": "制限時間あり、多い色", "en": "Timed play, many colors"}},
+#        {"key": "very_hard", "label": {"ja": "めちゃむず", "en": "Very Hard"}, "description": {"ja": "短い制限時間、大きなばんめん", "en": "Short time limit, large grid"}},
+#        {"key": "expert", "label": {"ja": "たつじん", "en": "Expert"}, "description": {"ja": "とても短い時間、最大ばんめん", "en": "Largest grid, shortest time limit"}}
+#    ],
     "game_state_messages": {
 #        "board_generation": {
 #            "message": {
@@ -179,41 +179,8 @@ class GameState(Enum):
     SCORE_DISPLAY = "score_display"
     HIGH_SCORE_DISPLAY = "high_score_display"
 
-#class Button:
-#    def __init__(self, x, y, width, height, label):
-#        self.x = x
-#        self.y = y
-#        self.width = width
-#        self.height = height
-#        self.label = label
-#
-#    def is_hovered(self, mx, my):
-#        return self.x <= mx <= self.x + self.width and self.y <= my <= self.y + self.height
-#
-#    def draw(self, is_hovered, draw_text_func, font):
-#        # ボタンの塗りつぶし
-##        color = pyxel.COLOR_LIGHT_BLUE if is_hovered else pyxel.COLOR_GRAY
-#        color = pyxel.COLOR_YELLOW if is_hovered else pyxel.COLOR_DARK_BLUE
-#        pyxel.rect(self.x, self.y, self.width, self.height, color)
-#
-#        # ボタンラベルの描画
-#        if self.label and draw_text_func:
-#            # 今までの単純な "pyxel.text()" をやめて、draw_text() を呼び出す
-#            text_width = font.text_width(self.label)
-#            text_x = self.x + (self.width - text_width) // 2
-#            text_y = self.y + (self.height - 10) // 2 # テキスト高さをおおよそ12ピクセルの場合
-#            draw_text_func(
-#                y=text_y,
-#                text=self.label,
-#                color=pyxel.COLOR_YELLOW,
-#                align="left",        # 中央揃えっぽくしたければ 'left' + x_offset を工夫
-#                x_offset=text_x,
-#                font=font,
-#                border_color=pyxel.COLOR_NAVY
-#            )
-
 class Button:
-    def __init__(self, x, y, width, height, label, color=None, border_color=None):
+    def __init__(self, x, y, width, height, label, color=None, border_color=None, key=None):
         self.x = x
         self.y = y
         self.width = width
@@ -221,6 +188,7 @@ class Button:
         self.label = label
         self.color = color if color is not None else pyxel.COLOR_DARK_BLUE
         self.border_color = border_color if border_color is not None else pyxel.COLOR_NAVY
+        self.key = key
 
     def is_hovered(self, mx, my):
         return self.x <= mx <= self.x + self.width and self.y <= my <= self.y + self.height
@@ -951,27 +919,48 @@ class SameGame:
         self.language_button = Button(x, y, button_width, button_height, "EN")
 
     def create_difficulty_buttons(self):
-        # 現在の言語で難易度情報を取得
-        difficulty_levels = [
-            {
-                "key": option["key"],
-                "label": option["label"][self.current_language],
-                "description": option["description"][self.current_language]
-            }
-            for option in translations["difficulty_options"]
-        ]
+#        # 現在の言語で難易度情報を取得
+#        difficulty_levels = [
+#            {
+#                "key": option["key"],
+#                "label": option["label"][self.current_language],
+#                "description": option["description"][self.current_language]
+#            }
+#            for option in translations["difficulty_options"]
+#        ]
+#
+#        # ボタンを縦に並べるための開始位置を計算
+#        start_x = (WINDOW_WIDTH - BUTTON_WIDTH) // 2 - 60
+#        start_y = 70
+#        self.difficulty_buttons = []
+#    
+#        for i, diff in enumerate(difficulty_levels):
+#            x = start_x
+#            y = start_y + i * (BUTTON_HEIGHT + BUTTON_SPACING)
+#            button = Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, diff["label"])
+#            button.key = diff["key"]  # 内部キーをボタンに追加
+#            self.difficulty_buttons.append(button)
 
-        # ボタンを縦に並べるための開始位置を計算
+        """
+        難易度選択ボタンを作成
+        """
+        difficulty_options = self.ui_text_translations["difficulty_options"][self.current_language]
         start_x = (WINDOW_WIDTH - BUTTON_WIDTH) // 2 - 60
         start_y = 70
-        self.difficulty_buttons = []
-    
-        for i, diff in enumerate(difficulty_levels):
-            x = start_x
-            y = start_y + i * (BUTTON_HEIGHT + BUTTON_SPACING)
-            button = Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, diff["label"])
-            button.key = diff["key"]  # 内部キーをボタンに追加
-            self.difficulty_buttons.append(button)
+        
+        print(f"[DEBUG]: difficulty_options = {difficulty_options}")
+        self.difficulty_buttons = [
+            Button(
+                x=start_x,
+                y=start_y + i * (BUTTON_HEIGHT + BUTTON_SPACING),
+                width=BUTTON_WIDTH,
+                height=BUTTON_HEIGHT,
+#                label=""
+                label=option["label"],  # ラベルはデータから取得
+                key=option["key"]      # 内部キーもセット
+            )
+            for i, option in enumerate(difficulty_options)
+        ]
 
     def create_game_buttons(self):
         """
