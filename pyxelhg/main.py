@@ -205,7 +205,6 @@ class Button:
             draw_text_func(
                 y=text_y,
                 text=self.label,
-#                color=pyxel.COLOR_WHITE,
                 color=pyxel.COLOR_GREEN,
                 align="left",        # 中央揃えっぽくしたければ 'left' + x_offset を工夫
                 x_offset=text_x,
@@ -1756,18 +1755,13 @@ class SameGame:
         self.draw_translated_text("titles_difficulty_selection", self.current_language)
         
         """難易度選択画面のボタンと説明を描画"""
-#        difficulty_options = translations["difficulty_options"]
-#        print(f"[DEBUG]: difficulty_options= {difficulty_options}")
         difficulty_options = self.ui_text_translations["difficulty_options"][self.current_language]
-        print(f"[DEBUG]: difficulty_options= {difficulty_options}")
+#        print(f"[DEBUG]: difficulty_options= {difficulty_options}")
         
         for i, button in enumerate(self.difficulty_buttons):
-            print(f"[DEBUG]: i, button= {i} {button}")
+#            print(f"[DEBUG]: i, button= {i} {button}")
             # 現在の言語に対応するボタンラベルと説明を取得
             option = difficulty_options[i]
-#            label = option["label"][self.current_language]
-##            description = option["description"][self.current_language]
-#            description = option[self.current_language]["description"]
             label = option["label"]
         
             # ボタンのホバー状態を確認
@@ -1782,19 +1776,19 @@ class SameGame:
             )
         
             # 説明文をボタンの右側に描画
-            description = option["description"]
-            self.draw_text(
-                y=button.y + 2,
-                text=description,
-                color=pyxel.COLOR_GREEN,
-                align="left",
-                x_offset=button.x + button.width + 10,
-                font=self.font_small,
-                border_color=pyxel.COLOR_NAVY
-            )
+#            description = option["description"]
+#            self.draw_text(
+#                y=button.y + 2,
+#                text=description,
+#                color=pyxel.COLOR_GREEN,
+#                align="left",
+#                x_offset=button.x + button.width + 10,
+#                font=self.font_small,
+#                border_color=pyxel.COLOR_NAVY
+#            )
 
-#            # 説明文をボタンの右側に描画
-#            self.draw_translated_text("titles_difficulty_selection", self.current_language)
+        # 説明文をボタンの右側に描画
+        self.draw_translated_text("difficulty_text", self.current_language)
 
     def draw_board_generation(self):
         board_gen_msg = translations["game_state_messages"]["board_generation"]

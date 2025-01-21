@@ -166,6 +166,72 @@
             }
         ]
     },
+    "difficulty_text": {
+        "ja": [
+            {
+                "align": "left",
+                "x_offset": 115,
+                "y": 72,
+                "text": "小さいばんめん、少ない色"
+            },
+            {
+                "align": "left",
+                "x_offset": 115,
+                "y": 97,
+                "text": "中ぐらいのばんめん、やや多い色"
+            },
+            {
+                "align": "left",
+                "x_offset": 115,
+                "y": 122,
+                "text": "制限時間あり、多い色"
+            },
+            {
+                "align": "left",
+                "x_offset": 115,
+                "y": 147,
+                "text": "短い制限時間、大きなばんめん"
+            },
+            {
+                "align": "left",
+                "x_offset": 115,
+                "y": 172,
+                "text": "とても短い時間、最大ばんめん"
+            }
+        ],
+        "en": [
+            {
+                "align": "left",
+                "x_offset": 115,
+                "y": 72,
+                "text": "Small grid, few colors"
+            },
+            {
+                "align": "left",
+                "x_offset": 115,
+                "y": 97,
+                "text": "Medium-sized grid, more colors"
+            },
+            {
+                "align": "left",
+                "x_offset": 115,
+                "y": 122,
+                "text": "Timed play, many colors"
+            },
+            {
+                "align": "left",
+                "x_offset": 115,
+                "y": 147,
+                "text": "Short time limit, large grid"
+            },
+            {
+                "align": "left",
+                "x_offset": 115,
+                "y": 172,
+                "text": "Largest grid, shortest time limit"
+            }
+        ]
+    },
     "game_state_messages_board_generation": {
         "ja": {
             "message": "ばんめんを生成ちゅう...",
