@@ -637,9 +637,9 @@ class SameGame:
         self.bgm_files = {
             GameState.OPENING: "assets/game_music/opening.json",
             GameState.DIFFICULTY_SELECTION: "assets/game_music/selection.json",
-            GameState.GAME_START: "assets/game_music/gameplay_start.json",
-            GameState.GAME_MID: "assets/game_music/gameplay_mid.json",
-            GameState.GAME_END: "assets/game_music/gameplay_end.json",
+#            GameState.GAME_START: "assets/game_music/gameplay_start.json",
+#            GameState.GAME_MID: "assets/game_music/gameplay_mid.json",
+#            GameState.GAME_END: "assets/game_music/gameplay_end.json",
             GameState.TIME_UP: "assets/game_music/time_up.json",
             GameState.NO_MOVES: "assets/game_music/no_moves.json",
             GameState.GAME_CLEARED: "assets/game_music/cleared.json",
@@ -1414,9 +1414,6 @@ class SameGame:
                 # 6) 画面を揺らすフラグをセット
                 # シェイクレベルをポイントに応じて増やす
                 # 点数ごとに+1, 最長20フレーム
-#                self.shake_magnitude = min(5, 1 + points_gained // 500)
-#                self.shake_magnitude = min(8, 1 + points_gained // 500)
-#                self.shake_timer = min(20, 2 + points_gained // 100)
                 self.shake_magnitude = min(15, 2 + points_gained // 100)
                 self.shake_timer = min(30, 4 + points_gained // 100)
 #                print(f"Debug: shake_magnitude={self.shake_magnitude}, shake_timer={self.shake_timer}, points_gained={points_gained}")
