@@ -1,6 +1,6 @@
 # HadeGame
 
-[ [English](README.md) | [日本語](README.ja.md) ]
+[ English | [日本語](README.ja.md) ]
 
 HadeGame is a simple yet profound SameGame-inspired puzzle game built with Pyxel. The goal is to clear the board by removing connected blocks of the same color. This game was created as part of a 24-hour challenge to see how far a game could be developed with the help of generative AI.
 
