@@ -506,6 +506,9 @@ class SameGame:
         # ゲームステート
         self.state = GameState.OPENING
 
+        # タイトル画像読み込み
+        self.load_image("assets/title_image.png")
+        
         # フォント読み込み
         try:
             self.font_small = self.load_font("assets/fonts/k8x12.bdf")
@@ -525,9 +528,6 @@ class SameGame:
         self.bgm_files = {
             GameState.OPENING: "assets/game_music/opening.json",
             GameState.DIFFICULTY_SELECTION: "assets/game_music/selection.json",
-#            GameState.GAME_START: "assets/game_music/gameplay_start.json",
-#            GameState.GAME_MID: "assets/game_music/gameplay_mid.json",
-#            GameState.GAME_END: "assets/game_music/gameplay_end.json",
             GameState.TIME_UP: "assets/game_music/time_up.json",
             GameState.NO_MOVES: "assets/game_music/no_moves.json",
             GameState.GAME_CLEARED: "assets/game_music/cleared.json",
@@ -631,6 +631,20 @@ class SameGame:
 
         # ゲームループ開始
         pyxel.run(self.update, self.draw)
+
+    def load_image(self, relative_path, image_bank=0, x=0, y=0):
+        """
+        Pyxelのimage bankに画像を絶対パスから読み込む。
+        
+        :param relative_path: 画像の相対パス
+        :param image_bank: Pyxelのimage bank (0〜2)
+        :param x: 読み込むX座標
+        :param y: 読み込むY座標
+        """
+        absolute_path = os.path.join(self.base_path, relative_path)
+        if not os.path.exists(absolute_path):
+            raise FileNotFoundError(f"Image file not found: {absolute_path}")
+        pyxel.image(image_bank).load(x, y, absolute_path)
 
     def load_font(self, relative_path):
         """BDFフォントを絶対パスで読み込む"""
@@ -806,8 +820,10 @@ class SameGame:
         """オープニング画面用の言語切り替えボタンを作成"""
         button_width = 20
         button_height = 20
-        x = WINDOW_WIDTH - 30 # 画面右に配置
-        y =  10 # 画面上部に配置
+#        x = WINDOW_WIDTH - 30 # 画面右に配置
+#        y =  10 # 画面上部に配置
+        x = WINDOW_WIDTH - 28 # 画面右に配置
+        y =  7 # 画面上部に配置
         self.language_button = Button(x, y, button_width, button_height, "EN")
 
     def create_difficulty_buttons(self):
@@ -1591,6 +1607,10 @@ class SameGame:
         return shake_x, shake_y
 
     def draw_opening(self):
+        # タイトル画像の描画
+#        pyxel.blt(8, 80, 0, 0, 0, 256, 146)  # 読み込んだ画像を描画
+        pyxel.blt(8, 34, 0, 0, 0, 256, 146)  # 読み込んだ画像を描画
+        
         """開始画面のテキストを描画"""
         self.draw_translated_text("titles_game_title", self.current_language)
 

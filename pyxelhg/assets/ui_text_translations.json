@@ -7,33 +7,29 @@
         "ja": [
             {
                 "align": "center",
-                "y": 40,
+                "y": 12,
                 "text": "はでがめ - HaDe Game",
-                "color": "WHITE",
-                "border_color": "NAVY"
+                "color": "RED"
             },
             {
                 "align": "center",
-                "y": 180,
+                "y": 225,
                 "text": "クリックするのじゃ。",
-                "color": "LIME",
-                "border_color": "NAVY"
+                "color": "LIME"
             }
         ],
         "en": [
             {
                 "align": "center",
-                "y": 40,
+                "y": 12,
                 "text": "HaDe (Hallowed Demolition) Game",
-                "color": "WHITE",
-                "border_color": "NAVY"
+                "color": "RED"
             },
             {
                 "align": "center",
-                "y": 180,
+                "y": 225,
                 "text": "Click, and proceed you will.",
-                "color": "LIME",
-                "border_color": "NAVY"
+                "color": "LIME"
             }
         ]
     },
@@ -42,21 +38,21 @@
             {
                 "align": "left",
                 "x_offset": 64,
-                "y": 90,
+                "y": 180,
                 "text": "・つながるブロックを消すのだ。",
                 "color": "WHITE"
             },
             {
                 "align": "left",
                 "x_offset": 64,
-                "y": 110,
+                "y": 195,
                 "text": "・まとめて消せばフォースは強まる。",
                 "color": "WHITE"
             },
             {
                 "align": "left",
                 "x_offset": 64,
-                "y": 130,
+                "y": 210,
                 "text": "・すべてのブロックを消し去れ！",
                 "color": "WHITE"
             }
@@ -65,21 +61,21 @@
             {
                 "align": "left",
                 "x_offset": 50,
-                "y": 90,
+                "y": 180,
                 "text": "- Connected blocks, clear them you will.",
                 "color": "WHITE"
             },
             {
                 "align": "left",
                 "x_offset": 50,
-                "y": 110,
+                "y": 195,
                 "text": "- Clear many at once, stronger the Force.",
                 "color": "WHITE"
             },
             {
                 "align": "left",
                 "x_offset": 50,
-                "y": 130,
+                "y": 210,
                 "text": "- All blocks, cleared they shall be.",
                 "color": "WHITE"
             }
