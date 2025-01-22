@@ -54,34 +54,49 @@ HadeGame is a simple yet profound SameGame-inspired puzzle game built with Pyxel
 - **Pyxel Official**: [Pyxel Official Site](https://github.com/kitao/pyxel)
 - **Advent Calendar Article**: [Creating a Pyxel Game with Minimal Coding - Qiita](https://qiita.com/hann-solo/items/e417c29c22d008752f60)
 
-## Story
+## The Trial of Eiris
 
-In the distant future, humanity has migrated its consciousness to a virtual realm called "Verse," abandoning physical bodies in pursuit of eternal comfort. Although the Verse appears orderly and harmonious, individual minds are entangled in countless "Klesha Blocks," losing their true freedom.
+Eiris found herself trapped in a heavy, restless sleep.
 
----
+In an endless expanse of darkness, she was surrounded by colossal blocks. From each block, whispers emerged—“Anger,” “Fear,” “Attachment.” These were the Kleshas, the latent desires and emotions that lingered within her heart.
 
-You, "Neo," live a monotonous existence as an ordinary citizen of the Verse. Despite a seemingly fulfilling life, you feel an unexplainable void. One day, an unexpected message appears on your device.
+### The Outer Rim Planet of Zalvan
 
----
+That evening, Eiris accompanied Master Yoda on a mission to the remote Outer Rim planet of Zalvan. Suddenly, they were ambushed by enemy forces. Amidst the raging sandstorm, red lightsabers flashed against the swirling winds, turning the mission into a fierce battle between Jedi and Sith.
 
-"Neo, do you seek the truth of this world?
-If so, embark on a journey to erase the Kleshas."
+Eiris charged through the battlefield, her lightsaber cutting through the chaos. Then, she caught sight of a figure cloaked in black standing in the distance. Despite the storm, his presence was strikingly vivid.
 
----
+When the man turned to face her, Eiris froze. The face before her was unmistakable. Memories of childhood, of holding hands and sharing laughs, flooded her mind.
 
-The sender, a mysterious entity named "Trinity," reveals the presence of the "108 Factors," an AI system that binds humanity with Klesha Blocks. To regain true freedom, the 108 Kleshas must be destroyed.
+“...Kastia? Brother?”
 
----
-
-"To liberate this world, you must erase the 108 Kleshas. Only you can do this."
+The man said nothing. He vanished into the storm, dissolving like a phantom. Emotions Eiris had locked away for so long came rushing to the surface—joy, confusion, and above all, fear.
 
 ---
 
-Determined, you set out on a mission to destroy the Klesha Blocks with your own hands. Thus begins your fight for freedom.
+Was he truly there? Or was it just a vision? Eiris couldn’t stop questioning it as their ship departed the planet. Suddenly, her communicator lit up with an incoming message. A holo transmission from an unknown sender.
 
----
+The image of a man cloaked in black appeared. Kastia.
 
-"Break the Kleshas with a single touch. The truth awaits beyond."
+“Eiris. What you saw was true—I am no longer the Kastia you once knew. I’ve come to understand the truth of the Sith teachings and gained real power. The Jedi cannot protect anything. Someday, you’ll understand.”
+
+The transmission ended abruptly.
+
+### The Klesha Blocks
+
+When Eiris awoke, she found herself in a strange, otherworldly realm. Floating before her were 108 massive blocks, radiating an ominous energy that seemed to corrode the Force itself.
+
+Master Yoda’s voice resonated in her mind.
+
+“Eiris, do you sense the disturbance in the Force? Kastia’s dark side weighs heavily on your heart. You must overcome this trial before you can face him. Destroy the 108 Klesha Blocks and purify your spirit.”
+
+Eiris gripped her lightsaber tightly, trying to shake off her doubts. A green flash illuminated the darkness as she swung her blade.
+
+“I won’t lose... I’ll surpass this trial and save Kastia!” She steadied her grip on her saber, determination blazing in her eyes.
+
+“Trust in the Force, Eiris,” Yoda’s voice guided her.
+
+With her right hand gripping her saber, Eiris extended her left hand toward the Klesha Blocks, ready to take her first step into the trial ahead.
 
 ## Origin of the Name
 
