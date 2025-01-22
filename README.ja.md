@@ -56,7 +56,8 @@ HadeGame（ハデがめ）は、Pyxel製のシンプルで奥深い「さめが�
 
 ## エイリスの試練
 
-![title_image_rd.png](https://cdn-ak.f.st-hatena.com/images/fotolife/m/masatora_bd5/20250123/20250123021058.png)
+<img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/masatora_bd5/20250123/20250123021058.png" width=80%>
+
 
 エイリスは重苦しい眠りの中で夢を見た。
 
