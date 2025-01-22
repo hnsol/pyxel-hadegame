@@ -56,7 +56,7 @@ HadeGame is a simple yet profound SameGame-inspired puzzle game built with Pyxel
 
 ## The Trial of Eiris
 
-<img src="https://cdn-ak.f.st-hatena.com/images/fotolife/m/masatora_bd5/20250123/20250123021058.png" width=80%>
+![img](https://cdn-ak.f.st-hatena.com/images/fotolife/m/masatora_bd5/20250123/20250123021058.png)
 
 Eiris found herself trapped in a heavy, restless sleep.
 
@@ -73,6 +73,8 @@ When the man turned to face her, Eiris froze. The face before her was unmistakab
 “...Kastia? Brother?”
 
 The man said nothing. He vanished into the storm, dissolving like a phantom. Emotions Eiris had locked away for so long came rushing to the surface—joy, confusion, and above all, fear.
+
+--
 
 Was he truly there? Or was it just a vision? Eiris couldn’t stop questioning it as their ship departed the planet. Suddenly, her communicator lit up with an incoming message. A holo transmission from an unknown sender.
 
