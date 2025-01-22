@@ -233,13 +233,13 @@
         "ja": [
             {
                 "align": "center",
-                "y": 80,
+                "y": 73,
                 "text": "時間ぎれ？否、おまえが弱いのだ！",
                 "color": "RED"
             },
             {
                 "align": "center",
-                "y": 120,
+                "y": 143,
                 "text": "時間をみかたにするのじゃ。そりゃ、もういちど！",
                 "color": "LIME"
             }
@@ -247,13 +247,13 @@
         "en": [
             {
                 "align": "center",
-                "y": 80,
+                "y": 73,
                 "text": "Out of time? No, it’s you who is weak!",
                 "color": "RED"
             },
             {
                 "align": "center",
-                "y": 120,
+                "y": 143,
                 "text": "Make time your ally. Now, once more!",
                 "color": "LIME"
             }
@@ -263,13 +263,13 @@
         "ja": [
             {
                 "align": "center",
-                "y": 80,
+                "y": 73,
                 "text": "それが全力か？ あわれだな……",
                 "color": "RED"
             },
             {
                 "align": "center",
-                "y": 120,
+                "y": 143,
                 "text": "もう少し！フォースと希望がみかたじゃ！",
                 "color": "LIME"
             }
@@ -277,13 +277,13 @@
         "en": [
             {
                 "align": "center",
-                "y": 80,
+                "y": 73,
                 "text": "Is that your best? Pathetic.",
                 "color": "RED"
             },
             {
                 "align": "center",
-                "y": 120,
+                "y": 143,
                 "text": "Hope and the Force are always with you!",
                 "color": "LIME"
             }
