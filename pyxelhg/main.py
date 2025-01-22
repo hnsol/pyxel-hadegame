@@ -78,7 +78,8 @@ class Button:
 
     def draw(self, is_hovered, draw_text_func, font):
         # ボタンの塗りつぶし
-        fill_color = self.color if not is_hovered else pyxel.COLOR_YELLOW
+#        fill_color = self.color if not is_hovered else pyxel.COLOR_YELLOW
+        fill_color = self.color if not is_hovered else pyxel.COLOR_LIME
         pyxel.rect(self.x, self.y, self.width, self.height, fill_color)
 
         # ボタンラベルの描画
@@ -89,7 +90,9 @@ class Button:
             draw_text_func(
                 y=text_y,
                 text=self.label,
-                color=pyxel.COLOR_YELLOW,
+#                color=pyxel.COLOR_YELLOW,
+#                color=pyxel.COLOR_GREEN,
+                color=pyxel.COLOR_LIME,
                 align="left",
                 x_offset=text_x,
                 font=font,
@@ -191,9 +194,11 @@ class ScorePopup:
     # ティア設定（データ定義）
     TIERS = [
         {"max_score": 99, "color": pyxel.COLOR_WHITE, "vy": -1.0, "font": "font_medium"},
-        {"max_score": 999, "color": pyxel.COLOR_WHITE, "vy": -1.5, "font": "font_medium"},
+#        {"max_score": 999, "color": pyxel.COLOR_WHITE, "vy": -1.5, "font": "font_medium"},
+        {"max_score": 999, "color": pyxel.COLOR_LIME, "vy": -1.5, "font": "font_medium"},
 #        {"max_score": 4999, "color": pyxel.COLOR_YELLOW, "vy": -3.0, "font": "font_medium"},
-        {"max_score": 4999, "color": pyxel.COLOR_YELLOW, "vy": -2.0, "font": "font_large"},
+#        {"max_score": 4999, "color": pyxel.COLOR_YELLOW, "vy": -2.0, "font": "font_large"},
+        {"max_score": 4999, "color": pyxel.COLOR_GREEN, "vy": -2.0, "font": "font_large"},
         {"max_score": float("inf"), "color": pyxel.COLOR_RED, "vy": -2.5, "font": "font_large"},
     ]
 
@@ -806,28 +811,6 @@ class SameGame:
         self.language_button = Button(x, y, button_width, button_height, "EN")
 
     def create_difficulty_buttons(self):
-#        # 現在の言語で難易度情報を取得
-#        difficulty_levels = [
-#            {
-#                "key": option["key"],
-#                "label": option["label"][self.current_language],
-#                "description": option["description"][self.current_language]
-#            }
-#            for option in translations["difficulty_options"]
-#        ]
-#
-#        # ボタンを縦に並べるための開始位置を計算
-#        start_x = (WINDOW_WIDTH - BUTTON_WIDTH) // 2 - 60
-#        start_y = 70
-#        self.difficulty_buttons = []
-#    
-#        for i, diff in enumerate(difficulty_levels):
-#            x = start_x
-#            y = start_y + i * (BUTTON_HEIGHT + BUTTON_SPACING)
-#            button = Button(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, diff["label"])
-#            button.key = diff["key"]  # 内部キーをボタンに追加
-#            self.difficulty_buttons.append(button)
-
         """
         難易度選択ボタンを作成
         """

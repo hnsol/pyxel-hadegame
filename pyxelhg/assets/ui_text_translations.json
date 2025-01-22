@@ -16,7 +16,7 @@
                 "align": "center",
                 "y": 180,
                 "text": "クリックするのじゃ。",
-                "color": "YELLOW",
+                "color": "LIME",
                 "border_color": "NAVY"
             }
         ],
@@ -32,7 +32,7 @@
                 "align": "center",
                 "y": 180,
                 "text": "Click, and proceed you will.",
-                "color": "YELLOW",
+                "color": "LIME",
                 "border_color": "NAVY"
             }
         ]
@@ -91,7 +91,7 @@
                 "align": "center",
                 "y": 40,
                 "text": "いかに困難でも、フォースはつねに在る...",
-                "color": "YELLOW"
+                "color": "LIME"
             }
         ],
         "en": [
@@ -99,7 +99,7 @@
                 "align": "center",
                 "y": 40,
                 "text": "However hard, the Force is there...",
-                "color": "YELLOW"
+                "color": "LIME"
             }
         ]
     },
@@ -221,7 +221,7 @@
                 "align": "center",
                 "y": 120,
                 "text": "ダークサイドがうず巻き、形をなしておる……",
-                "color": "YELLOW"
+                "color": "GREEN"
             }
         ],
         "en": [
@@ -229,7 +229,7 @@
                 "align": "center",
                 "y": 120,
                 "text": "The dark side swirls, taking shape it is...",
-                "color": "YELLOW"
+                "color": "GREEN"
             }
         ]
     },
@@ -245,7 +245,7 @@
                 "align": "center",
                 "y": 120,
                 "text": "時間をみかたにするのじゃ。そりゃ、もういちど！",
-                "color": "YELLOW"
+                "color": "LIME"
             }
         ],
         "en": [
@@ -259,7 +259,7 @@
                 "align": "center",
                 "y": 120,
                 "text": "Make time your ally. Now, once more!",
-                "color": "YELLOW"
+                "color": "LIME"
             }
         ]
     },
@@ -275,7 +275,7 @@
                 "align": "center",
                 "y": 120,
                 "text": "もう少し！フォースと希望がみかたじゃ！",
-                "color": "YELLOW"
+                "color": "LIME"
             }
         ],
         "en": [
@@ -289,7 +289,7 @@
                 "align": "center",
                 "y": 120,
                 "text": "Hope and the Force are always with you!",
-                "color": "YELLOW"
+                "color": "LIME"
             }
         ]
     },
@@ -314,7 +314,7 @@
                 "align": "center",
                 "y": 160,
                 "text": "うむ、うむ！悪くないぞ！",
-                "color": "YELLOW"
+                "color": "LIME"
             }
         ],
         "en": [
@@ -337,7 +337,7 @@
                 "align": "center",
                 "y": 160,
                 "text": "Hmm, hmm! Not bad, it is!",
-                "color": "YELLOW"
+                "color": "LIME"
             }
         ]
     },
@@ -353,7 +353,7 @@
                 "align": "center",
                 "y": 160,
                 "text": "しばしの休息じゃな…",
-                "color": "YELLOW"
+                "color": "LIME"
             }
         ],
         "en": [
@@ -367,7 +367,7 @@
                 "align": "center",
                 "y": 160,
                 "text": "Rest, for strength you need.",
-                "color": "YELLOW"
+                "color": "LIME"
             }
         ]
     },
@@ -383,7 +383,7 @@
                 "align": "center",
                 "y": 200,
                 "text": "つぎの攻げきにそなえよ！",
-                "color": "YELLOW"
+                "color": "LIME"
             }
         ],
         "en": [
@@ -397,7 +397,7 @@
                 "align": "center",
                 "y": 200,
                 "text": "Next attack, prepare!",
-                "color": "YELLOW"
+                "color": "LIME"
             }
         ]
     },
