@@ -26,7 +26,21 @@ BUTTON_SPACING = 10
 BUTTON_AREA_HEIGHT = 40  # ボタンエリアの高さ（縦にボタンを並べるため拡大）
 STATUS_AREA_HEIGHT = 30   # 表示エリアの高さ
 
-COLORS = [1, 4, 3, 6, 2]  # 色覚多様性対応 rev02
+# 色覚多様性対応
+#COLORS = [1, 4, 3, 6, 2]  # rev02
+#COLORS = [GREEN, ORANGE, PURPLE, BLUE, RED]  # rev03
+#COLORS = [3, 9, 2, 6, 8]  # rev03
+#COLORS = [3, 6, 2, 8, 9]  # rev04 クールトーン
+#COLORS = [3, 5, 6, 12, 13]  # rev05 未来感
+#COLORS = [2, 3, 4, 6, 13]  # rev06 重厚でミステリアス
+#COLORS = [BLUE, LIGHT_BLUE, CYAN, GRAY, WHITE]  # rev07 未来感
+#COLORS = [5, 6, 12, 13, 7]  # rev07 未来感
+#COLORS = [2, 4, 8, 6, 7]  # rev08 ストーリー参考に
+#COLORS = [5, 12, 4, 6, 7]  # rev09 ストーリー参考に
+#COLORS = [5, 12, 8, 6, 7]  # rev10 ストーリー参考に
+#COLORS = [BLUE, CYAN, ORANGE, BLUE, WHITE]  # rev11 ストーリー参考に
+COLORS = [5, 12, 9, 6, 7]  # rev11 ストーリー参考に
+
 DEFAULT_TOP_SCORES = [50000, 25000, 7500, 5000, 2500, 750, 500, 250, 75, 50]  # デフォルトのトップ10スコア
 
 # 色定数の定義
@@ -1141,20 +1155,39 @@ class SameGame:
                 self.update_high_scores()
                 self.state = GameState.SCORE_DISPLAY
     
+#        elif self.state == GameState.GAME_CLEARED:
+#            if self.current_bgm != GameState.GAME_CLEARED:
+#                self.play_bgm(GameState.GAME_CLEARED)
+#
+#            # ボーナススコアの加算を1度だけ実行
+#            if not self.bonus_added:
+#                bonus_score = int(self.score * 0.8)  # 現在のスコアの50%をボーナス
+##                self.score += bonus_score
+##                self.bonus_added = True  # フラグを立てる
+##                print(f"Bonus Score Added: {bonus_score}")  # デバッグ用
+#
+#            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and not self.stars.is_transition_active():
+#                self.score += bonus_score
+##                self.bonus_added = True  # フラグを立てる
+#                self.update_high_scores()
+#                self.state = GameState.SCORE_DISPLAY
+
         elif self.state == GameState.GAME_CLEARED:
+            # BGMを切り替え
             if self.current_bgm != GameState.GAME_CLEARED:
                 self.play_bgm(GameState.GAME_CLEARED)
-
-            # ボーナススコアの加算を1度だけ実行
-            if not self.bonus_added:
-                bonus_score = int(self.score * 0.5)  # 現在のスコアの50%をボーナス
-                self.score += bonus_score
-                self.bonus_added = True  # フラグを立てる
-#                print(f"Bonus Score Added: {bonus_score}")  # デバッグ用
-
+        
+            # クリック時にボーナススコアを加算し、スコア画面に遷移
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and not self.stars.is_transition_active():
+                if not self.bonus_added:  # ボーナスがまだ加算されていない場合
+                    bonus_score = int(self.score * 0.75)  # 現在のスコアの80%をボーナス
+                    self.score += bonus_score
+                    self.bonus_added = True  # フラグを立てる
+                    print(f"Bonus Score Added: {bonus_score}, Total Score: {self.score}")  # デバッグ用
+        
                 self.update_high_scores()
                 self.state = GameState.SCORE_DISPLAY
+
 
         # 6. SCORE_DISPLAY, HIGH_SCORE_DISPLAY
         elif self.state == GameState.SCORE_DISPLAY:
