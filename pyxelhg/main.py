@@ -1741,7 +1741,6 @@ class SameGame:
 
         # スコアメッセージを描画
         self.draw_translated_text("messages_score_display", self.current_language)
-#        self.draw_text(WINDOW_HEIGHT // 2 - 10, f"{int(self.score)}", pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_NAVY)
         self.draw_text(WINDOW_HEIGHT // 2 - 10, f"{int(self.score):,}", pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_NAVY)
 
     def draw_high_score_display(self):
@@ -1752,7 +1751,6 @@ class SameGame:
         self.draw_translated_text("messages_high_score_display", self.current_language)
         for i, score in enumerate(self.high_scores):
             rank = f"{i + 1:>2}"  # 順位を右詰めで整形
-#            text = f"{rank}: {score:>6}"  # スコアを右詰めで整形
             text = f"{rank}: {score:>10,}"  # スコアを右詰めかつ3桁区切りで整形
             color = pyxel.COLOR_RED if i == self.current_score_rank else pyxel.COLOR_WHITE
             self.draw_text(60 + i * 12, text, color, align="center", border_color=pyxel.COLOR_NAVY)

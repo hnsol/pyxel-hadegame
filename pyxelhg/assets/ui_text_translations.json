@@ -234,7 +234,7 @@
             {
                 "align": "center",
                 "y": 73,
-                "text": "時間ぎれ？否、おまえが弱いのだ！",
+                "text": "時間ぎれ？ 否、おまえが弱いのだ！",
                 "color": "RED"
             },
             {
@@ -270,7 +270,7 @@
             {
                 "align": "center",
                 "y": 143,
-                "text": "もう少し！フォースと希望がみかたじゃ！",
+                "text": "もう少し！ フォースと希望がみかたじゃ！",
                 "color": "LIME"
             }
         ],
@@ -294,22 +294,22 @@
             {
                 "align": "center",
                 "y": 70,
-                "text": "やったわ！ダークサイドが…",
+                "text": "やったわ！ ダークサイドが…",
                 "color": "WHITE"
             },
             {
                 "align": "center",
                 "y": 90,
-                "text": "引いていく！……兄さん？！",
+                "text": "引いていく！ …兄さん？！",
                 "color": "WHITE"
             },
             {
-                "bonus": "フォースの覚醒: +{bonus}"
+                "bonus": "フォースの覚醒: + {bonus}"
             },
             {
                 "align": "center",
                 "y": 160,
-                "text": "うむ、うむ！悪くないぞ！",
+                "text": "うむ、うむ！ 悪くないぞ！",
                 "color": "LIME"
             }
         ],
@@ -327,7 +327,7 @@
                 "color": "WHITE"
             },
             {
-                "bonus": "Power Awakened: +{bonus}"
+                "bonus": "Power Awakened: + {bonus}"
             },
             {
                 "align": "center",
