@@ -1,7 +1,7 @@
-# title: Pyxel SameGame
+# title: Hade Game
 # author: hann-solo
-# desc: A simple SameGame puzzle game built with Pyxel. Clear the board by removing groups of blocks with the same color!
-# site: https://github.com/hnsol/pyxel-samegame
+# desc: A simple SameGame like puzzle game built with Pyxel. Clear the board by removing groups of blocks with the same color!
+# site: https://github.com/hnsol/pyxel-hadegame
 # license: MIT
 # version: 0.9
 
@@ -368,13 +368,10 @@ class Stars:
                     star["x"] -= dx * 0.02 * speed_factor  # 始点の移動速度を調整
                     star["y"] -= dy * 0.02 * speed_factor
 
-            # 51フレーム目から60フレーム目まで円を描く
-#            if 50 < self.transition_frame <= 60:
+            # 30フレーム目から60フレーム目まで円を描く
             if 30 < self.transition_frame <= 60:
                 self.circle_effect_active = True
                 max_radius = pyxel.height // 2
-    #                    self.circle_radius = int((self.transition_frame - 40) / 20 * max_radius)
-#                t = (self.transition_frame - 50) / 10  # 正規化（0から1）
                 t = (self.transition_frame - 30) / 30  # 正規化（0から1）
                 self.circle_radius = int(max_radius * (t ** 3))  # 二次関数で加速度的に増加
             else:
@@ -908,8 +905,6 @@ class SameGame:
         Retry, Quit ボタンを描画
         """
         # 毎フレーム、最新言語のラベルを代入
-#        retry_label = translations["button_labels"]["retry"][self.current_language]
-#        quit_label  = translations["button_labels"]["quit"][self.current_language]
         retry_label = self.ui_text_translations["button_labels"][self.current_language]["retry"]
         quit_label = self.ui_text_translations["button_labels"][self.current_language]["quit"]
     
@@ -961,10 +956,7 @@ class SameGame:
         selection_notes = " ".join([self.selection_note] * int(num_blocks * 0.5 + 1))
 
         # 消したブロック数に応じてspeedを計算
-        # 例: base_speed = 14, speed_decrement_per_block = 0.1
-        # num_blocksが増えるほどspeedが減少し、再生が速くなる
         base_speed = self.selection_speed  # 既存のスピード
-#        speed_decrement_per_block = 0.2    # ブロック数あたりの減少量
         speed_decrement_per_block = 1    # ブロック数あたりの減少量
         calculated_speed = max(4, base_speed - (speed_decrement_per_block * num_blocks))
         calculated_speed = int(calculated_speed)  # Pyxelではspeedは整数
@@ -978,7 +970,6 @@ class SameGame:
                 tones=self.selection_tone,         # 既存のトーン
                 volumes=self.selection_volume,     # 既存のボリューム
                 effects=self.selection_effect,     # 既存のエフェクト
-#                speed=self.selection_speed          # 既存のスピード
                 speed=calculated_speed               # 動的に設定されたスピード
             )
         except Exception as e:
@@ -1053,10 +1044,6 @@ class SameGame:
             if self.language_button.is_hovered(pyxel.mouse_x, pyxel.mouse_y):
                 if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                     self.current_language = "en" if self.current_language == "ja" else "ja"
-#                    print(f"Language changed to: {self.current_language}")  # デバッグ用
-                    # ボタンのラベルを翻訳データから取得して更新
-#                    self.language_button.label = translations[self.current_language]["language_button_label"]
-#                    self.language_button.label = translations["language_button"][self.current_language]
                     self.language_button.label = self.ui_text_translations["language_button"][self.current_language]
                     self.create_difficulty_buttons()  # 言語切り替え時にボタンを再生成
                     language_button_clicked = True  # ボタンが押されたことを記録
@@ -1154,40 +1141,24 @@ class SameGame:
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and not self.stars.is_transition_active():
                 self.update_high_scores()
                 self.state = GameState.SCORE_DISPLAY
-    
-#        elif self.state == GameState.GAME_CLEARED:
-#            if self.current_bgm != GameState.GAME_CLEARED:
-#                self.play_bgm(GameState.GAME_CLEARED)
-#
-#            # ボーナススコアの加算を1度だけ実行
-#            if not self.bonus_added:
-#                bonus_score = int(self.score * 0.8)  # 現在のスコアの50%をボーナス
-##                self.score += bonus_score
-##                self.bonus_added = True  # フラグを立てる
-##                print(f"Bonus Score Added: {bonus_score}")  # デバッグ用
-#
-#            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and not self.stars.is_transition_active():
-#                self.score += bonus_score
-##                self.bonus_added = True  # フラグを立てる
-#                self.update_high_scores()
-#                self.state = GameState.SCORE_DISPLAY
 
         elif self.state == GameState.GAME_CLEARED:
             # BGMを切り替え
             if self.current_bgm != GameState.GAME_CLEARED:
                 self.play_bgm(GameState.GAME_CLEARED)
-        
+
+            self.bonus_score = int(self.score * 0.75)  # 現在のスコアの75%をボーナス
+#            print(f"Bonus Score at update: {self.bonus_score}")
+
             # クリック時にボーナススコアを加算し、スコア画面に遷移
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and not self.stars.is_transition_active():
                 if not self.bonus_added:  # ボーナスがまだ加算されていない場合
-                    bonus_score = int(self.score * 0.75)  # 現在のスコアの80%をボーナス
-                    self.score += bonus_score
+                    self.score += self.bonus_score
                     self.bonus_added = True  # フラグを立てる
-                    print(f"Bonus Score Added: {bonus_score}, Total Score: {self.score}")  # デバッグ用
+#                    print(f"Bonus Score Added: {bonus_score}, Total Score: {self.score}")  # デバッグ用
         
                 self.update_high_scores()
                 self.state = GameState.SCORE_DISPLAY
-
 
         # 6. SCORE_DISPLAY, HIGH_SCORE_DISPLAY
         elif self.state == GameState.SCORE_DISPLAY:
@@ -1398,6 +1369,7 @@ class SameGame:
         
         # スコアやボーナスフラグのリセット
         self.score = 0
+        self.bonus_score = 0
         self.bonus_added = False
         
         # BGM停止などが必要であればここに入れる
@@ -1641,7 +1613,6 @@ class SameGame:
 
     def draw_opening(self):
         # タイトル画像の描画
-#        pyxel.blt(8, 80, 0, 0, 0, 256, 146)  # 読み込んだ画像を描画
         pyxel.blt(8, 34, 0, 0, 0, 256, 146)  # 読み込んだ画像を描画
         
         """開始画面のテキストを描画"""
@@ -1726,7 +1697,12 @@ class SameGame:
                     None
                 )
                 if bonus_entry:
-                    bonus_text = bonus_entry["bonus"].format(bonus=f"{int(self.score * 0.75):,}")
+#                    bonus_text = bonus_entry["bonus"].format(bonus=f"{int(self.score * 0.75):,}")
+#                    self.draw_text(WINDOW_HEIGHT // 2, bonus_text, pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_NAVY)
+
+                    # ボーナススコアをインスタンス変数から取得して描画
+#                    bonus_text = f"Bonus: {self.bonus_score:,}" if hasattr(self, "bonus_score") else "Bonus: 0"
+                    bonus_text = bonus_entry["bonus"].format(bonus=f"{int(self.bonus_score):,}")
                     self.draw_text(WINDOW_HEIGHT // 2, bonus_text, pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_NAVY)
 
                 self.draw_difficulty_label()
@@ -1826,34 +1802,6 @@ class SameGame:
         return cell_size, grid_x_start, grid_y_start
 
     def draw_difficulty_label(self):
-#        difficulty_options = translations["difficulty_options"]
-#        difficulty_levels = [
-#            {"key": option["key"], "label": option["label"][self.current_language]}
-#            for option in difficulty_options
-#        ]
-#        difficulty_keys = [level["key"] for level in difficulty_levels]
-#        
-#        current_difficulty_label = None
-#        for key, level in zip(difficulty_keys, difficulty_levels):
-#            if key == self.current_difficulty:
-#                current_difficulty_label = level["label"]
-#                break
-
-
-#        if current_difficulty_label:
-#            difficulty_text_x = WINDOW_WIDTH - 60
-#            difficulty_text_y = (BUTTON_AREA_HEIGHT - 14) // 2
-#            self.draw_text(
-#                difficulty_text_y,
-#                current_difficulty_label,
-#                pyxel.COLOR_WHITE,
-#                align="right",
-#                x_offset=10,
-#                border_color=pyxel.COLOR_DARK_BLUE
-#            )
-
-#        current_difficulty_label = self.ui_text_translations["difficulty_options"][self.current_language]["label"]
-
         # 現在の言語に対応する難易度オプションを取得
         difficulty_data = self.ui_text_translations["difficulty_options"][self.current_language]
         # current_difficulty に一致する項目を検索して label を取得
