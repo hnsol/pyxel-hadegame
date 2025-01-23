@@ -401,7 +401,8 @@ class Stars:
             for star in self.stars:
                 dx = star["x"] - center_x
                 dy = star["y"] - center_y
-                distance = math.sqrt(dx**2 + dy**2)
+#                distance = math.sqrt(dx**2 + dy**2)
+                distance = max(math.sqrt(dx**2 + dy**2), 1e-10)
                 unit_dx, unit_dy = dx / distance, dy / distance  # 単位ベクトル計算
     
                 # 星の現在位置
@@ -655,7 +656,7 @@ class SameGame:
         absolute_path = os.path.join(self.base_path, relative_path)
         if not os.path.exists(absolute_path):
             raise FileNotFoundError(f"Image file not found: {absolute_path}")
-        pyxel.image(image_bank).load(x, y, absolute_path)
+#        pyxel.image(image_bank).load(x, y, absolute_path)
 
     def load_font(self, relative_path):
         """BDFフォントを絶対パスで読み込む"""
