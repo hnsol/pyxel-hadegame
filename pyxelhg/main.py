@@ -656,7 +656,7 @@ class SameGame:
         absolute_path = os.path.join(self.base_path, relative_path)
         if not os.path.exists(absolute_path):
             raise FileNotFoundError(f"Image file not found: {absolute_path}")
-#        pyxel.image(image_bank).load(x, y, absolute_path)
+        pyxel.image(image_bank).load(x, y, absolute_path)
 
     def load_font(self, relative_path):
         """BDFフォントを絶対パスで読み込む"""
