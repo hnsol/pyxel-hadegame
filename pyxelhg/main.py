@@ -167,9 +167,9 @@ class Particle:
         self.vx = random.uniform(-1.5, 1.5)  # ランダムなX方向速度
         self.vy = random.uniform(-2.0, 1.5)  # ランダムなY方向速度
         self.gravity = 0.25  # 重力
-        self.is_special = random.random() < 0.15  # 10%で他の色を混ぜる（赤黄色黒）
+        self.is_special = random.random() < 0.15  # xx%で他の色を混ぜる（赤黄色黒）
 
-        # 5%の確率で赤またはダークグレー
+        # xx%確率で赤、ピンク、黄色、黒
         if self.is_special:
             self.color = random.choice([pyxel.COLOR_RED, pyxel.COLOR_PINK, pyxel.COLOR_YELLOW, pyxel.COLOR_BLACK])
             self.size = size * random.uniform(0.5, 0.75)  # サイズを半分程度に縮小
@@ -1704,7 +1704,7 @@ class SameGame:
                     # ボーナススコアをインスタンス変数から取得して描画
 #                    bonus_text = f"Bonus: {self.bonus_score:,}" if hasattr(self, "bonus_score") else "Bonus: 0"
                     bonus_text = bonus_entry["bonus"].format(bonus=f"{int(self.bonus_score):,}")
-                    self.draw_text(WINDOW_HEIGHT // 2, bonus_text, pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_NAVY)
+                    self.draw_text(WINDOW_HEIGHT // 2, bonus_text, pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_NAVY)
 
                 self.draw_difficulty_label()
                 self.draw_score_and_time()
@@ -1718,7 +1718,7 @@ class SameGame:
 
         # スコアメッセージを描画
         self.draw_translated_text("messages_score_display", self.current_language)
-        self.draw_text(WINDOW_HEIGHT // 2 - 10, f"{int(self.score):,}", pyxel.COLOR_RED, align="center", border_color=pyxel.COLOR_NAVY)
+        self.draw_text(WINDOW_HEIGHT // 2 - 10, f"{int(self.score):,}", pyxel.COLOR_YELLOW, align="center", border_color=pyxel.COLOR_NAVY)
 
     def draw_high_score_display(self):
         # 画面をクリア
@@ -1729,7 +1729,7 @@ class SameGame:
         for i, score in enumerate(self.high_scores):
             rank = f"{i + 1:>2}"  # 順位を右詰めで整形
             text = f"{rank}: {score:>10,}"  # スコアを右詰めかつ3桁区切りで整形
-            color = pyxel.COLOR_RED if i == self.current_score_rank else pyxel.COLOR_WHITE
+            color = pyxel.COLOR_YELLOW if i == self.current_score_rank else pyxel.COLOR_WHITE
             self.draw_text(60 + i * 12, text, color, align="center", border_color=pyxel.COLOR_NAVY)
 
     def draw_translated_text(self, key, language):
