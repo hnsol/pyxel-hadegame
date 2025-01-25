@@ -505,7 +505,8 @@ class SameGame:
         """ゲーム全体の初期化"""
 
         # 言語設定
-        self.current_language = "ja"
+#        self.current_language = "ja"
+        self.current_language = "en"
 
         # ベースパス設定
         self.base_path = os.path.dirname(os.path.abspath(__file__))
@@ -625,13 +626,14 @@ class SameGame:
         # スコア表示設定
         self.score_popups = []
 
+        # タイマー関連の変数を追加
+        self.time_frozen = False            # 時間凍結フラグ
+        self.frozen_remaining_time = 0      # 凍結時の残り時間
+        self.remaining_time = 0             # 現在の残り時間
+
         # 背景のstars設定
         self.stars = Stars(num_stars=0, bpm=120)
         self.show_message = False  # メッセージ表示のフラグ
-
-        # トランジション設定
-#        self.transition_effect = TransitionEffect()
-#        self.show_message = False  # メッセージ表示のフラグ
 
         # 画面シェイク関連の変数
         self.shake_timer = 0      # シェイクが発生しているフレーム数
@@ -718,9 +720,9 @@ class SameGame:
     def play_bgm(self, state):
         """指定された状態に対応するBGMを再生"""
         if self.current_bgm == state:
-            print(f"BGM already playing for state: {state.name}")
+#            print(f"BGM already playing for state: {state.name}")
             return  # 既に再生中の場合は何もしない
-        print(f"Switching to BGM for state in play_bgm: {state.name}")  # デバッグ用
+#        print(f"Switching to BGM for state in play_bgm: {state.name}")  # デバッグ用
 
         # 現在のBGMを停止
         self.stop_bgm()
@@ -734,7 +736,7 @@ class SameGame:
                 key: random.choice(values) if isinstance(values, list) else values
                 for key, values in custom_parm_options.items()
             }
-            print(f"Custom parameters for {state.name}: {custom_parm}")  # デバッグ用
+#            print(f"Custom parameters for {state.name}: {custom_parm}")  # デバッグ用
             self.bgm.set_parm(custom_parm)
             self.bgm.generate_music()
             self.bgm.play()
@@ -748,7 +750,7 @@ class SameGame:
             print(f"BGM data not found for state: {state.name}")  # デバッグ用
 
     def stop_bgm(self):
-        print(f"Stopping all BGM channels")
+#        print(f"Stopping all BGM channels")
         bgm_channels = [0, 1, 2]  # 0以外を消す
         for ch in bgm_channels:
             # サウンドデータをリセット（空データを設定）
@@ -836,7 +838,8 @@ class SameGame:
 #        y =  10 # 画面上部に配置
         x = WINDOW_WIDTH - 28 # 画面右に配置
         y =  7 # 画面上部に配置
-        self.language_button = Button(x, y, button_width, button_height, "EN")
+#        self.language_button = Button(x, y, button_width, button_height, "EN")
+        self.language_button = Button(x, y, button_width, button_height, "JA")
 
     def create_difficulty_buttons(self):
         """
@@ -846,7 +849,7 @@ class SameGame:
         start_x = (WINDOW_WIDTH - BUTTON_WIDTH) // 2 - 60
         start_y = 70
         
-        print(f"[DEBUG]: difficulty_options = {difficulty_options}")
+#        print(f"[DEBUG]: difficulty_options = {difficulty_options}")
         self.difficulty_buttons = [
             Button(
                 x=start_x,
@@ -995,12 +998,18 @@ class SameGame:
         # B. ゲームステートやアニメフラグに応じたブロックアニメ更新
         self.handle_animations()
 
+        # C. アクティブなゲーム状態でのみ時間更新
+        if self.state in [GameState.GAME_START, GameState.GAME_MID, GameState.GAME_END]:
+            if self.time_limit and not self.time_frozen:
+                self.remaining_time = max(0, self.time_limit - (pyxel.frame_count - self.start_time) // 30)
+
     def handle_current_state(self):
         mx, my = pyxel.mouse_x, pyxel.mouse_y
         previous_state = self.state  # ステータスの変更を追跡
 
         # stars更新
         self.stars.update()
+
 
         # トランジション終了後にメッセージ表示フラグをオンにする
         if not self.stars.is_transition_active() and not self.show_message:
@@ -1060,10 +1069,10 @@ class SameGame:
 #            print(f"GameState is: {self.state}") # デバッグ出力
             if self.current_bgm != GameState.DIFFICULTY_SELECTION:
                 self.play_bgm(GameState.DIFFICULTY_SELECTION)
-                print(f"Switching to BGM for state state name: {state.name}")  # デバッグ用
+#                print(f"Switching to BGM for state state name: {state.name}")  # デバッグ用
             for button in self.difficulty_buttons:
                 if button.is_hovered(pyxel.mouse_x, pyxel.mouse_y) and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                    print(f"Difficulty button clicked: {button.key}")
+#                    print(f"Difficulty button clicked: {button.key}")
                     self.apply_difficulty_settings(button.key)
                     self.state = GameState.BOARD_GENERATION
                     self.stop_bgm()
@@ -1132,6 +1141,10 @@ class SameGame:
         elif self.state == GameState.TIME_UP:
             if self.current_bgm != GameState.TIME_UP:
                 self.play_bgm(GameState.TIME_UP)
+            if not self.time_frozen:
+                self.time_frozen = True
+                self.frozen_remaining_time = self.remaining_time
+                self.remaining_time = 0  # タイムアップ時は0秒
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and not self.stars.is_transition_active():
                 self.update_high_scores()
                 self.state = GameState.SCORE_DISPLAY
@@ -1139,6 +1152,9 @@ class SameGame:
         elif self.state == GameState.NO_MOVES:
             if self.current_bgm != GameState.NO_MOVES:
                 self.play_bgm(GameState.NO_MOVES)
+            if not self.time_frozen:
+                self.time_frozen = True
+                self.frozen_remaining_time = self.remaining_time  # 現在の時間を保持
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and not self.stars.is_transition_active():
                 self.update_high_scores()
                 self.state = GameState.SCORE_DISPLAY
@@ -1147,6 +1163,9 @@ class SameGame:
             # BGMを切り替え
             if self.current_bgm != GameState.GAME_CLEARED:
                 self.play_bgm(GameState.GAME_CLEARED)
+            if not self.time_frozen:
+                self.time_frozen = True
+                self.frozen_remaining_time = self.remaining_time  # 現在の時間を保持
 
             self.bonus_score = int(self.score * 0.75)  # 現在のスコアの75%をボーナス
 #            print(f"Bonus Score at update: {self.bonus_score}")
@@ -1219,7 +1238,7 @@ class SameGame:
             self.score_popups = alive_popups
 
     def apply_difficulty_settings(self, difficulty_key):
-        print(f"Applying difficulty: {self.current_difficulty}")  # デバッグ出力
+#        print(f"Applying difficulty: {self.current_difficulty}")  # デバッグ出力
         # ここで現在のdifficultyを更新する
         self.current_difficulty = difficulty_key
 
@@ -1365,14 +1384,28 @@ class SameGame:
         """
         盤面以外の情報（スコアやタイマーなど）だけをリセットする処理。
         """
-        # タイマーリセット
+#        # タイマーリセット
+#        self.start_time = pyxel.frame_count if self.time_limit else 0
+        # タイマー関連のリセット
         self.start_time = pyxel.frame_count if self.time_limit else 0
+        self.time_frozen = False
+        self.frozen_remaining_time = 0
+        self.remaining_time = self.time_limit if self.time_limit else 0
         
         # スコアやボーナスフラグのリセット
         self.score = 0
         self.bonus_score = 0
         self.bonus_added = False
+
+        # アニメーション関連のリセット
+        self.is_falling = False
+        self.is_shifting = False
         
+        # エフェクト関連のリセット
+        self.shake_timer = 0
+        self.shake_magnitude = 0
+        self.particles = []
+
         # BGM停止などが必要であればここに入れる
         self.stop_bgm()
 
@@ -1841,14 +1874,36 @@ class SameGame:
         )
     
         # タイマー表示
+#        if self.time_limit:
+#            remaining_time = max(0, self.time_limit - (pyxel.frame_count - self.start_time) // 30)
+#            time_label = self.ui_text_translations["score_and_time"][self.current_language]["time_label"]
+#            time_value = f"{remaining_time}s"
+#        else:
+#            time_label = self.ui_text_translations["score_and_time"][self.current_language]["time_label"]
+#            time_value = self.ui_text_translations["score_and_time"][self.current_language]["time_no_limit"]
+#    
+#        self.draw_text(
+#            y=WINDOW_HEIGHT - STATUS_AREA_HEIGHT + 5,
+#            text=f"{time_label} {time_value}",
+#            color=pyxel.COLOR_WHITE,
+#            align="right",
+#            x_offset=10,
+#            font=self.font_small,
+#            border_color=pyxel.COLOR_NAVY
+#        )
         if self.time_limit:
-            remaining_time = max(0, self.time_limit - (pyxel.frame_count - self.start_time) // 30)
+            # 凍結状態なら保持された時間を表示
+            if self.time_frozen:
+                display_time = self.frozen_remaining_time
+            else:
+                display_time = self.remaining_time
+
             time_label = self.ui_text_translations["score_and_time"][self.current_language]["time_label"]
-            time_value = f"{remaining_time}s"
+            time_value = f"{display_time}s"
         else:
             time_label = self.ui_text_translations["score_and_time"][self.current_language]["time_label"]
             time_value = self.ui_text_translations["score_and_time"][self.current_language]["time_no_limit"]
-    
+
         self.draw_text(
             y=WINDOW_HEIGHT - STATUS_AREA_HEIGHT + 5,
             text=f"{time_label} {time_value}",
